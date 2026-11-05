@@ -1,0 +1,16 @@
+PASS: dataset scriptura:demo:001 satisfies starter contract (not scholarly review)
+  corpora: 1
+  works: 2
+  reference_schemes: 1
+  passages: 2
+  traditions: 2
+  agents: 2
+  sources: 2
+  source_locators: 2
+  claims: 2
+  claim_versions: 2
+  claim_attributions: 2
+  claim_passages: 2
+  claim_evidence: 2
+  claim_relations: 1
+  passage_relations: 1

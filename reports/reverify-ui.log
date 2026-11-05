@@ -1,0 +1,14 @@
+UI revalidation: isolated /tmp copy of /workspace/scriptura; Next.js dev server on loopback 3107
+COMMAND: NODE_PATH=/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules CHROMIUM_PATH=/usr/bin/chromium node --test tests/ui.browser.cjs
+✔ 합성 고지와 기본 검증 필터가 표시된다 (5175.789198ms)
+✔ 미검증 전환으로 합성 주장, 출처 권리와 관계가 표시된다 (168.992253ms)
+✔ 전통 필터는 근거 없는 귀속을 만들지 않는다 (92.121683ms)
+✔ 본문 선택을 바꾸면 그 본문의 결과로 갱신된다 (144.099571ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5972.657333
