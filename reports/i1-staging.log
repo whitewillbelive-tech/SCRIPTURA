@@ -1,0 +1,28 @@
+PASS: 005 applies to isolated 004 staging schema
+PASS: frozen D3 archive hash rejected by database
+PASS: failed D3 write leaves no record
+PASS: 005 rollback succeeds when staging is empty
+PASS: 005 can be reapplied
+PASS: synthetic metadata can be staged
+PASS: 005 rollback refuses existing synthetic history
+PASS: failed rollback preserves synthetic history
+PASS: 004 applies only to an empty staging DB
+PASS: create test-owned extra object
+PASS: rollback refuses additional objects
+PASS: failed rollback preserves every object
+PASS: remove only the object this test created
+PASS: empty rollback succeeds
+PASS: reapply succeeds
+test_01_repeat_is_idempotent_and_keeps_record_counts (__main__.StagingPostgresTests.test_01_repeat_is_idempotent_and_keeps_record_counts) ... ok
+test_02_all_nine_rights_and_source_hashes_are_preserved_without_payload (__main__.StagingPostgresTests.test_02_all_nine_rights_and_source_hashes_are_preserved_without_payload) ... ok
+test_03_changed_archive_same_snapshot_fails_without_partial_write (__main__.StagingPostgresTests.test_03_changed_archive_same_snapshot_fails_without_partial_write) ... ok
+test_04_owner_and_unrestricted_roles_are_rejected (__main__.StagingPostgresTests.test_04_owner_and_unrestricted_roles_are_rejected) ... ok
+test_05_immutable_provenance_and_nonempty_rollback_refused (__main__.StagingPostgresTests.test_05_immutable_provenance_and_nonempty_rollback_refused) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.139s
+
+OK
+{"archive_sha256": "4b9e17c77f86a8c4edaab8f6eea46a2539c5433b8e49880347bc873d30266fc1", "canonical_promotion": false, "payload_stored": false, "record_count": 19, "snapshot": "TEST-SYNTHETIC-ONLY-v1", "status": "staged_or_identical"}
+{"archive_sha256": "4b9e17c77f86a8c4edaab8f6eea46a2539c5433b8e49880347bc873d30266fc1", "canonical_promotion": false, "payload_stored": false, "record_count": 19, "snapshot": "TEST-SYNTHETIC-ONLY-v1", "status": "staged_or_identical"}
+PASS: all synthetic I-1 staging tests completed; temporary server will stop

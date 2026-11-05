@@ -63,3 +63,15 @@ python3 scripts/d2_bridge_cli.py dry-run /path/to/SCRIPTURA_D11_D2_RESEARCH.zip 
 ```
 
 실제 D-2 입력은 로컬 dry-run만 허용하며 주 DB로 승격하지 않는다. `scripts/stage_synthetic.py`는 외부 ZIP을 받지 않고 내부 합성 자료만 생성한다. 전용 임시 DB·분리 역할·명시적 시험 승인과 로컬 연결이 필요하며, [스테이징 안내](docs/STAGING_SCHEMA.md)와 [12종 매핑 검토](docs/DATA_BRIDGE_MAPPING.md)를 참조한다. 원문 및 임의 자유 텍스트의 저작권을 자동 판정하지 않는다.
+
+## Gate I-1 D-3 수신 검사
+
+동결 연구 ZIP은 저장소에 포함하지 않는다. 다음 명령은 정확히 고정된 D-3와 내장 D-2 원본만 읽으며, 정본 DB에 연결하거나 쓰지 않는다. 결과 파일은 새 경로에만 생성하고 기존 파일은 덮어쓰지 않는다.
+
+```sh
+python3 scripts/i1_bridge_cli.py validate /path/to/SCRIPTURA_D3_DATA_RESEARCH.zip
+python3 scripts/i1_bridge_cli.py dry-run /path/to/SCRIPTURA_D3_DATA_RESEARCH.zip
+python3 scripts/i1_bridge_cli.py ingest-preview /path/to/SCRIPTURA_D3_DATA_RESEARCH.zip --output /path/to/new-mapping-report.json --quarantine-output /path/to/new-quarantine-summary.json --private-trace D3_PRIVATE_REVIEW.json
+```
+
+공개 가능한 보고서는 집계·행 해시·보류 사유만 담는다. `--private-trace`는 원 ID·참조·파일/행, 원래 검증·권리 상태 및 본문별 비교를 `.local/i1/`에 접근 권한 0600으로 생성한다. 이 파일과 실제 ZIP은 커밋하거나 외부에 배포하지 않는다. 문서 [I-1 매핑 검토](docs/I1_MAPPING_NOTES.md), [합성 스테이징 보호](docs/I1_STAGING_GUARDS.md), [I-1 수신 기록](I1_RECEIPT.md)을 참조한다. 합성/실자료 원문의 임의 자유 텍스트 저작권 판별이나 사람의 독립 학술 심사를 자동으로 수행하지 않는다.

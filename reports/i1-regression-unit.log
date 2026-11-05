@@ -1,0 +1,90 @@
+PASS: dataset scriptura:demo:001 satisfies starter contract (not scholarly review)
+  corpora: 1
+  works: 2
+  reference_schemes: 1
+  passages: 2
+  traditions: 2
+  agents: 2
+  sources: 2
+  source_locators: 2
+  claims: 2
+  claim_versions: 2
+  claim_attributions: 2
+  claim_passages: 2
+  claim_evidence: 2
+  claim_relations: 1
+  passage_relations: 1
+PASS: checked JSON fixtures are explicitly synthetic and contain no prohibited full-text/embedding fields
+test_cannot_duplicate_ids (test_contract.ContractTests.test_cannot_duplicate_ids) ... ok
+test_cannot_publish_synthetic_data (test_contract.ContractTests.test_cannot_publish_synthetic_data) ... ok
+test_claim_evidence_requires_target (test_contract.ContractTests.test_claim_evidence_requires_target) ... ok
+test_fails_missing_foreign_key (test_contract.ContractTests.test_fails_missing_foreign_key) ... ok
+test_full_text_needs_verified_license (test_contract.ContractTests.test_full_text_needs_verified_license) ... ok
+test_interpretive_link_requires_claimant (test_contract.ContractTests.test_interpretive_link_requires_claimant) ... ok
+test_official_doctrine_person_forbidden (test_contract.ContractTests.test_official_doctrine_person_forbidden) ... ok
+test_valid_synthetic_fixture (test_contract.ContractTests.test_valid_synthetic_fixture) ... ok
+test_verified_claim_needs_provenance (test_contract.ContractTests.test_verified_claim_needs_provenance) ... ok
+test_verified_relation_requires_checked_source (test_contract.ContractTests.test_verified_relation_requires_checked_source) ... ok
+test_work_scheme_corpus_mismatch (test_contract.ContractTests.test_work_scheme_corpus_mismatch) ... ok
+test_raw_text_and_embeddings_rejected_at_any_depth (test_fixture_policy.FixturePolicyTests.test_raw_text_and_embeddings_rejected_at_any_depth) ... ok
+test_synthetic_metadata_only_fixture_allowed (test_fixture_policy.FixturePolicyTests.test_synthetic_metadata_only_fixture_allowed) ... ok
+test_unclassified_and_real_data_are_not_fixture_approved (test_fixture_policy.FixturePolicyTests.test_unclassified_and_real_data_are_not_fixture_approved) ... ok
+test_report_will_not_overwrite_existing_file (test_s1b2_cli.BridgeCliTests.test_report_will_not_overwrite_existing_file) ... ok
+test_staging_requires_explicit_test_opt_in_and_no_external_path (test_s1b2_cli.BridgeCliTests.test_staging_requires_explicit_test_opt_in_and_no_external_path) ... ok
+test_synthetic_zip_cannot_bypass_production_pin (test_s1b2_cli.BridgeCliTests.test_synthetic_zip_cannot_bypass_production_pin) ... ok
+test_existing_database_aliases_and_user_changes_do_not_bypass (test_s1b2_staging.StagingGuardTests.test_existing_database_aliases_and_user_changes_do_not_bypass) ... ok
+test_explicit_acknowledgement_and_loopback_are_required (test_s1b2_staging.StagingGuardTests.test_explicit_acknowledgement_and_loopback_are_required) ... ok
+test_malformed_url_is_fail_closed (test_s1b2_staging.StagingGuardTests.test_malformed_url_is_fail_closed) ... ok
+test_production_digest_and_non_synthetic_snapshot_fail_before_connect (test_s1b2_staging.StagingGuardTests.test_production_digest_and_non_synthetic_snapshot_fail_before_connect) ... ok
+test_rights_are_default_denied_for_every_action_and_cross_edition (test_s1b2_staging.StagingGuardTests.test_rights_are_default_denied_for_every_action_and_cross_edition) ... ok
+test_allowed_with_evidence_still_requires_independent_review (test_s1b2_validator.SyntheticValidationTests.test_allowed_with_evidence_still_requires_independent_review) ... ok
+test_checked_empty_locator_is_not_confirmed (test_s1b2_validator.SyntheticValidationTests.test_checked_empty_locator_is_not_confirmed) ... ok
+test_claim_source_verified_without_valid_history_is_not_accepted (test_s1b2_validator.SyntheticValidationTests.test_claim_source_verified_without_valid_history_is_not_accepted) ... ok
+test_compression_bomb_is_rejected_before_processing (test_s1b2_validator.SyntheticValidationTests.test_compression_bomb_is_rejected_before_processing) ... ok
+test_delta_merged_disagreement_is_rejected (test_s1b2_validator.SyntheticValidationTests.test_delta_merged_disagreement_is_rejected) ... ok
+test_duplicate_archive_path_is_rejected (test_s1b2_validator.SyntheticValidationTests.test_duplicate_archive_path_is_rejected) ... /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/zipfile/__init__.py:1625: UserWarning: Duplicate name: 'RUN_MANIFEST.json'
+  return self._open_to_write(zinfo, force_zip64=force_zip64)
+ok
+test_duplicate_edition_action_not_granted (test_s1b2_validator.SyntheticValidationTests.test_duplicate_edition_action_not_granted) ... ok
+test_duplicate_global_id_is_rejected (test_s1b2_validator.SyntheticValidationTests.test_duplicate_global_id_is_rejected) ... ok
+test_duplicate_json_keys_are_rejected (test_s1b2_validator.SyntheticValidationTests.test_duplicate_json_keys_are_rejected) ... ok
+test_duplicate_normalized_doi_does_not_become_applicable (test_s1b2_validator.SyntheticValidationTests.test_duplicate_normalized_doi_does_not_become_applicable) ... ok
+test_internal_manifest_hash_tamper_is_rejected_even_with_matching_zip_hash (test_s1b2_validator.SyntheticValidationTests.test_internal_manifest_hash_tamper_is_rejected_even_with_matching_zip_hash) ... ok
+test_invalid_nonempty_review_dates_are_rejected (test_s1b2_validator.SyntheticValidationTests.test_invalid_nonempty_review_dates_are_rejected) ... ok
+test_json_nonfinite_constants_are_rejected (test_s1b2_validator.SyntheticValidationTests.test_json_nonfinite_constants_are_rejected) ... ok
+test_manifest_declared_counts_match_merged_jsonl (test_s1b2_validator.SyntheticValidationTests.test_manifest_declared_counts_match_merged_jsonl) ... ok
+test_manifest_entry_count_and_row_count_are_enforced (test_s1b2_validator.SyntheticValidationTests.test_manifest_entry_count_and_row_count_are_enforced) ... ok
+test_missing_action_is_rejected_not_default_allowed (test_s1b2_validator.SyntheticValidationTests.test_missing_action_is_rejected_not_default_allowed) ... ok
+test_missing_source_fk_does_not_become_applicable (test_s1b2_validator.SyntheticValidationTests.test_missing_source_fk_does_not_become_applicable) ... ok
+test_mixed_synthetic_and_real_records_are_not_accepted_as_real (test_s1b2_validator.SyntheticValidationTests.test_mixed_synthetic_and_real_records_are_not_accepted_as_real) ... ok
+test_official_doctrine_cannot_be_attributed_to_individual (test_s1b2_validator.SyntheticValidationTests.test_official_doctrine_cannot_be_attributed_to_individual) ... ok
+test_outer_zip_sha_mismatch_is_rejected (test_s1b2_validator.SyntheticValidationTests.test_outer_zip_sha_mismatch_is_rejected) ... ok
+test_partial_alignment_is_not_coerced_to_verified (test_s1b2_validator.SyntheticValidationTests.test_partial_alignment_is_not_coerced_to_verified) ... ok
+test_raw_original_text_field_is_not_accepted (test_s1b2_validator.SyntheticValidationTests.test_raw_original_text_field_is_not_accepted) ... ok
+test_research_scholarly_review_requires_separate_human_review_event (test_s1b2_validator.SyntheticValidationTests.test_research_scholarly_review_requires_separate_human_review_event) ... ok
+test_scholarly_review_not_forged_from_source_verification (test_s1b2_validator.SyntheticValidationTests.test_scholarly_review_not_forged_from_source_verification) ... ok
+test_snapshot_identity_mismatch_is_rejected (test_s1b2_validator.SyntheticValidationTests.test_snapshot_identity_mismatch_is_rejected) ... ok
+test_synthetic_snapshot_recreation_is_byte_identical (test_s1b2_validator.SyntheticValidationTests.test_synthetic_snapshot_recreation_is_byte_identical) ... ok
+test_textual_narrative_requires_literary_voice_and_is_not_retyped (test_s1b2_validator.SyntheticValidationTests.test_textual_narrative_requires_literary_voice_and_is_not_retyped) ... ok
+test_unjustified_allowed_rights_not_promoted (test_s1b2_validator.SyntheticValidationTests.test_unjustified_allowed_rights_not_promoted) ... ok
+test_unknown_and_conditional_rights_never_allow_sensitive_actions (test_s1b2_validator.SyntheticValidationTests.test_unknown_and_conditional_rights_never_allow_sensitive_actions) ... ok
+test_valid_synthetic_archive_is_read_only_and_has_all_twelve_tables (test_s1b2_validator.SyntheticValidationTests.test_valid_synthetic_archive_is_read_only_and_has_all_twelve_tables) ... ok
+test_whitespace_locator_cannot_support_source_verified_claim (test_s1b2_validator.SyntheticValidationTests.test_whitespace_locator_cannot_support_source_verified_claim) ... ok
+test_zip_excessive_compression_ratio_is_rejected (test_s1b2_validator.SyntheticValidationTests.test_zip_excessive_compression_ratio_is_rejected) ... ok
+test_zip_slip_entry_is_rejected (test_s1b2_validator.SyntheticValidationTests.test_zip_slip_entry_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 55 tests in 0.416s
+
+OK
+✔ store: unknown rights, metadata-only policy and absent permission are denied (0.780974ms)
+✔ embed: unknown rights, metadata-only policy and absent permission are denied (0.115183ms)
+✔ redistribute: unknown rights, metadata-only policy and absent permission are denied (0.083495ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6.705549

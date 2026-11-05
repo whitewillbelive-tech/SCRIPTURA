@@ -1,0 +1,8 @@
+test_both_frozen_research_hashes_rejected_before_file_or_database_access (test_i1_staging.I1ResearchStagingGuards.test_both_frozen_research_hashes_rejected_before_file_or_database_access) ... ok
+test_defense_in_depth_rejects_d3_hash_even_in_forged_passing_report (test_i1_staging.I1ResearchStagingGuards.test_defense_in_depth_rejects_d3_hash_even_in_forged_passing_report) ... ok
+test_evidence_of_browse_permission_never_authorizes_other_actions (test_i1_staging.I1ResearchStagingGuards.test_evidence_of_browse_permission_never_authorizes_other_actions) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+
+OK

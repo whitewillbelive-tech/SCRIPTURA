@@ -19,6 +19,9 @@ from urllib.parse import unquote, urlsplit
 
 from .validator import EXPECTED_SHA256, EXPECTED_SNAPSHOT, TABLES, validate_archive
 
+# Frozen research data is read-only; a synthetic test pin cannot authorize it.
+D3_RESEARCH_SHA256 = 'baf206d2846544f1e1bb20622ac10c557394b71aa41cfd6e2be5bbafade347be'
+RESEARCH_ARCHIVE_SHA256 = frozenset({EXPECTED_SHA256, D3_RESEARCH_SHA256})
 TEST_ACK = 'synthetic-test-only'
 ACTIONS = frozenset({'browse', 'collect_metadata', 'store_raw', 'store_excerpt', 'index_fulltext', 'embed', 'send_to_model', 'redistribute', 'public_link'})
 DANGEROUS_ACTIONS = frozenset({'store_raw', 'store_excerpt', 'index_fulltext', 'embed', 'send_to_model', 'redistribute', 'public_link'})
@@ -96,7 +99,7 @@ def _safe_data(report, records, origin, file_hashes):
     digest = report.get('archive_sha256')
     if not isinstance(snapshot, str) or not SNAPSHOT_PATTERN.fullmatch(snapshot) or snapshot == EXPECTED_SNAPSHOT:
         raise StagingError('synthetic_snapshot_required')
-    if not isinstance(digest, str) or not SHA_PATTERN.fullmatch(digest) or digest == EXPECTED_SHA256:
+    if not isinstance(digest, str) or not SHA_PATTERN.fullmatch(digest) or digest in RESEARCH_ARCHIVE_SHA256:
         raise StagingError('synthetic_archive_required')
     origin = Path(origin).name
     if not re.fullmatch(r'[A-Za-z0-9._-]{1,160}[.]zip', origin):
@@ -207,7 +210,7 @@ def stage_synthetic(archive_path, *, expected_sha256, expected_counts, expected_
     config = _connection(env)  # Check guards before opening files or contacting DB.
     if not isinstance(expected_snapshot,str) or not SNAPSHOT_PATTERN.fullmatch(expected_snapshot) or expected_snapshot == EXPECTED_SNAPSHOT:
         raise StagingError('synthetic_snapshot_required')
-    if not isinstance(expected_sha256,str) or not SHA_PATTERN.fullmatch(expected_sha256) or expected_sha256 == EXPECTED_SHA256:
+    if not isinstance(expected_sha256,str) or not SHA_PATTERN.fullmatch(expected_sha256) or expected_sha256 in RESEARCH_ARCHIVE_SHA256:
         raise StagingError('synthetic_archive_required')
     try:
         path = Path(archive_path)

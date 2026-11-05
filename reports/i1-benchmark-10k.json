@@ -1,0 +1,50 @@
+{
+  "cpu_count": 5,
+  "generation": {
+    "archive_bytes": 185295,
+    "archive_sha256": "9d0ac944bc30b8bd8e2f4a5e0d21d2d9ecd0e5fe91840c0cd9ea5a8afc078c65",
+    "auxiliary_counts": {
+      "bibliographic_edges": 391,
+      "coverage": 460
+    },
+    "baseline_sha256": "84bb8a59eb4f813f5cc4cd61401e60ade0e8a459d39370c23a007c406b6751ce",
+    "bundles": 380,
+    "counts": {
+      "affiliations": 380,
+      "agents": 381,
+      "alignments": 381,
+      "claims": 761,
+      "editions": 381,
+      "evidence": 761,
+      "locators": 381,
+      "passages": 762,
+      "relations": 380,
+      "reviews": 761,
+      "rights": 3429,
+      "sources": 772
+    },
+    "max_rss_kib": 29112,
+    "seconds": 0.149,
+    "status": "pass",
+    "target": 10000
+  },
+  "kind": "synthetic_only",
+  "measurement": "Independent invented bundles; metadata, graph, rights and references scaled together; source/DB performance is not measured.",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "python": "3.12.14",
+  "status": "pass",
+  "target_records": 10000,
+  "validation": {
+    "all_nine_rights_denied": true,
+    "dispositions": {
+      "eligible": 0,
+      "quarantined": 10381
+    },
+    "errors": {},
+    "expected_rows": 10381,
+    "max_rss_kib": 43640,
+    "seconds": 0.291,
+    "status": "pass",
+    "total_rows": 10381
+  }
+}

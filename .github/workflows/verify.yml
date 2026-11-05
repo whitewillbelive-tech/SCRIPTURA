@@ -38,6 +38,10 @@ jobs:
         run: |
           python3 scripts/benchmark_d2.py --sources 10000
           python3 scripts/benchmark_d2.py --sources 100000
+      - name: Validate complex I-1 synthetic datasets at scale
+        run: |
+          python3 scripts/benchmark_i1.py --records 10000
+          python3 scripts/benchmark_i1.py --records 100000
       - name: Test demo API and audit
         run: npm test
       - name: Build
@@ -161,6 +165,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify staging migration and guarded rollback on empty DB
         run: python3 tests/s1b2_staging_rollback.py
+      - name: Apply I-1 research archive guard
+        run: psql -X -v ON_ERROR_STOP=1 "$SCRIPTURA_TEST_STAGING_OWNER_URL" -f db/005_i1_research_guard.sql
       - name: Provision restricted synthetic staging writer
         run: |
           psql -X -v ON_ERROR_STOP=1 "$SCRIPTURA_TEST_STAGING_OWNER_URL" <<'SQL'
@@ -175,3 +181,10 @@ jobs:
         run: |
           python3 scripts/stage_synthetic.py
           python3 scripts/stage_synthetic.py
+      - name: Verify I-1 guard in a separate synthetic database
+        env:
+          SCRIPTURA_I1_OWNER_URL: postgresql://scriptura_stage_owner:stage_owner_ci_only@127.0.0.1:5432/scriptura_staging_i1_guard
+        run: |
+          createdb --maintenance-db="$SCRIPTURA_TEST_STAGING_OWNER_URL" scriptura_staging_i1_guard
+          psql -X -v ON_ERROR_STOP=1 "$SCRIPTURA_I1_OWNER_URL" -f db/004_d2_staging.sql
+          SCRIPTURA_TEST_STAGING_OWNER_URL="$SCRIPTURA_I1_OWNER_URL" python3 tests/i1_staging_guard.py

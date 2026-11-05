@@ -1,0 +1,19 @@
+BEGIN
+DO
+CREATE SCHEMA
+REVOKE
+CREATE TABLE
+CREATE TABLE
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+REVOKE
+COMMIT
+PASS: 005 applies to isolated 004 staging schema
+PASS: frozen D3 archive hash rejected by database
+PASS: failed D3 write leaves no record
+PASS: 005 rollback succeeds when staging is empty
+PASS: 005 can be reapplied
+PASS: synthetic metadata can be staged
+PASS: 005 rollback refuses existing synthetic history
+PASS: failed rollback preserves synthetic history

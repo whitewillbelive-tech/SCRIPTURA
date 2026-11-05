@@ -1,0 +1,4 @@
+validate PASS manifest 69/69, 12 tables 2528, bibliography 11, coverage 80, DB writes 0
+dry-run PASS manifest 69/69, 12 tables 2528, bibliography 11, coverage 80, DB writes 0
+ingest-preview PASS manifest 69/69, 12 tables 2528, bibliography 11, coverage 80, DB writes 0
+D3 archive SHA-256 unchanged PASS
