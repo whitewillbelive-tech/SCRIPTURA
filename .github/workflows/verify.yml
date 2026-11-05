@@ -34,6 +34,10 @@ jobs:
           python3 scripts/check_fixture_policy.py
           python3 -m unittest discover -s tests -v
           node tests/rights-policy.test.cjs
+      - name: Validate generated synthetic-scale snapshots
+        run: |
+          python3 scripts/benchmark_d2.py --sources 10000
+          python3 scripts/benchmark_d2.py --sources 100000
       - name: Test demo API and audit
         run: npm test
       - name: Build
@@ -130,3 +134,44 @@ jobs:
           done
           curl --fail --silent http://127.0.0.1:3107/explore > /dev/null || { cat /tmp/scriptura-ci-pg-web.log; exit 1; }
           node --test tests/ui-db.browser.cjs
+
+  d2-staging:
+    name: Synthetic D-2 isolated staging
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: scriptura_stage_owner
+          POSTGRES_PASSWORD: stage_owner_ci_only
+          POSTGRES_DB: scriptura_staging_ci
+        ports:
+          - 127.0.0.1:5432:5432
+        options: >-
+          --health-cmd "pg_isready -U scriptura_stage_owner -d scriptura_staging_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      SCRIPTURA_TEST_STAGING_OWNER_URL: postgresql://scriptura_stage_owner:stage_owner_ci_only@127.0.0.1:5432/scriptura_staging_ci
+      SCRIPTURA_STAGING_DATABASE_URL: postgresql://scriptura_stage_writer:stage_writer_ci_only@127.0.0.1:5432/scriptura_staging_ci
+      SCRIPTURA_STAGING_APPROVED: synthetic-test-only
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify staging migration and guarded rollback on empty DB
+        run: python3 tests/s1b2_staging_rollback.py
+      - name: Provision restricted synthetic staging writer
+        run: |
+          psql -X -v ON_ERROR_STOP=1 "$SCRIPTURA_TEST_STAGING_OWNER_URL" <<'SQL'
+          CREATE ROLE scriptura_stage_writer LOGIN PASSWORD 'stage_writer_ci_only';
+          GRANT CONNECT ON DATABASE scriptura_staging_ci TO scriptura_stage_writer;
+          GRANT USAGE ON SCHEMA scriptura_d2_stage TO scriptura_stage_writer;
+          GRANT SELECT, INSERT ON scriptura_d2_stage.snapshots, scriptura_d2_stage.records TO scriptura_stage_writer;
+          SQL
+      - name: Verify synthetic staging against PostgreSQL
+        run: python3 tests/s1b2_staging_pg.py
+      - name: Verify synthetic staging CLI is repeatable
+        run: |
+          python3 scripts/stage_synthetic.py
+          python3 scripts/stage_synthetic.py

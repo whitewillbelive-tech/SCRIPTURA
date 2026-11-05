@@ -1,0 +1,43 @@
+{
+  "cpu_count": 5,
+  "generation": {
+    "archive_bytes": 194216,
+    "counts": {
+      "affiliations": 0,
+      "agents": 1,
+      "alignments": 1,
+      "claims": 1,
+      "editions": 1,
+      "evidence": 1,
+      "locators": 1,
+      "passages": 2,
+      "relations": 0,
+      "reviews": 1,
+      "rights": 9,
+      "sources": 10000
+    },
+    "elapsed_seconds": 0.048,
+    "merged_records": 10018,
+    "peak_rss_kib": 23900,
+    "sha256": "cf796ae382109856c5e8e80f2fce3a2aa407be0e4025b864762f1250044d249a",
+    "source_count": 10000,
+    "status": "pass"
+  },
+  "kind": "synthetic_test_only",
+  "measurement": "separate processes; RSS is per-process maximum; source count plus small linked fixtures",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "python": "3.12.14",
+  "status": "pass",
+  "validation": {
+    "dispositions": {
+      "eligible": 0,
+      "quarantined": 10018
+    },
+    "elapsed_seconds": 0.257,
+    "error_counts": {},
+    "peak_rss_kib": 52212,
+    "records_per_second": 38980.5,
+    "status": "pass",
+    "validated_records": 10018
+  }
+}

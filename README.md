@@ -52,3 +52,14 @@ npm test
 ## S-1B.1 PostgreSQL 탐색
 
 `/explore`에서 명시적으로 연구 자료 또는 합성 자료를 선택해 검색한다. PostgreSQL 설정, 마이그레이션, 별도 읽기·검수 역할과 관리자 API는 [S-1B.1 API 안내](docs/API_S1B1.md)와 [DB 보안 안내](docs/DB_S1B1.md)를 참조한다. 이는 개발 및 검증용 구현으로 개인별 운영 인증을 제공하지 않는다. Work의 S-1A 연구 ZIP은 이번 작업에 제공되지 않아 실제 자료와 제안은 통합되지 않았다.
+
+## S-1B.2 D-2 수신 검증
+
+D-2 동결 ZIP은 저장소에 포함하지 않는다. 원본을 변경하지 않는 검증과 적재 계획은 다음과 같이 실행한다. 출력 파일이 이미 있으면 덮어쓰지 않는다.
+
+```sh
+python3 scripts/d2_bridge_cli.py validate /path/to/SCRIPTURA_D11_D2_RESEARCH.zip
+python3 scripts/d2_bridge_cli.py dry-run /path/to/SCRIPTURA_D11_D2_RESEARCH.zip --output /path/to/new-report.json
+```
+
+실제 D-2 입력은 로컬 dry-run만 허용하며 주 DB로 승격하지 않는다. `scripts/stage_synthetic.py`는 외부 ZIP을 받지 않고 내부 합성 자료만 생성한다. 전용 임시 DB·분리 역할·명시적 시험 승인과 로컬 연결이 필요하며, [스테이징 안내](docs/STAGING_SCHEMA.md)와 [12종 매핑 검토](docs/DATA_BRIDGE_MAPPING.md)를 참조한다. 원문 및 임의 자유 텍스트의 저작권을 자동 판정하지 않는다.

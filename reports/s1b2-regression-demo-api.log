@@ -1,0 +1,22 @@
+
+> scriptura-s1b-demo@0.1.0 test
+> node --experimental-strip-types --test tests/*.test.ts
+
+(node:32728) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///tmp/scriptura-s1b2-baseline/tests/api.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /tmp/scriptura-s1b2-baseline/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ 기본 조회는 검증되지 않은 주장과 그래프를 숨기고 데모 경고를 포함한다 (1441.051402ms)
+✔ 명시적 미검증 토글에서만 합성 주장과 출처 및 귀속을 조회한다 (19.057814ms)
+✔ 주소 체계와 본문 주소를 함께 검색하며 없는 전통 귀속을 만들어 내지 않는다 (23.172023ms)
+✔ 관리자 API는 인증되지 않은 읽기 및 쓰기를 거부한다 (40.688625ms)
+✔ 관리자 생성은 합성 fixture만 허용하고 외부 원문을 거부한다 (35.521478ms)
+✔ 추출, 검수, 승인 이벤트를 보존하고 수정 및 삭제를 거부한다 (23.603292ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1706.77315

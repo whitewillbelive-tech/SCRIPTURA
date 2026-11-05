@@ -1,0 +1,60 @@
+
+> scriptura-s1b-demo@0.1.0 test
+> node --experimental-strip-types --test tests/*.test.ts
+
+(node:32291) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///tmp/scriptura-s1b2-baseline/tests/api.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /tmp/scriptura-s1b2-baseline/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✖ 기본 조회는 검증되지 않은 주장과 그래프를 숨기고 데모 경고를 포함한다 (45028.659909ms)
+✖ 명시적 미검증 토글에서만 합성 주장과 출처 및 귀속을 조회한다 (0.678469ms)
+✖ 주소 체계와 본문 주소를 함께 검색하며 없는 전통 귀속을 만들어 내지 않는다 (0.123005ms)
+✖ 관리자 API는 인증되지 않은 읽기 및 쓰기를 거부한다 (0.050926ms)
+✖ 관리자 생성은 합성 fixture만 허용하고 외부 원문을 거부한다 (0.048633ms)
+✖ 추출, 검수, 승인 이벤트를 보존하고 수정 및 삭제를 거부한다 (0.038308ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 45147.441578
+
+✖ failing tests:
+
+test at tests/api.test.ts:50:1
+✖ 기본 조회는 검증되지 않은 주장과 그래프를 숨기고 데모 경고를 포함한다 (45028.659909ms)
+  Error: API startup timeout
+      at TestContext.<anonymous> (file:///tmp/scriptura-s1b2-baseline/tests/api.test.ts:40:9)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at tests/api.test.ts:58:1
+✖ 명시적 미검증 토글에서만 합성 주장과 출처 및 귀속을 조회한다 (0.678469ms)
+  Error: API startup timeout
+      at TestContext.<anonymous> (file:///tmp/scriptura-s1b2-baseline/tests/api.test.ts:40:9)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at tests/api.test.ts:66:1
+✖ 주소 체계와 본문 주소를 함께 검색하며 없는 전통 귀속을 만들어 내지 않는다 (0.123005ms)
+  Error: API startup timeout
+      at TestContext.<anonymous> (file:///tmp/scriptura-s1b2-baseline/tests/api.test.ts:40:9)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at tests/api.test.ts:75:1
+✖ 관리자 API는 인증되지 않은 읽기 및 쓰기를 거부한다 (0.050926ms)
+  Error: API startup timeout
+      at TestContext.<anonymous> (file:///tmp/scriptura-s1b2-baseline/tests/api.test.ts:40:9)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at tests/api.test.ts:80:1
+✖ 관리자 생성은 합성 fixture만 허용하고 외부 원문을 거부한다 (0.048633ms)
+  Error: API startup timeout
+      at TestContext.<anonymous> (file:///tmp/scriptura-s1b2-baseline/tests/api.test.ts:40:9)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
+
+test at tests/api.test.ts:93:1
+✖ 추출, 검수, 승인 이벤트를 보존하고 수정 및 삭제를 거부한다 (0.038308ms)
+  Error: API startup timeout
+      at TestContext.<anonymous> (file:///tmp/scriptura-s1b2-baseline/tests/api.test.ts:40:9)
+      at async TestHook.run (node:internal/test_runner/test:1409:7)
