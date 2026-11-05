@@ -29,3 +29,9 @@ D-3 ZIP SHA-256 `baf206d2846544f1e1bb20622ac10c557394b71aa41cfd6e2be5bbafade347b
 - 세 읽기 명령과 입력 해시 보존: [i1-d3-receipt-check.log](reports/i1-d3-receipt-check.log). CI는 합성 자료만 사용하도록 구성했으며 현재 실행 상태는 원격 workflow를 참조한다.
 
 [005 가드 안내](docs/I1_STAGING_GUARDS.md)는 고정 D-3 해시의 합성 적재 경로 차단과 운영 보안상 한계를 설명한다. 내부 테스트 API에 대한 임의 재포장이나 고권한 DB 직접 SQL까지 방지한다고 주장하지 않는다. 사람의 학술·권리 심사, 적대적 동시성, 실제 자료 정본 적재 및 공개는 **PENDING**이다.
+
+## GitHub 반영 및 PR
+
+개발 브랜치는 `codex/scriptura-i1-d3-receipt`, 기준 브랜치는 `codex/scriptura-d2-staging-bridge`다. 구현 커밋 `0d83490ec81c564b8917139e57473355744a2497`의 [GitHub Actions 실행](https://github.com/whitewillbelive-tech/SCRIPTURA/actions/runs/42065633764)을 확인한다. 이 문서 변경 후 HEAD와 Actions 상태는 원격 브랜치에서 별도로 확인한다.
+
+Draft PR 생성 요청은 `Post https://api.github.com/graphql: Forbidden`으로 실패해 PR 번호가 없다. 별도의 우회 게시나 병합은 수행하지 않았다. [지정된 기준 브랜치 대상 비교·PR 생성 화면](https://github.com/whitewillbelive-tech/SCRIPTURA/compare/codex/scriptura-d2-staging-bridge...codex/scriptura-i1-d3-receipt?expand=1)을 사용할 수 있다.
