@@ -1,17 +1,35 @@
 import { NextResponse } from 'next/server';
 import { data, warning, claimDetails, interpretations, graph } from '../../../../lib/demo';
 import { authorized, createSample, listAudit, listSamples, addReview } from '../../../../lib/admin';
+import { pgRead, pgReview, pgAudit, dbWarning } from '../../../../lib/postgres';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 type Context = { params: Promise<{ path: string[] }> };
 function respond(body: object, status = 200) {
-  return NextResponse.json({ warning, ...body }, { status, headers: { 'Cache-Control': 'no-store' } });
+  return NextResponse.json({ dataset_kind: 'synthetic', warning, ...body }, { status, headers: { 'Cache-Control': 'no-store' } });
 }
 export async function GET(request: Request, context: Context) {
   const { path } = await context.params;
   const url = new URL(request.url);
   const include = url.searchParams.get('include_unverified') === 'true';
+  const dataset = url.searchParams.get('dataset');
+  if (dataset && dataset !== 'database' && dataset !== 'synthetic') return respond({ error: 'Invalid dataset' }, 400);
+  if (dataset === 'database') {
+    const mode = url.searchParams.get('data_mode');
+    if (mode && mode !== 'synthetic' && mode !== 'research') return respond({ dataset_kind:'database', warning:dbWarning, error:'Invalid data_mode' },400);
+    const synthetic = mode === 'synthetic';
+    const dbMeta = { dataset_kind: synthetic ? 'synthetic' : 'database', warning: synthetic ? warning : dbWarning };
+    try {
+      if (path[0] === 'admin') {
+        if (Buffer.byteLength(process.env.SCRIPTURA_ADMIN_TOKEN || '') < 32 || !authorized(request)) return respond({ dataset_kind:'database', warning:dbWarning, error:'Unauthorized' }, 401);
+        if (path.length === 2 && path[1] === 'audit') return respond({ dataset_kind:'database', warning:dbWarning, ...(await pgAudit(url.searchParams.get('entity_id'))) });
+        return respond({ dataset_kind:'database', warning:dbWarning, error:'Not found' },404);
+      }
+      const result = await pgRead(path,url,synthetic ? 'synthetic' : 'research');
+      return respond({ ...dbMeta, ...result.body },result.status);
+    } catch { return respond({ ...dbMeta, error:'Database unavailable or request invalid' },503); }
+  }
   if (path[0] === 'admin') {
     if (!authorized(request)) return respond({ error: 'Unauthorized' }, 401);
     if (path.length === 2 && path[1] === 'claims') return respond({ samples: listSamples() });
@@ -44,10 +62,17 @@ export async function GET(request: Request, context: Context) {
 export async function POST(request: Request, context: Context) {
   const { path } = await context.params;
   if (path[0] !== 'admin') return respond({ error: 'Not found' }, 404);
-  if (!authorized(request)) return respond({ error: 'Unauthorized' }, 401);
+  const requestedDataset = new URL(request.url).searchParams.get('dataset');
+  if (!authorized(request) || (requestedDataset === 'database' && Buffer.byteLength(process.env.SCRIPTURA_ADMIN_TOKEN || '') < 32)) return respond({ error: 'Unauthorized' }, 401);
   try {
     const body = await request.json();
     if (!body || typeof body !== 'object' || Array.isArray(body)) return respond({ error: 'Invalid request' }, 400);
+    const dataset = new URL(request.url).searchParams.get('dataset');
+    if (dataset && dataset !== 'database' && dataset !== 'synthetic') return respond({ error:'Invalid dataset' },400);
+    if (dataset === 'database') {
+      if (path.length === 2 && path[1] === 'reviews') return respond({ dataset_kind:'database', warning:dbWarning, review:await pgReview(body) },201);
+      return respond({ dataset_kind:'database', warning:dbWarning, error:'Not found' },404);
+    }
     if (path.length === 2 && path[1] === 'claims') {
       if (Object.keys(body).some((key) => key !== 'fixture_version_id')) return respond({ error: 'Only fixture_version_id is accepted; external content cannot be imported' }, 400);
       return respond({ sample: createSample(body.fixture_version_id) }, 201);

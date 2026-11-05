@@ -1,0 +1,2397 @@
+PG 17.11 isolated 127.0.0.1 database; commands: 001+002+003, database_s1b1.sql, database.sql, reverify-alignments.sql, 003 down/up, database_s1b1.sql
+BEGIN
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+COMMIT
+BEGIN
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+COMMIT
+BEGIN
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+DO
+REVOKE
+COMMIT
+BEGIN
+CREATE FUNCTION
+INSERT 0 2
+INSERT 0 1
+INSERT 0 3
+INSERT 0 4
+INSERT 0 4
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ id  
+-----
+ ver
+(1 row)
+
+DO
+CREATE ROLE
+GRANT
+GRANT
+SET
+CREATE TABLE
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+RESET
+PASS: S1B.1 integrity, approval, classification, rights metadata and append-only audit (18 assertions)
+ROLLBACK
+BEGIN
+CREATE FUNCTION
+INSERT 0 2
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+INSERT 0 2
+INSERT 0 2
+INSERT 0 3
+DO
+PASS: many-to-many mapping
+TEST: cross-corpus work foreign key
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: missing passage foreign key
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: duplicate passage address
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: duplicate claim-passage link
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: positive revision check
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: unknown-license full-text check
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: evidence target required
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+TEST: review UPDATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: review DELETE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: review TRUNCATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance UPDATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance DELETE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance TRUNCATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+PASS: 14 PostgreSQL schema assertions (1 mapping, 7 constraints, 6 audit immutability)
+ROLLBACK
+BEGIN
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+INSERT 0 4
+INSERT 0 3
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: address mapping many-to-many in both query directions
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: alignment foreign key
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: address uniqueness
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: self alignment check
+DO
+INSERT 0 1
+OBSERVATION: duplicate from/to/type alignment accepted; missing uniqueness constraint remains documented
+ROLLBACK
+BEGIN
+LOCK TABLE
+DO
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP TRIGGER
+DROP TRIGGER
+DROP TRIGGER
+DROP FUNCTION
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+COMMIT
+BEGIN
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+DO
+REVOKE
+COMMIT
+BEGIN
+CREATE FUNCTION
+INSERT 0 2
+INSERT 0 1
+INSERT 0 3
+INSERT 0 4
+INSERT 0 4
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ id  
+-----
+ ver
+(1 row)
+
+DO
+CREATE ROLE
+GRANT
+GRANT
+SET
+CREATE TABLE
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+RESET
+PASS: S1B.1 integrity, approval, classification, rights metadata and append-only audit (18 assertions)
+ROLLBACK
+INSERT 0 1
+BEGIN
+LOCK TABLE
+psql:db/003_research_integrity.down.sql:9: ERROR:  rollback refused: corpora contains classified data
+CONTEXT:  PL/pgSQL function inline_code_block line 4 at RAISE
+PASS: classified data rollback refused, no data removed
+  id   | data_class 
+-------+------------
+ guard | synthetic
+(1 row)
+
+DELETE 1
+BEGIN
+LOCK TABLE
+DO
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP TRIGGER
+DROP TRIGGER
+DROP TRIGGER
+DROP FUNCTION
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+COMMIT
+BEGIN
+LOCK TABLE
+DO
+DROP TRIGGER
+DROP TRIGGER
+DROP FUNCTION
+COMMIT
+BEGIN
+LOCK TABLE
+DO
+DROP TABLE
+COMMIT
+BEGIN
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+COMMIT
+BEGIN
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+COMMIT
+BEGIN
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+DO
+REVOKE
+COMMIT
+PASS: complete empty rollback and reapply; classified-data guard verified
+Repeat final tests/database_s1b1.sql: 20 checks (14 expected errors and 6 assertion blocks); earlier draft test had a temp-table shadowed assertion and was corrected.
+BEGIN
+CREATE FUNCTION
+INSERT 0 2
+INSERT 0 1
+INSERT 0 3
+INSERT 0 4
+INSERT 0 4
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ id  
+-----
+ ver
+(1 row)
+
+DO
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+CREATE ROLE
+GRANT
+GRANT
+SET
+CREATE TABLE
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id 
+----
+ v2
+(1 row)
+
+RESET
+DO
+PASS: S1B.1 integrity, approval, classification, rights metadata and append-only audit (20 checks: 14 expected errors, 6 assertion blocks)
+ROLLBACK
+Final 003 with mixed-origin support rejection, new DB, 003 down/up and rerun
+BEGIN
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+COMMIT
+BEGIN
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+COMMIT
+BEGIN
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+DO
+REVOKE
+COMMIT
+BEGIN
+CREATE FUNCTION
+INSERT 0 3
+INSERT 0 1
+INSERT 0 3
+INSERT 0 5
+INSERT 0 5
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ id  
+-----
+ ver
+(1 row)
+
+DO
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+CREATE ROLE
+GRANT
+GRANT
+SET
+CREATE TABLE
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id 
+----
+ v2
+(1 row)
+
+RESET
+DO
+PASS: S1B.1 integrity, approval, classification, rights metadata and append-only audit (21 checks: 15 expected errors, 6 assertion blocks)
+ROLLBACK
+BEGIN
+CREATE FUNCTION
+INSERT 0 2
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+INSERT 0 2
+INSERT 0 2
+INSERT 0 3
+DO
+PASS: many-to-many mapping
+TEST: cross-corpus work foreign key
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: missing passage foreign key
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: duplicate passage address
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: duplicate claim-passage link
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: positive revision check
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: unknown-license full-text check
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: evidence target required
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+TEST: review UPDATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: review DELETE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: review TRUNCATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance UPDATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance DELETE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance TRUNCATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+PASS: 14 PostgreSQL schema assertions (1 mapping, 7 constraints, 6 audit immutability)
+ROLLBACK
+BEGIN
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+INSERT 0 4
+INSERT 0 3
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: address mapping many-to-many in both query directions
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: alignment foreign key
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: address uniqueness
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: self alignment check
+DO
+INSERT 0 1
+OBSERVATION: duplicate from/to/type alignment accepted; missing uniqueness constraint remains documented
+ROLLBACK
+BEGIN
+LOCK TABLE
+DO
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP TRIGGER
+DROP TRIGGER
+DROP TRIGGER
+DROP FUNCTION
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+COMMIT
+BEGIN
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+DO
+REVOKE
+COMMIT
+BEGIN
+CREATE FUNCTION
+INSERT 0 3
+INSERT 0 1
+INSERT 0 3
+INSERT 0 5
+INSERT 0 5
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ id  
+-----
+ ver
+(1 row)
+
+DO
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+CREATE ROLE
+GRANT
+GRANT
+SET
+CREATE TABLE
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id 
+----
+ v2
+(1 row)
+
+RESET
+DO
+PASS: S1B.1 integrity, approval, classification, rights metadata and append-only audit (21 checks: 15 expected errors, 6 assertion blocks)
+ROLLBACK
+Final repeat adds synthetic passage and synthetic related-claim mixed-origin approval cases:
+BEGIN
+CREATE FUNCTION
+INSERT 0 3
+INSERT 0 1
+INSERT 0 3
+INSERT 0 5
+INSERT 0 5
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+UPDATE 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ id  
+-----
+ ver
+(1 row)
+
+DO
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+CREATE ROLE
+GRANT
+GRANT
+SET
+CREATE TABLE
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id 
+----
+ v2
+(1 row)
+
+RESET
+DO
+PASS: S1B.1 integrity, approval, classification, rights metadata and append-only audit (23 checks: 17 expected errors, 6 assertion blocks)
+ROLLBACK
+Final fresh DB and rollback/reapply: 24 checks, plus baseline tests and address mappings.
+BEGIN
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+COMMIT
+BEGIN
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+COMMIT
+BEGIN
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+DO
+REVOKE
+COMMIT
+BEGIN
+CREATE FUNCTION
+INSERT 0 3
+INSERT 0 1
+INSERT 0 3
+INSERT 0 5
+INSERT 0 5
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+UPDATE 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ id  
+-----
+ ver
+(1 row)
+
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+CREATE ROLE
+GRANT
+GRANT
+SET
+CREATE TABLE
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id 
+----
+ v2
+(1 row)
+
+RESET
+DO
+PASS: S1B.1 integrity, approval, classification, rights metadata and append-only audit (24 checks: 18 expected errors, 6 assertion blocks)
+ROLLBACK
+BEGIN
+CREATE FUNCTION
+INSERT 0 2
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+INSERT 0 2
+INSERT 0 2
+INSERT 0 3
+DO
+PASS: many-to-many mapping
+TEST: cross-corpus work foreign key
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: missing passage foreign key
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: duplicate passage address
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: duplicate claim-passage link
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: positive revision check
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: unknown-license full-text check
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: evidence target required
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+TEST: review UPDATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: review DELETE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: review TRUNCATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance UPDATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance DELETE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance TRUNCATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+PASS: 14 PostgreSQL schema assertions (1 mapping, 7 constraints, 6 audit immutability)
+ROLLBACK
+BEGIN
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+INSERT 0 4
+INSERT 0 3
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: address mapping many-to-many in both query directions
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: alignment foreign key
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: address uniqueness
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: self alignment check
+DO
+INSERT 0 1
+OBSERVATION: duplicate from/to/type alignment accepted; missing uniqueness constraint remains documented
+ROLLBACK
+BEGIN
+LOCK TABLE
+DO
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP TRIGGER
+DROP TRIGGER
+DROP TRIGGER
+DROP FUNCTION
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+COMMIT
+BEGIN
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+DO
+REVOKE
+COMMIT
+BEGIN
+CREATE FUNCTION
+INSERT 0 3
+INSERT 0 1
+INSERT 0 3
+INSERT 0 5
+INSERT 0 5
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+UPDATE 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ id  
+-----
+ ver
+(1 row)
+
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+CREATE ROLE
+GRANT
+GRANT
+SET
+CREATE TABLE
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id 
+----
+ v2
+(1 row)
+
+RESET
+DO
+PASS: S1B.1 integrity, approval, classification, rights metadata and append-only audit (24 checks: 18 expected errors, 6 assertion blocks)
+ROLLBACK
+Final fresh DB and rollback/reapply: 26 checks including attribution identity protection; baseline and mappings.
+BEGIN
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+COMMIT
+BEGIN
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+COMMIT
+BEGIN
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+DO
+REVOKE
+COMMIT
+BEGIN
+CREATE FUNCTION
+INSERT 0 3
+INSERT 0 1
+INSERT 0 3
+INSERT 0 5
+INSERT 0 5
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+UPDATE 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ id  
+-----
+ ver
+(1 row)
+
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+CREATE ROLE
+GRANT
+GRANT
+SET
+CREATE TABLE
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id 
+----
+ v2
+(1 row)
+
+RESET
+DO
+PASS: S1B.1 integrity, approval, classification, rights metadata and append-only audit (26 checks: 20 expected errors, 6 assertion blocks)
+ROLLBACK
+BEGIN
+CREATE FUNCTION
+INSERT 0 2
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+INSERT 0 2
+INSERT 0 2
+INSERT 0 3
+DO
+PASS: many-to-many mapping
+TEST: cross-corpus work foreign key
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: missing passage foreign key
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: duplicate passage address
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: duplicate claim-passage link
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: positive revision check
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: unknown-license full-text check
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: evidence target required
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+TEST: review UPDATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: review DELETE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: review TRUNCATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance UPDATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance DELETE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance TRUNCATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+PASS: 14 PostgreSQL schema assertions (1 mapping, 7 constraints, 6 audit immutability)
+ROLLBACK
+BEGIN
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+INSERT 0 4
+INSERT 0 3
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: address mapping many-to-many in both query directions
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: alignment foreign key
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: address uniqueness
+psql:tests/reverify-alignments.sql:17: NOTICE:  PASS: self alignment check
+DO
+INSERT 0 1
+OBSERVATION: duplicate from/to/type alignment accepted; missing uniqueness constraint remains documented
+ROLLBACK
+BEGIN
+LOCK TABLE
+DO
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP FUNCTION
+DROP TRIGGER
+DROP TRIGGER
+DROP TRIGGER
+DROP TRIGGER
+DROP FUNCTION
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+COMMIT
+BEGIN
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+DO
+REVOKE
+COMMIT
+BEGIN
+CREATE FUNCTION
+INSERT 0 3
+INSERT 0 1
+INSERT 0 3
+INSERT 0 5
+INSERT 0 5
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+UPDATE 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id  
+-----
+ ver
+(1 row)
+
+DO
+ id  
+-----
+ ver
+(1 row)
+
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+INSERT 0 1
+INSERT 0 1
+ expect_error 
+--------------
+ 
+(1 row)
+
+DO
+CREATE ROLE
+GRANT
+GRANT
+SET
+CREATE TABLE
+ expect_error 
+--------------
+ 
+(1 row)
+
+ expect_error 
+--------------
+ 
+(1 row)
+
+ id 
+----
+ v2
+(1 row)
+
+RESET
+DO
+PASS: S1B.1 integrity, approval, classification, rights metadata and append-only audit (26 checks: 20 expected errors, 6 assertion blocks)
+ROLLBACK

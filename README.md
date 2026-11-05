@@ -48,3 +48,7 @@ npm test
 ```
 
 `npm test`는 임시 DB와 루프백 서버를 사용한다. 브라우저 검증은 Playwright와 Chromium이 별도로 필요하다. 테스트 서버를 3107번 포트에서 실행한 후 `node --test tests/ui.browser.cjs`를 실행한다. 환경별 결과와 Gate 판정은 [S1B_REPORT.md](docs/S1B_REPORT.md)에 기록한다. 첨부의 문서는 시작 시점 초안으로 보존했다.
+
+## S-1B.1 PostgreSQL 탐색
+
+`/explore`에서 명시적으로 연구 자료 또는 합성 자료를 선택해 검색한다. PostgreSQL 설정, 마이그레이션, 별도 읽기·검수 역할과 관리자 API는 [S-1B.1 API 안내](docs/API_S1B1.md)와 [DB 보안 안내](docs/DB_S1B1.md)를 참조한다. 이는 개발 및 검증용 구현으로 개인별 운영 인증을 제공하지 않는다. Work의 S-1A 연구 ZIP은 이번 작업에 제공되지 않아 실제 자료와 제안은 통합되지 않았다.

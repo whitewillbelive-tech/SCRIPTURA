@@ -59,7 +59,7 @@ export default function Home() {
   const short = (id: string) => claims.find(c => c.id === id)?.statement ?? id;
   return <main>
     <div className="notice"><span className="notice-dot"/> 합성 데모 / 실제 학술 데이터 아님 <span className="notice-note">모든 주장과 출처는 개발을 위한 가상 예시입니다.</span></div>
-    <header className="topbar"><a className="brand" href="/"><span className="brand-mark">S</span><span>SCRIPTURA<small>INTERPRETATION EXPLORER</small></span></a><span className="header-badge">연구 프로토타입 <span>·</span> v0.1</span></header>
+    <header className="topbar"><a className="brand" href="/"><span className="brand-mark">S</span><span>SCRIPTURA<small>INTERPRETATION EXPLORER</small></span></a><a className="header-badge" href="/explore">연구 자료 탐색 →</a></header>
     <div className="shell">
       <section className="intro"><div><div className="eyebrow"><span>01</span> INTERPRETATION EXPLORER</div><h1>하나의 본문,<br/><em>다양한 관점.</em></h1><p>본문을 선택하고 가상의 주장과 그 근거를 살펴보세요.<br/>해석의 연결을 따라가며 출처와 검증 상태를 함께 확인할 수 있습니다.</p></div><div className="intro-mark" aria-hidden="true">§<span>TEXT / CONTEXT / CONNECTION</span></div></section>
       <section className="workspace" aria-label="본문 탐색">

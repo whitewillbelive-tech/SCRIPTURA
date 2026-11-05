@@ -1,0 +1,127 @@
+name: Verify SCRIPTURA
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+
+jobs:
+  demo:
+    name: Fixture, demo API, build and browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Validate synthetic fixture and contract
+        run: |
+          python3 scripts/validate_fixture.py fixtures/demo_valid.json
+          python3 scripts/check_fixture_policy.py
+          python3 -m unittest discover -s tests -v
+          node tests/rights-policy.test.cjs
+      - name: Test demo API and audit
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Install browser test dependencies
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Test demo UI in Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run start -- --hostname 127.0.0.1 --port 3107 > /tmp/scriptura-ci-web.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3107/ > /dev/null; then break; fi
+            if ! kill -0 "$server_pid" 2>/dev/null; then cat /tmp/scriptura-ci-web.log; exit 1; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:3107/ > /dev/null || { cat /tmp/scriptura-ci-web.log; exit 1; }
+          node --test tests/ui.browser.cjs
+
+  postgres:
+    name: PostgreSQL migrations and integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: scriptura_test
+          POSTGRES_PASSWORD: scriptura_ci_only
+          POSTGRES_DB: scriptura_synthetic_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U scriptura_test -d scriptura_synthetic_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      DATABASE_URL: postgresql://scriptura_test:scriptura_ci_only@127.0.0.1:5432/scriptura_synthetic_ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Apply and test migrations
+        run: |
+          psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/001_schema.sql
+          psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/002_append_only.sql
+          psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/003_research_integrity.sql
+          psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f tests/database_s1b1.sql
+          psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f tests/database.sql
+          psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f tests/reverify-alignments.sql
+      - name: Verify rollback and reapplication on empty database
+        run: |
+          psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/003_research_integrity.down.sql
+          psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/002_append_only.down.sql
+          psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/001_schema.down.sql
+          psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/001_schema.sql
+          psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/002_append_only.sql
+          psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/003_research_integrity.sql
+          psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f tests/database_s1b1.sql
+      - name: Exercise PostgreSQL-backed HTTP API and approval audit
+        run: node --test tests/pg-api.integration.mjs
+      - name: Seed an isolated synthetic-only dataset
+        run: psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f tests/seed_synthetic_pg.sql
+      - name: Build and install Chromium
+        run: |
+          npm run build
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Test PostgreSQL UI in Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run start -- --hostname 127.0.0.1 --port 3107 > /tmp/scriptura-ci-pg-web.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3107/explore > /dev/null; then break; fi
+            if ! kill -0 "$server_pid" 2>/dev/null; then cat /tmp/scriptura-ci-pg-web.log; exit 1; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:3107/explore > /dev/null || { cat /tmp/scriptura-ci-pg-web.log; exit 1; }
+          node --test tests/ui-db.browser.cjs

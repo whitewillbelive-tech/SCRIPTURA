@@ -1,0 +1,14 @@
+✔ database results hide candidates by default and isolate synthetic records (1480.339038ms)
+✔ explicit PostgreSQL synthetic mode never mixes either dataset and hides unverified by default (55.578237ms)
+✔ filters preserve attribution and supported affiliation evidence (19.054831ms)
+✔ read and review roles are distinct and limited to necessary database privileges (14.312782ms)
+✔ approval is authenticated, verifies prerequisites, and appends immutable audit events (68.64653ms)
+✔ alignments and rebuttal graph include checked locations and hide proposed data by default (55.162903ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1873.782782

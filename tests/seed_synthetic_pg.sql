@@ -1,0 +1,32 @@
+-- Synthetic developer fixture only; never use for academic or production data.
+-- A dedicated database name starting scriptura_synthetic_ is required.
+BEGIN;
+DO $$ BEGIN IF current_database() NOT LIKE 'scriptura\_synthetic\_%' ESCAPE '\' THEN RAISE EXCEPTION 'synthetic seed requires a dedicated scriptura_synthetic_* database'; END IF; END $$;
+INSERT INTO corpora (id, name, corpus_kind, data_class) VALUES ('cor:bible-demo', '성경 데모 코퍼스', 'bible', 'synthetic');
+INSERT INTO works (id, corpus_id, title, abbrev, data_class) VALUES ('wrk:isa', 'cor:bible-demo', '이사야서', 'Isa', 'synthetic');
+INSERT INTO works (id, corpus_id, title, abbrev, data_class) VALUES ('wrk:mat', 'cor:bible-demo', '마태복음', 'Matt', 'synthetic');
+INSERT INTO reference_schemes (id, corpus_id, scheme_name, data_class) VALUES ('ref:osis-demo', 'cor:bible-demo', '가상 OSIS 표기 시범', 'synthetic');
+INSERT INTO passages (id, corpus_id, work_id, scheme_id, external_ref, granularity, data_class) VALUES ('psg:isa714', 'cor:bible-demo', 'wrk:isa', 'ref:osis-demo', 'Isa.7.14', 'verse', 'synthetic');
+INSERT INTO passages (id, corpus_id, work_id, scheme_id, external_ref, granularity, data_class) VALUES ('psg:mat123', 'cor:bible-demo', 'wrk:mat', 'ref:osis-demo', 'Matt.1.23', 'verse', 'synthetic');
+INSERT INTO traditions (id, name, classification_kind, data_class) VALUES ('trd:demo-a', '가상 해석 전통 A', 'school', 'synthetic');
+INSERT INTO traditions (id, name, classification_kind, data_class) VALUES ('trd:demo-b', '가상 해석 전통 B', 'school', 'synthetic');
+INSERT INTO agents (id, display_name, agent_kind, data_class) VALUES ('agt:demo-a', '가상 연구자 A', 'person', 'synthetic');
+INSERT INTO agents (id, display_name, agent_kind, data_class) VALUES ('agt:demo-b', '가상 연구자 B', 'person', 'synthetic');
+INSERT INTO sources (id, title, creator, source_kind, storage_policy, license_status, data_class) VALUES ('src:demo-a', '가상의 연구 메모 A — 실제로 존재하지 않는 문헌', '가상 연구자 A', 'other', 'metadata_only', 'unknown', 'synthetic');
+INSERT INTO sources (id, title, creator, source_kind, storage_policy, license_status, data_class) VALUES ('src:demo-b', '가상의 연구 메모 B — 실제로 존재하지 않는 문헌', '가상 연구자 B', 'other', 'metadata_only', 'unknown', 'synthetic');
+INSERT INTO source_locators (id, source_id, locator_type, locator_value, verification_status) VALUES ('loc:demo-a', 'src:demo-a', 'section', 'fictional-section-1', 'unverified');
+INSERT INTO source_locators (id, source_id, locator_type, locator_value, verification_status) VALUES ('loc:demo-b', 'src:demo-b', 'section', 'fictional-section-2', 'unverified');
+INSERT INTO claims (id) VALUES ('clm:demo-a');
+INSERT INTO claims (id) VALUES ('clm:demo-b');
+INSERT INTO claim_versions (id, claim_id, revision_no, statement, extraction_method, review_status, revision_reason, data_class) VALUES ('clv:demo-a-1', 'clm:demo-a', 1, '(가상 예시) 이 구절의 해석에서 당대 배경을 가장 먼저 분석해야 한다.', 'human', 'extracted', 'Synthetic starter fixture', 'synthetic');
+INSERT INTO claim_versions (id, claim_id, revision_no, statement, extraction_method, review_status, revision_reason, data_class) VALUES ('clv:demo-b-1', 'clm:demo-b', 1, '(가상 예시) 후대 정경적 적용을 가장 먼저 분석해야 한다.', 'human', 'extracted', 'Synthetic starter fixture', 'synthetic');
+INSERT INTO claim_attributions (id, claim_version_id, agent_id, attribution_kind, source_locator_id, attribution_status) VALUES ('attr:demo-a', 'clv:demo-a-1', 'agt:demo-a', 'individual_opinion', 'loc:demo-a', 'unverified');
+INSERT INTO claim_attributions (id, claim_version_id, agent_id, attribution_kind, source_locator_id, attribution_status) VALUES ('attr:demo-b', 'clv:demo-b-1', 'agt:demo-b', 'individual_opinion', 'loc:demo-b', 'unverified');
+INSERT INTO claim_passages (id, claim_version_id, passage_id, link_kind) VALUES ('cp:demo-a', 'clv:demo-a-1', 'psg:isa714', 'interpretation_of');
+INSERT INTO claim_passages (id, claim_version_id, passage_id, link_kind) VALUES ('cp:demo-b', 'clv:demo-b-1', 'psg:isa714', 'interpretation_of');
+INSERT INTO claim_evidence (id, claim_version_id, source_locator_id, evidence_role, explanation, review_status) VALUES ('ev:demo-a', 'clv:demo-a-1', 'loc:demo-a', 'context', '가상의 논거 자리 표시자; 학술 자료가 아님', 'proposed');
+INSERT INTO claim_evidence (id, claim_version_id, source_locator_id, evidence_role, explanation, review_status) VALUES ('ev:demo-b', 'clv:demo-b-1', 'loc:demo-b', 'context', '가상의 논거 자리 표시자; 학술 자료가 아님', 'proposed');
+INSERT INTO claim_relations (id, from_version_id, to_version_id, relation_type, source_locator_id, review_status, rationale) VALUES ('rel:demo-1', 'clv:demo-b-1', 'clv:demo-a-1', 'qualifies', 'loc:demo-b', 'proposed', '가상 관계; 실제 논증 연결 근거 없음');
+INSERT INTO passage_relations (id, from_passage_id, to_passage_id, relation_type, source_locator_id, review_status, rationale) VALUES ('prel:demo-1', 'psg:mat123', 'psg:isa714', 'quotes', 'loc:demo-a', 'proposed', '주소 연결 기능만 시험하는 데모');
+INSERT INTO passage_alignments(id,from_passage_id,to_passage_id,alignment_type,review_status,source_locator_id,rationale) VALUES ('align:synthetic-demo','psg:isa714','psg:mat123','uncertain','proposed','loc:demo-a','합성 연결 예시, 실제 학술 주장 아님');
+COMMIT;
