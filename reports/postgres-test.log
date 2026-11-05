@@ -1,0 +1,307 @@
+PostgreSQL integration on isolated local Unix socket; 2026-11-05 UTC
+psql (PostgreSQL) 17.11 (Debian 17.11-0+deb13u1)
+COMMAND: createdb -h /tmp/scriptura-apt/socket scriptura_report_final
+COMMAND: psql -X -v ON_ERROR_STOP=1 -h /tmp/scriptura-apt/socket -d scriptura_report_final -f db/001_schema.sql -f db/002_append_only.sql -f tests/database.sql
+BEGIN
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+COMMIT
+BEGIN
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+COMMIT
+BEGIN
+CREATE FUNCTION
+INSERT 0 2
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+INSERT 0 2
+INSERT 0 2
+INSERT 0 3
+DO
+PASS: many-to-many mapping
+TEST: cross-corpus work foreign key
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: missing passage foreign key
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: duplicate passage address
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: duplicate claim-passage link
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: positive revision check
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: unknown-license full-text check
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: evidence target required
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+TEST: review UPDATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: review DELETE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: review TRUNCATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance UPDATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance DELETE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance TRUNCATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+PASS: 14 PostgreSQL schema assertions (1 mapping, 7 constraints, 6 audit immutability)
+ROLLBACK
+COMMAND: psql (same options) -f db/002_append_only.down.sql
+BEGIN
+LOCK TABLE
+DO
+DROP TRIGGER
+DROP TRIGGER
+DROP FUNCTION
+COMMIT
+COMMAND: insert synthetic corpus and attempt db/001_schema.down.sql; expected refusal
+INSERT 0 1
+BEGIN
+LOCK TABLE
+psql:db/001_schema.down.sql:15: ERROR:  rollback refused: corpora contains data
+CONTEXT:  PL/pgSQL function inline_code_block line 6 at RAISE
+PASS: nonempty schema rollback refused
+DELETE 1
+COMMAND: psql (same options) -f db/001_schema.down.sql -f db/001_schema.sql -f db/002_append_only.sql -f tests/database.sql
+BEGIN
+LOCK TABLE
+DO
+DROP TABLE
+COMMIT
+BEGIN
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+COMMIT
+BEGIN
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+COMMIT
+BEGIN
+CREATE FUNCTION
+INSERT 0 2
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+INSERT 0 2
+INSERT 0 2
+INSERT 0 3
+DO
+PASS: many-to-many mapping
+TEST: cross-corpus work foreign key
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: missing passage foreign key
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: duplicate passage address
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: duplicate claim-passage link
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: positive revision check
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: unknown-license full-text check
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: evidence target required
+ expect_error 
+--------------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+TEST: review UPDATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: review DELETE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: review TRUNCATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance UPDATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance DELETE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+TEST: provenance TRUNCATE rejected
+ expect_error 
+--------------
+ 
+(1 row)
+
+PASS: 14 PostgreSQL schema assertions (1 mapping, 7 constraints, 6 audit immutability)
+ROLLBACK
+COMMAND: insert synthetic audit event and attempt db/002_append_only.down.sql; expected refusal
+INSERT 0 1
+BEGIN
+LOCK TABLE
+psql:db/002_append_only.down.sql:8: ERROR:  rollback refused: audit history exists
+CONTEXT:  PL/pgSQL function inline_code_block line 3 at RAISE
+PASS: audit history rollback refused
+ retained_audit_events 
+-----------------------
+                     1
+(1 row)
+
+PASS: forward, down, reapply and safety refusals completed; no unexpected failures

@@ -1,0 +1,65 @@
+{
+  "metadata": {
+    "dataset_id": "scriptura:demo:001",
+    "schema_version": "0.1",
+    "is_synthetic": true,
+    "approved_for_public_display": false,
+    "note": "ALL interpretive claims and sources in this file are fictional developer examples, NOT real academic assertions."
+  },
+  "corpora": [
+    {"id": "cor:bible-demo", "name": "성경 데모 코퍼스", "corpus_kind": "bible"}
+  ],
+  "works": [
+    {"id": "wrk:isa", "corpus_id": "cor:bible-demo", "title": "이사야서", "abbrev": "Isa"},
+    {"id": "wrk:mat", "corpus_id": "cor:bible-demo", "title": "마태복음", "abbrev": "Matt"}
+  ],
+  "reference_schemes": [
+    {"id": "ref:osis-demo", "corpus_id": "cor:bible-demo", "scheme_name": "가상 OSIS 표기 시범"}
+  ],
+  "passages": [
+    {"id": "psg:isa714", "corpus_id": "cor:bible-demo", "work_id": "wrk:isa", "scheme_id": "ref:osis-demo", "external_ref": "Isa.7.14", "granularity": "verse"},
+    {"id": "psg:mat123", "corpus_id": "cor:bible-demo", "work_id": "wrk:mat", "scheme_id": "ref:osis-demo", "external_ref": "Matt.1.23", "granularity": "verse"}
+  ],
+  "traditions": [
+    {"id": "trd:demo-a", "name": "가상 해석 전통 A", "classification_kind": "school"},
+    {"id": "trd:demo-b", "name": "가상 해석 전통 B", "classification_kind": "school"}
+  ],
+  "agents": [
+    {"id": "agt:demo-a", "display_name": "가상 연구자 A", "agent_kind": "person"},
+    {"id": "agt:demo-b", "display_name": "가상 연구자 B", "agent_kind": "person"}
+  ],
+  "sources": [
+    {"id": "src:demo-a", "title": "가상의 연구 메모 A — 실제로 존재하지 않는 문헌", "creator": "가상 연구자 A", "source_kind": "other", "storage_policy": "metadata_only", "license_status": "unknown"},
+    {"id": "src:demo-b", "title": "가상의 연구 메모 B — 실제로 존재하지 않는 문헌", "creator": "가상 연구자 B", "source_kind": "other", "storage_policy": "metadata_only", "license_status": "unknown"}
+  ],
+  "source_locators": [
+    {"id": "loc:demo-a", "source_id": "src:demo-a", "locator_type": "section", "locator_value": "fictional-section-1", "verification_status": "unverified"},
+    {"id": "loc:demo-b", "source_id": "src:demo-b", "locator_type": "section", "locator_value": "fictional-section-2", "verification_status": "unverified"}
+  ],
+  "claims": [
+    {"id": "clm:demo-a"},
+    {"id": "clm:demo-b"}
+  ],
+  "claim_versions": [
+    {"id": "clv:demo-a-1", "claim_id": "clm:demo-a", "revision_no": 1, "statement": "(가상 예시) 이 구절의 해석에서 당대 배경을 가장 먼저 분석해야 한다.", "extraction_method": "human", "review_status": "extracted", "revision_reason": "Synthetic starter fixture"},
+    {"id": "clv:demo-b-1", "claim_id": "clm:demo-b", "revision_no": 1, "statement": "(가상 예시) 후대 정경적 적용을 가장 먼저 분석해야 한다.", "extraction_method": "human", "review_status": "extracted", "revision_reason": "Synthetic starter fixture"}
+  ],
+  "claim_attributions": [
+    {"id": "attr:demo-a", "claim_version_id": "clv:demo-a-1", "agent_id": "agt:demo-a", "attribution_kind": "individual_opinion", "source_locator_id": "loc:demo-a", "attribution_status": "unverified"},
+    {"id": "attr:demo-b", "claim_version_id": "clv:demo-b-1", "agent_id": "agt:demo-b", "attribution_kind": "individual_opinion", "source_locator_id": "loc:demo-b", "attribution_status": "unverified"}
+  ],
+  "claim_passages": [
+    {"id": "cp:demo-a", "claim_version_id": "clv:demo-a-1", "passage_id": "psg:isa714", "link_kind": "interpretation_of"},
+    {"id": "cp:demo-b", "claim_version_id": "clv:demo-b-1", "passage_id": "psg:isa714", "link_kind": "interpretation_of"}
+  ],
+  "claim_evidence": [
+    {"id": "ev:demo-a", "claim_version_id": "clv:demo-a-1", "source_locator_id": "loc:demo-a", "evidence_role": "context", "explanation": "가상의 논거 자리 표시자; 학술 자료가 아님", "review_status": "proposed"},
+    {"id": "ev:demo-b", "claim_version_id": "clv:demo-b-1", "source_locator_id": "loc:demo-b", "evidence_role": "context", "explanation": "가상의 논거 자리 표시자; 학술 자료가 아님", "review_status": "proposed"}
+  ],
+  "claim_relations": [
+    {"id": "rel:demo-1", "from_version_id": "clv:demo-b-1", "to_version_id": "clv:demo-a-1", "relation_type": "qualifies", "source_locator_id": "loc:demo-b", "review_status": "proposed", "rationale": "가상 관계; 실제 논증 연결 근거 없음"}
+  ],
+  "passage_relations": [
+    {"id": "prel:demo-1", "from_passage_id": "psg:mat123", "to_passage_id": "psg:isa714", "relation_type": "quotes", "source_locator_id": "loc:demo-a", "review_status": "proposed", "rationale": "주소 연결 기능만 시험하는 데모"}
+  ]
+}

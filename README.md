@@ -1,0 +1,50 @@
+# SCRIPTURA — Gate S-1B 합성 시범
+
+**합성 데모 / 실제 학술 데이터 아님. 외부 공개 금지.** 이 독립 프로젝트는 첨부된 S-0 초안과 합성 fixture를 이용하는 개발용 시범이다. 실제 문헌 수집, AI 답변, 신학 판정, 운영 배포는 하지 않는다. 원본 `fixtures/demo_valid.json`은 공개 승인되지 않았다. 검증 상태는 출처 검증을 뜻하며 신학적 사실을 판정하지 않는다.
+
+## 실행
+
+Node.js 24, npm 및 Python 3.10 이상이 필요하다. PostgreSQL 검증은 15 이상을 대상으로 한다. 프로젝트 루트에서:
+
+```sh
+npm ci
+npm run build
+npm run start -- --hostname 127.0.0.1 --port 3000
+```
+
+개발 중에는 `npm run dev -- --hostname 127.0.0.1 --port 3000`을 사용한다. 개발 서버와 빌드·API 테스트는 `.next`를 공유하므로 동시에 실행하지 않는다. 루프백에서만 사용하고 공개 네트워크에 바인딩하지 않는다. UI 기본값은 검증된 주장만 표시한다. 샘플은 모두 미검증이어서 명시적 토글이 필요하다. fixture에는 주장-전통 소속과 반박이 없으며, 제안된 `qualifies` 관계를 반박으로 바꾸지 않는다.
+
+| 변수 | 용도 | 기본값 |
+|---|---|---|
+| `SCRIPTURA_ADMIN_TOKEN` | 관리자 API Bearer 토큰. 미설정 시 관리자 API 사용 불가 | 없음 |
+| `SCRIPTURA_DEMO_DB` | 관리자 샘플 및 감사 이벤트용 SQLite 파일 경로 | `.local/demo.sqlite` |
+| `DATABASE_URL` | 별도 PostgreSQL 테스트 DB 연결 문자열 (`psql` 명령에만 사용) | 없음 |
+| `SCRIPTURA_TEST_URL` | 브라우저 테스트 대상 서버 | `http://127.0.0.1:3107` |
+| `CHROMIUM_PATH` | 브라우저 테스트용 Chromium 실행 파일 경로 | Playwright 기본값 |
+
+비밀 값은 환경에만 설정하고 파일이나 Git에 넣지 않는다. 관리자 API는 `Authorization: Bearer <token>`이 필요하다. `POST /api/v1/admin/claims`는 기존 합성 `fixture_version_id`만 받아 샘플을 생성하며, `GET /api/v1/admin/claims`와 `/api/v1/admin/claims/{id}`로 조회한다. `/api/v1/admin/reviews`와 `/api/v1/admin/audit`는 데모 이벤트를 기록·조회한다. 승인 이벤트는 실제 주장의 검증 상태를 변경하지 않는다. 이 단일 토큰과 로컬 SQLite는 운영 인증·계정·PostgreSQL 통합을 대체하지 않는다.
+
+읽기 API는 `/api/v1/passages`, `/api/v1/passages/{id}`, `/api/v1/passages/{id}/interpretations`, `/api/v1/claims/{version_id}`, `/api/v1/graph?passage_id=...`, `/api/v1/traditions`, `/api/v1/sources/{id}` 등을 제공한다. `scheme_id`와 `ref`로 주소를 찾는다. 합성 미검증 예시는 `include_unverified=true`일 때만 반환한다. 외부 원문 저장·임베딩·재배포 기능은 없으며, 관련 정책 함수는 기본 거부 설계다. 실제 기능을 만들 때는 작업별 권한과 저장 정책, 라이선스를 트랜잭션 경계에서 확인해야 한다.
+
+## PostgreSQL 마이그레이션
+
+반드시 새 전용 테스트 DB에서 다음 순서를 사용한다. 롤백은 데이터가 있으면 거부된다. 자세한 제한은 [DB_MIGRATION_NOTES.md](docs/DB_MIGRATION_NOTES.md)를 참조한다.
+
+```sh
+psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/001_schema.sql
+psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/002_append_only.sql
+psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f tests/database.sql
+# 쓰기를 중단하고, 빈 테스트 DB에서만 역순 실행
+psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/002_append_only.down.sql
+psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/001_schema.down.sql
+```
+
+## 검증
+
+```sh
+python3 scripts/validate_fixture.py fixtures/demo_valid.json
+python3 -m unittest discover -s tests -v
+npm test
+```
+
+`npm test`는 임시 DB와 루프백 서버를 사용한다. 브라우저 검증은 Playwright와 Chromium이 별도로 필요하다. 테스트 서버를 3107번 포트에서 실행한 후 `node --test tests/ui.browser.cjs`를 실행한다. 환경별 결과와 Gate 판정은 [S1B_REPORT.md](docs/S1B_REPORT.md)에 기록한다. 첨부의 문서는 시작 시점 초안으로 보존했다.

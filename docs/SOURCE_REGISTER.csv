@@ -1,0 +1,16 @@
+source_key,source_name,url,primary_use,preliminary_rights,next_action,status
+src001,STEPBible Data,https://github.com/STEPBible/STEPBible-Data,Original-language and versification datasets,Repository labels CC BY 4.0; review per-file provenance,Record attribution and actual file terms,CANDIDATE
+src002,Sefaria Text and Links,https://developers.sefaria.org/reference/get-links,Rabbinic commentaries and text relationships,License is per edition; not a blanket reusable corpus,Inventory individual edition licenses,CANDIDATE
+src003,OpenAlex,https://help.openalex.org/api/,Scholarly works and author metadata,API usage limits and metadata policy need current review,Design incremental metadata harvesting,CANDIDATE
+src004,Crossref REST,https://www.crossref.org/documentation/retrieve-metadata/rest-api/,Academic bibliographic metadata,Metadata public; some abstracts may have separate rights,Register DOI and precise locator schema,CANDIDATE
+src005,USFM/USX/USJ standard,https://docs.usfm.bible/usfm/3.1/introduction.html,Text markup interoperability,Standard documentation not Bible text licensing,Confirm parser conversion approach,CANDIDATE
+src006,OSIS standard,https://wiki.crosswire.org/OSIS_Bibles,External Bible reference interoperability,Standard does not license edition content,Specify reference scheme adapter,CANDIDATE
+src007,PROV-O standard,https://www.w3.org/TR/prov-o/,Provenance lineage,Technical standard,Map import/review audit events,CANDIDATE
+src008,Quran Foundation API,https://api-docs.quran.foundation/legal/developer-terms/,Quran text and tafsir lookup,Restricted caching/derived outputs; no bulk mirroring,Review terms and only allow approved compliant access,CANDIDATE
+src009,Vatican official resources,https://www.vatican.va/,Catholic official documents,Check rights per document and language,Identify official doctrine sources,CANDIDATE
+src010,USCCB Bible,https://bible.usccb.org/,Catholic Bible text and explanatory notes,Rights per text and notes must be verified,Map official and editorial authorship,CANDIDATE
+src011,KCI,https://www.kci.go.kr/,Korean academic article search and bibliographic metadata,Metadata and full text policies differ,Check API and permissions,CANDIDATE
+src012,RISS,https://www.riss.kr/,Korean theses and scholarly discovery,Institution-level and document-level rights must be checked,Identify thesis metadata ingestion,CANDIDATE
+src013,Orthodox Church in America,https://www.oca.org/,Eastern Orthodox institutional documents,Rights per item must be verified,Scope official statements and article authorship,CANDIDATE
+src014,Orthodox Presbyterian Church,https://opc.org/,Reformed confessional standards and institutional statements,Rights per publication must be verified,Distinguish official doctrine from individual authors,CANDIDATE
+src015,Bible Odyssey,https://www.bibleodyssey.org/,Historical and scholarly biblical studies explainers,Rights per contribution must be verified,Inventory individual scholars and source citations,CANDIDATE
