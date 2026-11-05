@@ -22,7 +22,7 @@ D-2 ZIP SHA-256 `c8b64b9144367a8526c77b121b3343f04a7c683276f9fd239b2cc51458589a4
 - 004 격리 PG17: rollback·추가 객체 보존 7단계, 최소 권한 writer 통합 5개, 합성 CLI 두 차례 멱등 PASS. 실제 연구 ZIP 적재 0건: [s1b2-staging.log](../reports/s1b2-staging.log).
 - 기존 기준 회귀: Python 14, 권리 함수 3, 데모 HTTP 6, PostgreSQL HTTP 6, 데모 UI 4, PostgreSQL UI 4 PASS, FAIL/SKIP 0. PG 기존 스키마 14, 003 무결성 26그룹, 주소 대응 4와 001–003 적용·역순 rollback·재적용 PASS. Next.js 빌드 PASS. 각 `reports/s1b2-regression-*.log` 참조. 최초 독립 사본의 의존성 심볼릭 링크가 Turbopack 경계 밖이어서 데모 API 기동이 실패했고, 의존성 복사 후 통과한 기록을 보존했다.
 - 생성 합성 source 10,000개(+18행) 검증 0.257초·최대 RSS 52,212 KiB, 100,000개(+18행) 3.109초·366,768 KiB PASS. 각 1회 클라우드 실행이며 source 편중 검증기 부하로, 실자료나 PostgreSQL 적재 성능을 뜻하지 않는다. [계획과 한계](S1B2_SCALE_TEST.md), [10k JSON](../reports/s1b2-benchmark-10k.json), [100k JSON](../reports/s1b2-benchmark-100k.json).
-- GitHub Actions는 기존 작업에 합성 10k/100k 검사와 별도 loopback PG staging job을 추가했다. 원격 실행 상태는 해당 브랜치 실행 기록을 확인해야 한다.
+- GitHub Actions는 기존 작업에 합성 10k/100k 검사와 별도 loopback PG staging job을 추가했다. 커밋 `28b7dc9`의 [원격 실행](https://github.com/whitewillbelive-tech/SCRIPTURA/actions/runs/42031471659)은 세 job 모두 성공했다.
 
 | 항목 | 판정 | 제한 |
 |---|---|---|
@@ -32,3 +32,9 @@ D-2 ZIP SHA-256 `c8b64b9144367a8526c77b121b3343f04a7c683276f9fd239b2cc51458589a4
 | S-1B.1 회귀·합성 부하 | PASS | 실제 자료·대량 DB 부하 아님 |
 | D-3 접합·독립 학술 심사·실자료 정본 적재 | PENDING | 별도 Gate I-1과 사람의 검수 및 권리 결정 필요 |
 | 운영 보안·실자료 처리·대량 스테이징 | PENDING | 승인·격리·동시성·권리 강제 설계 필요 |
+
+## 변경 파일과 PR
+
+새 도구는 `scripts/d2_bridge/`, `scripts/d2_bridge_cli.py`, `scripts/stage_synthetic.py`, `scripts/benchmark_d2.py`, 추가 스키마는 `db/004_d2_staging*.sql`, 합성 테스트는 `tests/*s1b2*`에 있다. `DRY_RUN_REPORT.json`, 이 보고서와 매핑·스테이징·규모 문서 및 `reports/s1b2-*`에 결과를 보존하고, 기존 workflow와 README에 실행 경로를 추가했다. 실제 연구 ZIP/JSONL은 포함하지 않았다.
+
+기준 브랜치 `gate/s1b-1-integration` 대상 Draft PR 생성을 시도했으나 GitHub API가 `Forbidden`을 반환해 생성되지 않았다. [PR 생성 화면](https://github.com/whitewillbelive-tech/SCRIPTURA/compare/gate/s1b-1-integration...codex/scriptura-d2-staging-bridge?expand=1)에서 생성할 수 있다.
