@@ -18,7 +18,7 @@ env:
 jobs:
   demo:
     name: Fixture, demo API, build and browser
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -38,10 +38,12 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
-      - name: Install browser test dependencies
-        run: |
-          npm install --no-save --package-lock=false playwright@1.55.0
-          npx playwright install --with-deps chromium
+      - name: Install Playwright package
+        run: npm install --no-save --package-lock=false playwright@1.62.1
+      - name: Install Chromium system dependencies
+        run: npx --no-install playwright install-deps chromium
+      - name: Download Chromium
+        run: npx --no-install playwright install chromium
       - name: Test demo UI in Chromium
         shell: bash
         run: |
@@ -59,7 +61,7 @@ jobs:
 
   postgres:
     name: PostgreSQL migrations and integration
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     services:
       postgres:
@@ -106,11 +108,14 @@ jobs:
         run: node --test tests/pg-api.integration.mjs
       - name: Seed an isolated synthetic-only dataset
         run: psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f tests/seed_synthetic_pg.sql
-      - name: Build and install Chromium
-        run: |
-          npm run build
-          npm install --no-save --package-lock=false playwright@1.55.0
-          npx playwright install --with-deps chromium
+      - name: Build
+        run: npm run build
+      - name: Install Playwright package
+        run: npm install --no-save --package-lock=false playwright@1.62.1
+      - name: Install Chromium system dependencies
+        run: npx --no-install playwright install-deps chromium
+      - name: Download Chromium
+        run: npx --no-install playwright install chromium
       - name: Test PostgreSQL UI in Chromium
         shell: bash
         run: |
