@@ -1,0 +1,6 @@
+PASS: YAML parsed; existing four jobs preserved
+PASS: Python unittest discovery and I-2.1 browser tests preserved
+PASS: I-3 guard and separate synthetic DB tests wired after prerequisites
+PASS: CI workflow does not require frozen research ZIP
+PASS: equivalent PostgreSQL sequence passed on isolated PG17 (see i3-staging-pg.log and i3-staging-regression.log)
+PENDING: remote GitHub Actions

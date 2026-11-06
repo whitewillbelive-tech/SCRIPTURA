@@ -1,0 +1,30 @@
+RUN: SCRIPTURA_TEST_URL=http://127.0.0.1:3227 CHROMIUM_PATH=/usr/bin/chromium node tests/ui-i2-authority.browser.cjs (isolated synthetic production copy)
+✔ 합성 고지와 별도 범주의 실제 API 응답을 표시한다 (1097.285039ms)
+✔ 대표성·발행·확인 경로·권리와 네 독립 검증 상태를 표시한다 (38.715837ms)
+✔ 개인 의견과 전언을 채택된 공동체 입장과 분리한다 (7.73869ms)
+✔ 기준일 밖의 채택은 미확정이며 과거 간행물을 현재 입장으로 승격하지 않는다 (75.78577ms)
+✔ 전통과 범주 필터는 개인 의견을 분리하고 503 이후 빈 결과와 복구를 표시한다 (168.850229ms)
+✔ 오래된 200 응답이 취소를 무시하고 늦게 끝나도 최신 필터 결과가 유지된다 (75.517186ms)
+✔ 오래된 503 응답이 취소를 무시하고 늦게 끝나도 최신 필터 결과가 유지된다 (65.258378ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1598.13008
+
+RUN: SCRIPTURA_TEST_URL=http://127.0.0.1:3227 CHROMIUM_PATH=/usr/bin/chromium node tests/ui.browser.cjs (isolated synthetic production copy)
+✔ 합성 고지와 기본 검증 필터가 표시된다 (951.601518ms)
+✔ 미검증 전환으로 합성 주장, 출처 권리와 관계가 표시된다 (85.860091ms)
+✔ 전통 필터는 근거 없는 귀속을 만들지 않는다 (66.370849ms)
+✔ 본문 선택을 바꾸면 그 본문의 결과로 갱신된다 (66.682989ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1231.225801

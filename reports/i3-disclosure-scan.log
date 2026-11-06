@@ -1,0 +1,15 @@
+I-3 D6/D5 disclosure scan (exact literals only; no source values recorded)
+D6 and nested D5 JSONL files read: 41
+D6 and nested D5 JSONL records read: 4507
+D5 selected CSV files read: 1
+Modified or untracked files scanned: 24
+id patterns: 4625 ; files with matches: 0
+url patterns: 339 ; files with matches: 0
+selected_text patterns: 695 ; files with matches: 0
+Research archive / JSONL / credential-like filename candidates: 0
+Files not inspected as UTF-8: 0
+Public summary quarantine records: 4507 ; mapping references: 0 ; identifier/shape violations: 0
+Private local mapping preview quarantine records: 4507 ; mapping references: 2050 ; identifier/shape violations: 0
+Reference representation: no raw identifiers; public summary uses source layer/table/row and raw-line SHA-256; mapping preview references source and target layer/table/row/field, not identifier hashes. Original ZIP permits row-based linkage.
+Method: parse selected D6/D5 JSONL and D5 coverage CSV fields, compare literal IDs, full URLs and selected text with modified/untracked UTF-8 files; validate summary hashes and allowed keys/types for summary and mapping items.
+Limitations: no substring excerpts, paraphrase, OCR, semantic matches, unselected field types, other input layers, binary contents, full license/privacy assessment, or future file edits; generic strings filtered by minimum length. Exact match is not proof of publication rights.

@@ -89,3 +89,7 @@ node tests/i2-authority.test.mjs
 ```
 
 PostgreSQL 시험은 빈 전용 합성 시험 DB에 기존 001·002·003을 적용한 뒤 `psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/006_authority_evidence.sql` 및 `psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f tests/i2_authority_db.sql`을 실행한다. 빈 I-2 테이블의 역방향 마이그레이션은 `psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/006_authority_evidence.down.sql`이다. 실자료나 비어 있지 않은 I-2 구조를 파괴적으로 되돌리지 않는다. 실행 결과와 보류 사항은 [I-2 보고서](I2_REPORT.md)를 참조한다.
+
+## Gate I-3 D-5/D-6 읽기 전용 수신
+
+고정 D-6 ZIP은 내장 D-5 기준본과 함께 저장소 밖에 두고 `python3 scripts/i3_d6_dryrun.py validate /path/to/SCRIPTURA_D6_SCOPE_RESEARCH.zip`으로 검사한다. `dry-run`과 `mapping-preview`도 같은 입력에 사용할 수 있다. 공개 출력은 원본 좌표와 행 해시를 포함하므로 익명화로 취급하지 않는다. 실제 연구 DB 쓰기와 정본 승격은 제공하지 않는다. 자세한 재현 명령과 한계는 [수신 기록](I3_D5_D6_RECEIPT.md), 기존 스키마와의 차이는 [호환성 보고서](I3_SCHEMA_COMPATIBILITY.md)를 참조한다.

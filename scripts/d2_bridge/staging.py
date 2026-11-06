@@ -1,4 +1,4 @@
-"""Synthetic-only, metadata-only staging. D-2 research data must never be loaded.
+"""Synthetic-only, metadata-only staging. Research data must never be loaded.
 
 The public CLI must generate its own synthetic fixture and must not expose this
 internal function as an arbitrary ZIP importer. No source payload is stored.
@@ -21,7 +21,10 @@ from .validator import EXPECTED_SHA256, EXPECTED_SNAPSHOT, TABLES, validate_arch
 
 # Frozen research data is read-only; a synthetic test pin cannot authorize it.
 D3_RESEARCH_SHA256 = 'baf206d2846544f1e1bb20622ac10c557394b71aa41cfd6e2be5bbafade347be'
-RESEARCH_ARCHIVE_SHA256 = frozenset({EXPECTED_SHA256, D3_RESEARCH_SHA256})
+D4_RESEARCH_SHA256 = '05ab5bdf3fc258f39b926257c771ef4a17138355aa072cb8bc97c56387999beb'
+D5_RESEARCH_SHA256 = '4709ddbe914c276e68ebcc66cee1d76e1c096e0071992eb53b9e4c2f03e96d19'
+D6_RESEARCH_SHA256 = '6d94de447eba8517c038f6f709c8b1040e0c6efbdd4676f9e19aea568d3e59da'
+RESEARCH_ARCHIVE_SHA256 = frozenset({EXPECTED_SHA256, D3_RESEARCH_SHA256, D4_RESEARCH_SHA256, D5_RESEARCH_SHA256, D6_RESEARCH_SHA256})
 TEST_ACK = 'synthetic-test-only'
 ACTIONS = frozenset({'browse', 'collect_metadata', 'store_raw', 'store_excerpt', 'index_fulltext', 'embed', 'send_to_model', 'redistribute', 'public_link'})
 DANGEROUS_ACTIONS = frozenset({'store_raw', 'store_excerpt', 'index_fulltext', 'embed', 'send_to_model', 'redistribute', 'public_link'})

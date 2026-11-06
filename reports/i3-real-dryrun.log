@@ -1,0 +1,23 @@
+Input: fixed D6 ZIP, memory-only inspection; no database connection or write
+SHA256 after: 6d94de447eba8517c038f6f709c8b1040e0c6efbdd4676f9e19aea568d3e59da
+validate status pass errors {}
+  pinned input before = after: True
+  manifest entry counts: {'d1': 28, 'd2': 65, 'd3': 69, 'd4': 72, 'd5': 53, 'd6': 32}
+  record totals: {'baseline_d4': 3104, 'd5': 754, 'd6': 584, 'd6_auxiliary': 65, 'resolved_reference_occurrences': 2050}
+  DB write: False canonical promotion: False
+  prior external handoff manifest: {'corresponding_members_checked': 2, 'entries': 5, 'remaining_require_prior_handoff': 3}
+dry-run status pass errors {}
+  pinned input before = after: True
+  manifest entry counts: {'d1': 28, 'd2': 65, 'd3': 69, 'd4': 72, 'd5': 53, 'd6': 32}
+  record totals: {'baseline_d4': 3104, 'd5': 754, 'd6': 584, 'd6_auxiliary': 65, 'resolved_reference_occurrences': 2050}
+  quarantined records: 4507
+  DB write: False canonical promotion: False
+  prior external handoff manifest: {'corresponding_members_checked': 2, 'entries': 5, 'remaining_require_prior_handoff': 3}
+mapping-preview status pass errors {}
+  pinned input before = after: True
+  manifest entry counts: {'d1': 28, 'd2': 65, 'd3': 69, 'd4': 72, 'd5': 53, 'd6': 32}
+  record totals: {'baseline_d4': 3104, 'd5': 754, 'd6': 584, 'd6_auxiliary': 65, 'resolved_reference_occurrences': 2050}
+  quarantined records: 4507
+  coordinate-only reference occurrences: 2050
+  DB write: False canonical promotion: False
+  prior external handoff manifest: {'corresponding_members_checked': 2, 'entries': 5, 'remaining_require_prior_handoff': 3}

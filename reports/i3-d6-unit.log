@@ -1,0 +1,40 @@
+test_authority_wrong_type_community (test_i3_d6.SyntheticD6Tests.test_authority_wrong_type_community) ... ok
+test_claim_wrong_type_community (test_i3_d6.SyntheticD6Tests.test_claim_wrong_type_community) ... ok
+test_cli_never_overwrites_output (test_i3_d6.SyntheticD6Tests.test_cli_never_overwrites_output) ... ok
+test_conditional_is_not_unconditional_permission (test_i3_d6.SyntheticD6Tests.test_conditional_is_not_unconditional_permission) ... ok
+test_direct_rebuttal_needs_explicit_proof (test_i3_d6.SyntheticD6Tests.test_direct_rebuttal_needs_explicit_proof) ... ok
+test_duplicate_action (test_i3_d6.SyntheticD6Tests.test_duplicate_action) ... ok
+test_duplicate_id (test_i3_d6.SyntheticD6Tests.test_duplicate_id) ... ok
+test_duplicate_json_keys_are_rejected (test_i3_d6.SyntheticD6Tests.test_duplicate_json_keys_are_rejected) ... ok
+test_evidence_source_mismatch (test_i3_d6.SyntheticD6Tests.test_evidence_source_mismatch) ... ok
+test_final_requires_evidence (test_i3_d6.SyntheticD6Tests.test_final_requires_evidence) ... ok
+test_human_review_requires_independent_validation (test_i3_d6.SyntheticD6Tests.test_human_review_requires_independent_validation) ... ok
+test_input_objects_not_mutated (test_i3_d6.SyntheticD6Tests.test_input_objects_not_mutated) ... ok
+test_known_tradition_alias_is_not_new_community (test_i3_d6.SyntheticD6Tests.test_known_tradition_alias_is_not_new_community) ... ok
+test_malformed_foreign_key_array (test_i3_d6.SyntheticD6Tests.test_malformed_foreign_key_array) ... ok
+test_manifest_missing_extra_or_mutation_fails (test_i3_d6.SyntheticD6Tests.test_manifest_missing_extra_or_mutation_fails) ... ok
+test_missing_community_id (test_i3_d6.SyntheticD6Tests.test_missing_community_id) ... ok
+test_missing_passage (test_i3_d6.SyntheticD6Tests.test_missing_passage) ... ok
+test_nested_baseline_tampering_detected (test_i3_d6.SyntheticD6Tests.test_nested_baseline_tampering_detected) ... ok
+test_nested_json_manifest_checks_content_and_complete_list (test_i3_d6.SyntheticD6Tests.test_nested_json_manifest_checks_content_and_complete_list) ... ok
+test_nine_rights_each_once (test_i3_d6.SyntheticD6Tests.test_nine_rights_each_once) ... ok
+test_null_community_is_not_assigned (test_i3_d6.SyntheticD6Tests.test_null_community_is_not_assigned) ... ok
+test_ongoing_not_final (test_i3_d6.SyntheticD6Tests.test_ongoing_not_final) ... ok
+test_oversized_archive_is_bounded (test_i3_d6.SyntheticD6Tests.test_oversized_archive_is_bounded) ... ok
+test_raw_text_field_disallowed (test_i3_d6.SyntheticD6Tests.test_raw_text_field_disallowed) ... ok
+test_reject_wrong_pinned_zip (test_i3_d6.SyntheticD6Tests.test_reject_wrong_pinned_zip) ... ok
+test_required_fk_placeholders_are_not_silently_accepted (test_i3_d6.SyntheticD6Tests.test_required_fk_placeholders_are_not_silently_accepted) ... ok
+test_reversed_assessment_relationship (test_i3_d6.SyntheticD6Tests.test_reversed_assessment_relationship) ... ok
+test_safe_zip_rejects_traversal (test_i3_d6.SyntheticD6Tests.test_safe_zip_rejects_traversal) ... ok
+test_self_explanation_stays_self_explanation (test_i3_d6.SyntheticD6Tests.test_self_explanation_stays_self_explanation) ... ok
+test_tradition_alias_maps_to_original_registry_row_without_identifier_hash (test_i3_d6.SyntheticD6Tests.test_tradition_alias_maps_to_original_registry_row_without_identifier_hash) ... ok
+test_unknown_optional_foreign_key (test_i3_d6.SyntheticD6Tests.test_unknown_optional_foreign_key) ... ok
+test_unknown_uppercase_is_preserved (test_i3_d6.SyntheticD6Tests.test_unknown_uppercase_is_preserved) ... ok
+test_unsupported_official_claim (test_i3_d6.SyntheticD6Tests.test_unsupported_official_claim) ... ok
+test_valid_synthetic (test_i3_d6.SyntheticD6Tests.test_valid_synthetic) ... ok
+test_wrong_kind_locator (test_i3_d6.SyntheticD6Tests.test_wrong_kind_locator) ... ok
+
+----------------------------------------------------------------------
+Ran 35 tests in 0.150s
+
+OK
