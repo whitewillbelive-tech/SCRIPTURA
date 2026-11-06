@@ -1,0 +1,5 @@
+PASS: existing four jobs and unittest discovery retained; final synthetic Python 318 PASS
+PASS: I-2.1 browser 7 and J-2 browser 14 retained; synthetic J-3 browser 9 PASS
+PASS: workflow does not require or embed the frozen research ZIP
+PENDING: final GitHub Actions results
+NOT_RUN: Windows host unavailable; wrapper flow exercised with synthetic mocks only

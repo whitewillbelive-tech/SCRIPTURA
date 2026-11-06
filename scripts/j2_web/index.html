@@ -23,6 +23,7 @@
       <p class="subtle">로컬 터미널에서 지정한 세션 비밀을 입력하세요. 브라우저 저장소에는 보관하지 않습니다.</p>
     </section>
     <div id="connection" role="status" class="connection">세션을 열면 선택한 자료를 불러옵니다.</div>
+    <p id="visibility-status" class="subtle" aria-live="polite">표시 적격성 정보: 미확인</p>
     <details class="panel mapping" aria-label="자료 범위와 미대응">
       <summary>자료 단계별 대응 범위 보기</summary>
       <p class="subtle">입력 건수와 화면에 일부만 대응했거나 아직 대응하지 않은 유형입니다. 이는 이용권 승인이나 정본 수가 아닙니다.</p>
@@ -32,7 +33,7 @@
       <aside aria-label="검색 조건" class="panel filters">
         <div class="section-heading"><div><p class="eyebrow">01 / SEARCH</p><h2>검색 조건</h2></div><span>선택 사항</span></div>
         <form id="filters" autocomplete="off">
-          <div class="pair"><label>자료 단계 <select name="stage"><option value="">전체</option><option value="base">D-4 기준</option><option value="d5">D-5</option><option value="d6">D-6</option><option value="d7">D-7</option><option value="d8">D-8</option></select></label><label>결과 유형 <select name="record_kind"><option value="">전체</option><option value="claim">해석 주장</option><option value="source">문헌</option></select></label></div>
+          <div class="pair"><label>자료 단계 <select name="stage"><option value="">전체</option><option value="base">D-4 기준</option><option value="d5">D-5</option><option value="d6">D-6</option><option value="d7">D-7</option><option value="d8">D-8</option><option value="d9">D-9</option></select></label><label>결과 유형 <select name="record_kind"><option value="">전체</option><option value="claim">해석 주장</option><option value="source">문헌</option></select></label></div>
           <label>통합 검색 <input name="q" type="search" maxlength="200" placeholder="표시가 허용된 메타데이터"></label>
           <label>종교 · 교단 · 단체 <input name="community" type="search" maxlength="200" placeholder="전통 또는 공동체"></label>
           <label>연구자 · 발화 주체 <input name="researcher" type="search" maxlength="200" placeholder="저자 또는 연구자"></label>
@@ -56,7 +57,7 @@
           <p id="error" class="error" role="alert" hidden></p>
           <div id="results" class="cards"></div>
           <nav class="pagination" aria-label="결과 페이지"><button id="prev-page" type="button" disabled>이전</button><span id="page-status"></span><button id="next-page" type="button" disabled>다음</button></nav>
-          <p id="empty" class="empty" hidden>선택한 조건에 맞는 후보가 없습니다.</p>
+          <p id="empty" class="empty" hidden>표시 가능한 필드에서 조건에 맞는 후보가 없습니다. 표시 보류된 필드의 일치 여부는 확인할 수 없습니다.</p>
         </section>
         <section aria-label="후보 상세" class="panel detail">
           <div class="section-heading"><div><p class="eyebrow">03 / EVIDENCE</p><h2>출처와 검증 상태</h2></div></div>

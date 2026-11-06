@@ -1,0 +1,4 @@
+status PASS
+baseline_records 508; added_claims 6; added_sources 14; records 528; prior_fields_preserved 508
+eligibility_total 1270; metadata_candidate 9; candidate_visible_local 0; unknown 751; unmapped 510
+rights_source_records 135; rights_action_observations 162

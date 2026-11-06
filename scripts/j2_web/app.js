@@ -14,6 +14,7 @@
   const next = document.getElementById('next-page');
   const pageStatus = document.getElementById('page-status');
   const mappingSummary = document.getElementById('mapping-summary');
+  const visibilityStatus = document.getElementById('visibility-status');
   let secret = '';
   let controller = null;
   let generation = 0;
@@ -22,6 +23,9 @@
   let pageSize = 100;
   let detailGeneration = 0;
   let detailController = null;
+  // The selected archive is fixed for one authenticated session. A response
+  // that changes dataset must never replace results from the selected archive.
+  let sessionDataset = null;
 
   const value = (v, fallback = '표시 보류 또는 미확인') => {
     if (typeof v === 'string' && v.trim()) return v;
@@ -29,8 +33,17 @@
     return fallback;
   };
   // Only generated layer/table/row coordinates are displayed; never raw source IDs.
-  const safeRef = key => typeof key === 'string' && /^(base|d[5-8]):(claims|sources):[1-9][0-9]{0,6}$/.test(key) ? key : '미확인';
-  const safeCoordinate = (key, table) => typeof key === 'string' && new RegExp(`^(base|d[5-8]):${table}:[1-9][0-9]{0,6}$`).test(key) ? key : '미확인';
+  const safeRef = key => typeof key === 'string' && /^(base|d[5-9]):(claims|sources):[1-9][0-9]{0,6}$/.test(key) ? key : '미확인';
+  const safeCoordinate = (key, table) => typeof key === 'string' && new RegExp(`^(base|d[5-9]):${table}:[1-9][0-9]{0,6}$`).test(key) ? key : '미확인';
+  // No actual D8/D9 names or free text are approved yet. This extra UI
+  // boundary complements the server gate; synthetic tests remain labeled.
+  const safeRow = (row, dataset) => {
+    if (!row || typeof row !== 'object') return null;
+    if (dataset === 'synthetic') return row;
+    const safe = {...row};
+    for (const field of ['source_title','source_creator','researcher','speaker','tradition','community_reference','evaluated_subject','summary']) safe[field] = null;
+    return safe;
+  };
   const node = (tag, text, className) => {
     const el = document.createElement(tag);
     if (text !== undefined) el.textContent = text;
@@ -53,6 +66,7 @@
     count.textContent = '—';
     prev.disabled = true; next.disabled = true; pageStatus.textContent = '';
     mappingSummary.replaceChildren(node('p', '미확인', 'empty'));
+    visibilityStatus.textContent = '표시 적격성 정보: 미확인';
   };
   const showError = message => {
     rows = [];
@@ -76,6 +90,21 @@
     redacted_rights_unresolved:'표시 범위 미확인', not_done:'독립 심사 미실시',
   };
   const readable = v => typeof v === 'string' && labels[v] ? labels[v] : value(v);
+  const OBSERVATION_KINDS = new Set(['audit_review','review_queue','evidence','relationship','audit']);
+  const OBSERVATION_STATES = new Set(['verified_exact','partially_verified','source_checked','metadata_checked','pending','unknown','unmapped','direct_published_source_rechecked','translation_checked_human_review_pending','rendered_content_checked_adoption_unknown','source_label_checked_legal_event_ambiguous','direct_rendered_browser_checked','review_scan_checked_book_unseen']);
+  const OBSERVATION_METHODS = new Set(['unknown','unmapped','direct']);
+  const RIGHTS_ACTIONS = new Set(['browse','collect_metadata','store_raw','store_excerpt','index_fulltext','embed','send_to_model','redistribute','public_link']);
+  const RIGHTS_DECISIONS = new Set(['unknown','conditional','allowed','prohibited','not_recorded','conflicting','unmapped']);
+  const RELATION_TYPES = {
+    same_community_similar_interpretation: '같은 공동체의 유사 해석',
+    published_review_criticizes_book_treatment: '출판된 서평의 문헌 처리 비평',
+    bibliographic_record_describes: '서지 기록의 설명',
+    unmapped: '관계 유형 미대응',
+  };
+  // Only known schema field names can be displayed in research mode. A raw
+  // ID, name or free text must not become visible merely by looking like a key.
+  const UNMAPPED_FIELDS = new Set(['source_title','source_creator','source_chain','title','creator','speaker','community_id','statement_ko','scope_note','note','url','doi','access_scope','document_type_scope','language','published_at','theological_primary_document','original_text_saved','claim_truth_status','independent_human_review','source_full_text','rights_scope','source_url','unreviewed_source_text','formal_adoption_evidence','position_scope','human_review','scholarly_reviewed','reference','reference_scheme','corpus','location','status','verification_status','authority_status','attribution_kind','passage_ids','source_locator_id','checked_at','unrecognized_field']);
+  const safeEnum = (v, allowed) => typeof v === 'string' && allowed.has(v) ? v : '미확인';
   const showDetail = selected => {
     detailGeneration += 1;
     if (detailController) detailController.abort();
@@ -162,6 +191,26 @@
       for (const item of observations) if (item && typeof item === 'object') list.append(node('li', `${value(item.scope, '범위 미확인')} · ${value(item.verification_status, '상태 미확인')} · ${value(item.as_of, '시점 미확인')}`));
       body.append(list);
     }
+    const later = Array.isArray(selected.d9_observations) ? selected.d9_observations : [];
+    const laterRights = Array.isArray(selected.d9_rights_observations) ? selected.d9_rights_observations : [];
+    if (sessionDataset === 'D9' && (later.length || laterRights.length)) {
+      body.append(node('h4', 'D-9 후속 관찰 · 원본 상태 변경 없음'));
+      const list = node('ul');
+      for (const item of later) if (item && typeof item === 'object') {
+        const direction = item.direction === 'outgoing' ? '이 후보 → 연결 대상' : item.direction === 'incoming' ? '연결 대상 → 이 후보' : '방향 미확인';
+        const relation = Object.hasOwn(RELATION_TYPES, item.relation_type) ? RELATION_TYPES[item.relation_type] : '관계 유형 미확인';
+        const li = node('li', `관찰 · ${safeEnum(item.kind, OBSERVATION_KINDS)} · ${safeEnum(item.status, OBSERVATION_STATES)} · ${safeEnum(item.method, OBSERVATION_METHODS)} · ${direction} · ${relation} `);
+        if (safeRef(item.target_key) !== '미확인') {
+          const target = node('button', '후속 관찰 연결 대상 열기', 'target-button');
+          target.type = 'button'; target.addEventListener('click', () => openTarget(item.target_key)); li.append(target);
+        }
+        list.append(li);
+      }
+      for (const item of laterRights) if (item && typeof item === 'object') {
+        list.append(node('li', `권리 추가 관찰 · 판본 ${safeCoordinate(item.edition_key, 'editions')} · ${safeEnum(item.action, RIGHTS_ACTIONS)} · ${safeEnum(item.decision, RIGHTS_DECISIONS)} · 적용 대기`));
+      }
+      body.append(list);
+    }
     body.append(node('h4', '근거와 관계'));
     const evidence = Array.isArray(selected.evidence) ? selected.evidence : [];
     const relations = Array.isArray(selected.relationships) ? selected.relationships : [];
@@ -183,10 +232,29 @@
     } else body.append(node('p', '표시 가능한 근거 또는 관계가 없습니다.', 'muted'));
     const unmapped = Array.isArray(selected.unmapped) ? selected.unmapped : [];
     body.append(node('p', `표시·대응 보류: ${unmapped.length}개 필드. 원문, 직접 인용, 자유 요약과 외부 링크는 표시하지 않습니다.`, 'field-notice'));
-    const names = [...new Set(unmapped.filter(name => typeof name === 'string' && /^[A-Za-z0-9_]{1,80}$/.test(name)))];
+    const names = [...new Set(unmapped.filter(name => typeof name === 'string' && (UNMAPPED_FIELDS.has(name) || (sessionDataset === 'synthetic' && /^[A-Za-z0-9_]{1,80}$/.test(name)))))];
     if (names.length) {
       const un = node('details'); un.append(node('summary', '대응되지 않은 필드 이름 보기'));
       const list = node('ul'); for (const name of names) list.append(node('li', name)); un.append(list); body.append(un);
+    }
+    const eligibility = selected.field_eligibility;
+    if (eligibility && typeof eligibility === 'object' && !Array.isArray(eligibility)) {
+      const groups = ['bibliography','own_summary','short_quote','full_text','private_link'];
+      const entities = ['source','claim','edition','locator'];
+      const states = new Set(['metadata_candidate','unknown','unmapped','redacted_rights_unresolved']);
+      if (sessionDataset === 'synthetic') states.add('candidate_visible_local');
+      const report = node('details'); report.append(node('summary', '필드별 표시 적격성 보기'));
+      const list = node('ul');
+      for (const entity of entities) {
+        const item = eligibility[entity];
+        if (!item || typeof item !== 'object' || Array.isArray(item)) continue;
+        for (const group of groups) if (Object.hasOwn(item, group)) {
+          const state = safeEnum(item[group], states);
+          const scope = sessionDataset === 'synthetic' && state === 'candidate_visible_local' ? '합성 시험용 승인' : '표시 승인 아님';
+          list.append(node('li', `${entity} · ${group}: ${state} · ${scope}`));
+        }
+      }
+      report.append(list); body.append(report);
     }
     detail.replaceChildren(body);
   };
@@ -205,12 +273,13 @@
       if (!response.ok) throw new Error('unavailable');
       const data = await response.json();
       if (current !== detailGeneration) return;
-      const target = Array.isArray(data.records) ? data.records.find(row => row && row.key === key) : null;
+      if (!data || data.dataset !== sessionDataset) throw new Error('dataset mismatch');
+      const target = Array.isArray(data.records) ? safeRow(data.records.find(row => row && row.key === key), data.dataset) : null;
       if (!target) { detail.replaceChildren(node('p', '연결 대상의 표시 가능한 후보가 없습니다.', 'empty')); return; }
       showDetail(target);
     } catch (e) {
       if (current !== detailGeneration || e.name === 'AbortError') return;
-      detail.replaceChildren(node('p', '연결 대상을 불러오지 못했습니다.', 'error'));
+      detail.replaceChildren(node('p', e.message === 'dataset mismatch' ? '선택한 자료 버전과 응답이 일치하지 않습니다.' : '연결 대상을 불러오지 못했습니다.', 'error'));
     }
   };
   const renderMapping = summary => {
@@ -230,14 +299,23 @@
     mappingSummary.replaceChildren(list);
   };
   const render = data => {
-    rows = Array.isArray(data.records) ? data.records : [];
+    rows = Array.isArray(data.records) ? data.records.map(row => safeRow(row, data.dataset)).filter(Boolean) : [];
     renderMapping(data.unmapped_summary);
+    const visibility = data.visibility_summary;
+    const validCount = n => Number.isSafeInteger(n) && n >= 0 && n <= 100000;
+    // The pinned D9 handoff contains no field approved for local display.
+    // A positive count from a mismatched/invalid response is not approval.
+    if (visibility && typeof visibility === 'object' && validCount(visibility.metadata_candidate) && validCount(visibility.candidate_visible_local) && (data.dataset !== 'D9' || visibility.candidate_visible_local === 0)) {
+      visibilityStatus.textContent = `표시 적격성: 검토 후보 ${visibility.metadata_candidate}건 · 로컬 표시 승인 ${visibility.candidate_visible_local}건. 검토 후보는 표시 승인이 아닙니다.`;
+    } else {
+      visibilityStatus.textContent = '표시 적격성 정보: 미확인';
+    }
     const total = Number.isSafeInteger(data.total) && data.total >= 0 ? data.total : rows.length;
     count.textContent = `${total}개 후보`;
     pageSize = Number.isSafeInteger(data.page_size) && data.page_size > 0 ? data.page_size : 100;
     prev.disabled = offset <= 0; next.disabled = offset + rows.length >= total || rows.length === 0;
     pageStatus.textContent = total ? `${offset + 1}–${offset + rows.length} / ${total}` : '';
-    connection.textContent = data.dataset === 'synthetic' ? '합성 시험 자료 / 실제 연구 데이터 아님.' : '선택한 로컬 자료에서 조회했습니다. 모든 결과는 연구 후보입니다.';
+    connection.textContent = data.dataset === 'synthetic' ? '합성 시험 자료 / 실제 연구 데이터 아님.' : `${data.dataset === 'D9' ? 'D-9' : 'D-8'} 연구 후보 · 선택한 로컬 자료에서 조회했습니다. 모든 결과는 연구 후보입니다.`;
     empty.hidden = rows.length > 0;
     for (const row of rows) {
       if (!row || typeof row !== 'object') continue;
@@ -259,6 +337,17 @@
     controller = new AbortController();
     const query = new URLSearchParams();
     for (const [key, item] of new FormData(form)) if (typeof item === 'string' && item.trim()) query.set(key, item.trim());
+    const nameSearchBlocked = () => Boolean(query.get('community') || query.get('researcher'));
+    const showNameSearchBlocked = () => {
+      count.textContent = '검색 보류';
+      connection.textContent = '이름 필드는 표시 자격 검토 전까지 검색할 수 없습니다.';
+      empty.textContent = '공동체명·교단명·연구자명·발화 주체 이름 검색은 보류 중입니다. 보류는 일치하는 자료가 없다는 뜻이 아닙니다.';
+      empty.hidden = false;
+    };
+    if (sessionDataset && sessionDataset !== 'synthetic' && nameSearchBlocked()) {
+      showNameSearchBlocked();
+      return;
+    }
     if (offset) query.set('offset', String(offset));
     connection.textContent = '연구 후보를 불러오는 중입니다.';
     try {
@@ -268,23 +357,28 @@
       if (!response.ok) throw new Error('unavailable');
       const data = await response.json();
       if (current !== generation) return;
-      if (!data || !Array.isArray(data.records) || !['D8','synthetic'].includes(data.dataset)) throw new Error('unexpected');
+      if (!data || !Array.isArray(data.records) || !['D8','D9','synthetic'].includes(data.dataset)) throw new Error('unexpected');
+      if (sessionDataset && sessionDataset !== data.dataset) throw new Error('dataset mismatch');
+      sessionDataset = data.dataset;
+      if (sessionDataset !== 'synthetic' && nameSearchBlocked()) { showNameSearchBlocked(); return; }
+      empty.textContent = '표시 가능한 필드에서 조건에 맞는 후보가 없습니다. 표시 보류된 필드의 일치 여부는 확인할 수 없습니다.';
       render(data);
     } catch (e) {
       if (current !== generation || e.name === 'AbortError') return;
       connection.textContent = '자료를 불러오지 못했습니다.';
-      showError('자료를 불러오지 못했습니다. 로컬 서버 상태와 선택한 자료를 확인해 주세요.');
+      showError(e.message === 'dataset mismatch' ? '선택한 자료 버전과 응답이 일치하지 않습니다.' : '자료를 불러오지 못했습니다. 로컬 서버 상태와 선택한 자료를 확인해 주세요.');
     }
   };
   document.getElementById('session-form').addEventListener('submit', event => {
     event.preventDefault();
     offset = 0;
+    sessionDataset = null;
     secret = secretInput.value;
     secretInput.value = '';
     search();
   });
   document.getElementById('session-close').addEventListener('click', () => {
-    secret = ''; secretInput.value = ''; clear(); connection.textContent = '세션이 닫혔습니다.';
+    secret = ''; sessionDataset = null; secretInput.value = ''; clear(); connection.textContent = '세션이 닫혔습니다.';
   });
   form.addEventListener('input', () => { offset = 0; clear(); connection.textContent = secret ? '조건이 변경됐습니다. 후보 검색을 눌러 주세요.' : '세션 비밀을 입력해 주세요.'; });
   form.addEventListener('change', () => { offset = 0; clear(); connection.textContent = secret ? '조건이 변경됐습니다. 후보 검색을 눌러 주세요.' : '세션 비밀을 입력해 주세요.'; });

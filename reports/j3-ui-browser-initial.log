@@ -1,0 +1,112 @@
+✖ D9 후보 상태는 승인 0과 미승인 이름을 분리한다 (79.173526ms)
+✖ 근거 없는 승인 플래그는 표시 승인으로 나타내지 않는다 (0.073921ms)
+✖ 명시적 이름 검색 보류와 다른 조건의 0건을 구분한다 (0.048803ms)
+✖ 다른 데이터셋 응답은 목록이나 상세에 혼합하지 않는다 (0.050486ms)
+✖ D9 후속 관찰을 기존 D8의 원본 권리·검증 상태와 합치지 않는다 (0.071648ms)
+✖ 세션 종료 후 새 D8 세션을 열 수 있고 이전 D9 결과는 없다 (0.084266ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 91.985936
+
+✖ failing tests:
+
+test at tests/ui-j3-candidate.browser.cjs:39:1
+✖ D9 후보 상태는 승인 0과 미승인 이름을 분리한다 (79.173526ms)
+  browserType.launch: Executable doesn't exist at /home/agent/.cache/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-linux64/chrome-headless-shell
+  ╔════════════════════════════════════════════════════════════╗
+  ║ Looks like Playwright was just installed or updated.       ║
+  ║ Please run the following command to download new browsers: ║
+  ║                                                            ║
+  ║     npx playwright install                                 ║
+  ║                                                            ║
+  ║ <3 Playwright Team                                         ║
+  ╚════════════════════════════════════════════════════════════╝
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:34:25) {
+    log: [],
+    name: 'Error'
+  }
+
+test at tests/ui-j3-candidate.browser.cjs:56:1
+✖ 근거 없는 승인 플래그는 표시 승인으로 나타내지 않는다 (0.073921ms)
+  browserType.launch: Executable doesn't exist at /home/agent/.cache/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-linux64/chrome-headless-shell
+  ╔════════════════════════════════════════════════════════════╗
+  ║ Looks like Playwright was just installed or updated.       ║
+  ║ Please run the following command to download new browsers: ║
+  ║                                                            ║
+  ║     npx playwright install                                 ║
+  ║                                                            ║
+  ║ <3 Playwright Team                                         ║
+  ╚════════════════════════════════════════════════════════════╝
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:34:25) {
+    log: [],
+    name: 'Error'
+  }
+
+test at tests/ui-j3-candidate.browser.cjs:70:1
+✖ 명시적 이름 검색 보류와 다른 조건의 0건을 구분한다 (0.048803ms)
+  browserType.launch: Executable doesn't exist at /home/agent/.cache/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-linux64/chrome-headless-shell
+  ╔════════════════════════════════════════════════════════════╗
+  ║ Looks like Playwright was just installed or updated.       ║
+  ║ Please run the following command to download new browsers: ║
+  ║                                                            ║
+  ║     npx playwright install                                 ║
+  ║                                                            ║
+  ║ <3 Playwright Team                                         ║
+  ╚════════════════════════════════════════════════════════════╝
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:34:25) {
+    log: [],
+    name: 'Error'
+  }
+
+test at tests/ui-j3-candidate.browser.cjs:85:1
+✖ 다른 데이터셋 응답은 목록이나 상세에 혼합하지 않는다 (0.050486ms)
+  browserType.launch: Executable doesn't exist at /home/agent/.cache/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-linux64/chrome-headless-shell
+  ╔════════════════════════════════════════════════════════════╗
+  ║ Looks like Playwright was just installed or updated.       ║
+  ║ Please run the following command to download new browsers: ║
+  ║                                                            ║
+  ║     npx playwright install                                 ║
+  ║                                                            ║
+  ║ <3 Playwright Team                                         ║
+  ╚════════════════════════════════════════════════════════════╝
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:34:25) {
+    log: [],
+    name: 'Error'
+  }
+
+test at tests/ui-j3-candidate.browser.cjs:105:1
+✖ D9 후속 관찰을 기존 D8의 원본 권리·검증 상태와 합치지 않는다 (0.071648ms)
+  browserType.launch: Executable doesn't exist at /home/agent/.cache/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-linux64/chrome-headless-shell
+  ╔════════════════════════════════════════════════════════════╗
+  ║ Looks like Playwright was just installed or updated.       ║
+  ║ Please run the following command to download new browsers: ║
+  ║                                                            ║
+  ║     npx playwright install                                 ║
+  ║                                                            ║
+  ║ <3 Playwright Team                                         ║
+  ╚════════════════════════════════════════════════════════════╝
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:34:25) {
+    log: [],
+    name: 'Error'
+  }
+
+test at tests/ui-j3-candidate.browser.cjs:123:1
+✖ 세션 종료 후 새 D8 세션을 열 수 있고 이전 D9 결과는 없다 (0.084266ms)
+  browserType.launch: Executable doesn't exist at /home/agent/.cache/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-linux64/chrome-headless-shell
+  ╔════════════════════════════════════════════════════════════╗
+  ║ Looks like Playwright was just installed or updated.       ║
+  ║ Please run the following command to download new browsers: ║
+  ║                                                            ║
+  ║     npx playwright install                                 ║
+  ║                                                            ║
+  ║ <3 Playwright Team                                         ║
+  ╚════════════════════════════════════════════════════════════╝
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:34:25) {
+    log: [],
+    name: 'Error'
+  }
