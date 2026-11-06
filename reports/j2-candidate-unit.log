@@ -1,0 +1,20 @@
+test_access_event_requires_matching_source_and_edition (test_j2_candidate.CandidateProjectionTests.test_access_event_requires_matching_source_and_edition) ... ok
+test_all_name_fields_redacted_and_recorded_as_unmapped (test_j2_candidate.CandidateProjectionTests.test_all_name_fields_redacted_and_recorded_as_unmapped) ... ok
+test_baseline_j1_bytes_support_preserves_existing_validation (test_j2_candidate.CandidateProjectionTests.test_baseline_j1_bytes_support_preserves_existing_validation) ... ok
+test_community_role_is_never_guessed_from_critique (test_j2_candidate.CandidateProjectionTests.test_community_role_is_never_guessed_from_critique) ... ok
+test_d8_metadata_coordinate_and_format_gate (test_j2_candidate.CandidateProjectionTests.test_d8_metadata_coordinate_and_format_gate) ... ok
+test_invalid_calendar_dates_are_not_displayed (test_j2_candidate.CandidateProjectionTests.test_invalid_calendar_dates_are_not_displayed) ... ok
+test_locator_rules_disallow_quote_and_urls (test_j2_candidate.CandidateProjectionTests.test_locator_rules_disallow_quote_and_urls) ... ok
+test_missing_or_wrong_archive_fails_closed_without_path (test_j2_candidate.CandidateProjectionTests.test_missing_or_wrong_archive_fails_closed_without_path) ... ok
+test_network_paths_rejected_before_any_read (test_j2_candidate.CandidateProjectionTests.test_network_paths_rejected_before_any_read) ... ok
+test_no_claim_body_or_locator_excerpt (test_j2_candidate.CandidateProjectionTests.test_no_claim_body_or_locator_excerpt) ... ok
+test_reference_requires_safe_address_and_corpus_scheme (test_j2_candidate.CandidateProjectionTests.test_reference_requires_safe_address_and_corpus_scheme) ... ok
+test_rights_override_keeps_base_and_new_as_independent_observations (test_j2_candidate.CandidateProjectionTests.test_rights_override_keeps_base_and_new_as_independent_observations) ... ok
+test_source_aliases_obey_same_field_gate (test_j2_candidate.CandidateProjectionTests.test_source_aliases_obey_same_field_gate) ... ok
+test_source_rights_preserve_each_edition_without_merging (test_j2_candidate.CandidateProjectionTests.test_source_rights_preserve_each_edition_without_merging) ... ok
+test_status_axes_do_not_auto_promote (test_j2_candidate.CandidateProjectionTests.test_status_axes_do_not_auto_promote) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.003s
+
+OK

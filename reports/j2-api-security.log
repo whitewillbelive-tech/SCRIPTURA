@@ -1,0 +1,34 @@
+test_authentication_lock_and_recovery (test_j2_private_server.HttpTests.test_authentication_lock_and_recovery) ... ok
+test_bad_query_never_reflects_input_or_password (test_j2_private_server.HttpTests.test_bad_query_never_reflects_input_or_password) ... ok
+test_correct_session_can_access_synthetic_candidate (test_j2_private_server.HttpTests.test_correct_session_can_access_synthetic_candidate) ... ok
+test_exact_local_origin_is_allowed (test_j2_private_server.HttpTests.test_exact_local_origin_is_allowed) ... ok
+test_missing_and_bad_password_rejected_no_data (test_j2_private_server.HttpTests.test_missing_and_bad_password_rejected_no_data) ... ok
+test_options_post_do_not_enable_cors_or_selection (test_j2_private_server.HttpTests.test_options_post_do_not_enable_cors_or_selection) ... ok
+test_parallel_bad_attempts_lock_shared_server (test_j2_private_server.HttpTests.test_parallel_bad_attempts_lock_shared_server) ... ok
+test_request_access_is_not_logged (test_j2_private_server.HttpTests.test_request_access_is_not_logged) ... ok
+test_server_binds_ipv4_loopback_only (test_j2_private_server.HttpTests.test_server_binds_ipv4_loopback_only) ... ok
+test_static_policy_and_no_directory_browsing (test_j2_private_server.HttpTests.test_static_policy_and_no_directory_browsing) ... ok
+test_success_resets_failed_attempts (test_j2_private_server.HttpTests.test_success_resets_failed_attempts) ... ok
+test_wrong_host_and_cross_origin_are_rejected (test_j2_private_server.HttpTests.test_wrong_host_and_cross_origin_are_rejected) ... ok
+test_community_subject_does_not_create_attribution (test_j2_private_server.SearchTests.test_community_subject_does_not_create_attribution) ... ok
+test_enum_matching_is_exact (test_j2_private_server.SearchTests.test_enum_matching_is_exact) ... ok
+test_evidence_and_relation_are_separately_searchable (test_j2_private_server.SearchTests.test_evidence_and_relation_are_separately_searchable) ... ok
+test_flat_passage_fallback_when_list_absent (test_j2_private_server.SearchTests.test_flat_passage_fallback_when_list_absent) ... ok
+test_known_dates_filter_only_explicit_intervals (test_j2_private_server.SearchTests.test_known_dates_filter_only_explicit_intervals) ... ok
+test_multiple_passage_predicates_must_match_same_address (test_j2_private_server.SearchTests.test_multiple_passage_predicates_must_match_same_address) ... ok
+test_obvious_remote_archive_path_rejected_before_open (test_j2_private_server.SearchTests.test_obvious_remote_archive_path_rejected_before_open) ... ok
+test_researcher_matches_speaker_and_creator (test_j2_private_server.SearchTests.test_researcher_matches_speaker_and_creator) ... ok
+test_rights_action_and_decision_match_same_recorded_action (test_j2_private_server.SearchTests.test_rights_action_and_decision_match_same_recorded_action) ... ok
+test_rights_override_is_separate_from_original (test_j2_private_server.SearchTests.test_rights_override_is_separate_from_original) ... ok
+test_source_multiple_editions_preserve_separate_action_decisions (test_j2_private_server.SearchTests.test_source_multiple_editions_preserve_separate_action_decisions) ... ok
+test_stage_key_and_pagination (test_j2_private_server.SearchTests.test_stage_key_and_pagination) ... ok
+test_unapproved_free_text_is_never_returned_or_searchable (test_j2_private_server.SearchTests.test_unapproved_free_text_is_never_returned_or_searchable) ... ok
+test_unknown_date_scope_is_pending (test_j2_private_server.SearchTests.test_unknown_date_scope_is_pending) ... ok
+test_unknown_filter_or_invalid_date_fails_closed (test_j2_private_server.SearchTests.test_unknown_filter_or_invalid_date_fails_closed) ... ok
+test_unmapped_summary_rejects_arbitrary_fields (test_j2_private_server.SearchTests.test_unmapped_summary_rejects_arbitrary_fields) ... ok
+test_unreviewed_research_names_and_titles_are_not_returned_or_searchable (test_j2_private_server.SearchTests.test_unreviewed_research_names_and_titles_are_not_returned_or_searchable) ... ok
+
+----------------------------------------------------------------------
+Ran 29 tests in 0.534s
+
+OK

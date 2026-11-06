@@ -1,0 +1,30 @@
+
+> scriptura-s1b-demo@0.1.0 build
+> next build
+
+▲ Next.js 16.4.5 (Turbopack)
+✓ Running next.config took 15ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.6s
+  Running TypeScript ...
+  Finished TypeScript in 2.5s ...
+  Collecting page data using 4 workers ...
+  Generating static pages using 4 workers (0/5) ...
+  Generating static pages using 4 workers (1/5) 
+  Generating static pages using 4 workers (2/5) 
+  Generating static pages using 4 workers (3/5) 
+✓ Generating static pages using 4 workers (5/5) in 169ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/v1/[...path]
+├ ○ /authority
+└ ○ /explore
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

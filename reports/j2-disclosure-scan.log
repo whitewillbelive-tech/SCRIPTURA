@@ -1,0 +1,13 @@
+J-2 D8/D7/D6/D5 disclosure scan (exact literals; no source values recorded)
+Nested JSONL files examined: 81
+Nested JSONL records examined: 5995
+D5 selected CSV files examined: 1
+Modified, staged or untracked UTF-8 files scanned: 32
+id patterns: 5875 ; files with new exact matches: 0 ; existing baseline file matches: 0
+url patterns: 403 ; files with new exact matches: 0 ; existing baseline file matches: 0
+selected_text patterns: 652 ; files with new exact matches: 0 ; existing baseline file matches: 0
+personal_name patterns: 449 ; files with new exact matches: 0 ; existing baseline file matches: 0
+Research archive / JSONL / credential-like filename candidates: 0
+Files not inspected as UTF-8: 0
+Method: parse selected D8/D7/D6/D5 JSONL and D5 coverage CSV fields entirely in memory, compare literal IDs, full URLs, selected text and names with new/modified/staged UTF-8 files; source values are not saved or printed.
+Limitations: does not detect excerpts, paraphrase, OCR, semantic matches, unselected fields, other input layers, binary contents, copyright/privacy issues, or future file edits; generic strings are filtered by minimum length. Exact match does not establish rights.

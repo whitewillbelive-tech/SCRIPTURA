@@ -212,7 +212,12 @@ def inspect_archive(path, *, mode='dry-run'):
  def finish():report['errors']=dict(sorted(errors.items()));report['status']='fail' if errors else 'pass';return report
  archives=[]
  try:
-  blob=prior._bounded_read(path);report['hashes']['d7_before']=prior._sha(blob)
+  if isinstance(path, bytes):
+   if len(path)>64*1024*1024:raise ValueError('archive too large')
+   read_input=lambda: path
+  else:
+   read_input=lambda: prior._bounded_read(path)
+  blob=read_input();report['hashes']['d7_before']=prior._sha(blob)
   if report['hashes']['d7_before']!=D7_SHA:errors['d7_sha_mismatch']+=1;return finish()
   def open_zip(blob,label,pin,manifest):
    report['hashes'][label]=prior._sha(blob)
@@ -327,7 +332,7 @@ def inspect_archive(path, *, mode='dry-run'):
      for item in items:entries.append({'layer':layer,'table':name.rsplit('/',1)[-1][:-6],'row':item['line'],'line_sha256':item['sha256'],'disposition':'quarantined','reason_codes':['actual_research_read_only','auxiliary_not_canonical']})
    report['quarantine']={'record_count':len(entries),'records':entries}
    if mode=='mapping-preview':report['mapping_preview']={'reference_occurrences':p_refs+refs,'raw_values_emitted':False,'source_zip_required_to_recover_fields':True,'duplicate_candidate_coordinates':duplicate_candidates}
-  report['hashes']['d7_after']=prior._sha(prior._bounded_read(path))
+  report['hashes']['d7_after']=prior._sha(read_input())
   if report['hashes']['d7_after']!=report['hashes']['d7_before']:errors['input_changed_during_inspection']+=1
  except (OSError,KeyError,UnicodeError,ValueError,TypeError,RuntimeError,RecursionError):errors['archive_processing_error']+=1
  finally:

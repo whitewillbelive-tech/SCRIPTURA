@@ -97,3 +97,7 @@ PostgreSQL 시험은 빈 전용 합성 시험 DB에 기존 001·002·003을 적�
 ## Gate J-1 D-7 읽기 전용 수신
 
 고정 D-7 ZIP은 저장소 밖에 두고 `python3 scripts/j1_d7_dryrun.py validate /path/to/SCRIPTURA_D7_RESEARCH.zip`으로 검사한다. `dry-run`과 `mapping-preview`는 원본 계층·행 좌표와 행 해시를 사용하며, 이는 익명화를 보장하지 않는다. 실자료의 PostgreSQL 쓰기나 정본 승격은 제공하지 않는다. 재현 방법과 수량은 [수신 기록](J1_D7_RECEIPT.md), 대응되지 않는 의미와 보류 항목은 [호환성 보고서](J1_SCHEMA_COMPATIBILITY.md)를 참조한다.
+
+## Gate J-2 비공개 연구 후보 탐색
+
+동결 D-8 ZIP을 프로젝트 밖의 개인 폴더에 보관하고, [J-2 비공개 탐색기 안내](docs/J2_PRIVATE_PREVIEW_KO.md)의 로컬 실행 방법을 따른다. 학술 미검증 자료는 연구 후보이며 원문·직접 인용·자유 요약과 URL을 가린다. 실제 D-8 자료의 문헌명·연구자·발화자·공동체 이름은 가려 해당 이름으로 검색할 수 없으며, DOI·연도·상태·본문 등으로 탐색한다. 계약상 표시 자격 확인은 보류 상태다. 원본과 공개 페이지를 변경하거나 운영 DB에 쓰지 않는다.

@@ -1,0 +1,58 @@
+test_audit_previous_must_match (test_j2_d8_validation.Validation.test_audit_previous_must_match) ... ok
+test_broken_edition (test_j2_d8_validation.Validation.test_broken_edition) ... ok
+test_claim_can_lack_passage_when_unmapped (test_j2_d8_validation.Validation.test_claim_can_lack_passage_when_unmapped) ... ok
+test_conditional_evidence_required (test_j2_d8_validation.Validation.test_conditional_evidence_required) ... ok
+test_crosswalk_complete_events (test_j2_d8_validation.Validation.test_crosswalk_complete_events) ... ok
+test_duplicate_id (test_j2_d8_validation.Validation.test_duplicate_id) ... ok
+test_evidence_mismatch (test_j2_d8_validation.Validation.test_evidence_mismatch) ... ok
+test_independent_review_not_inferred (test_j2_d8_validation.Validation.test_independent_review_not_inferred) ... ok
+test_missing_community_is_not_invented (test_j2_d8_validation.Validation.test_missing_community_is_not_invented) ... ok
+test_missing_rights_action (test_j2_d8_validation.Validation.test_missing_rights_action) ... ok
+test_not_mutated (test_j2_d8_validation.Validation.test_not_mutated) ... ok
+test_official_not_automatically_accepted (test_j2_d8_validation.Validation.test_official_not_automatically_accepted) ... ok
+test_override_cannot_change_baseline_action (test_j2_d8_validation.Validation.test_override_cannot_change_baseline_action) ... ok
+test_override_cannot_mark_baseline_mutated (test_j2_d8_validation.Validation.test_override_cannot_mark_baseline_mutated) ... ok
+test_override_conditional_without_scope_is_pending (test_j2_d8_validation.Validation.test_override_conditional_without_scope_is_pending) ... ok
+test_override_decision_must_be_known (test_j2_d8_validation.Validation.test_override_decision_must_be_known) ... ok
+test_raw_content_field_rejected (test_j2_d8_validation.Validation.test_raw_content_field_rejected) ... ok
+test_reversed_relationship_type_rejected (test_j2_d8_validation.Validation.test_reversed_relationship_type_rejected) ... ok
+test_source_index_cannot_replace_source_with_duplicate (test_j2_d8_validation.Validation.test_source_index_cannot_replace_source_with_duplicate) ... ok
+test_source_index_chain_does_not_cross_sources (test_j2_d8_validation.Validation.test_source_index_chain_does_not_cross_sources) ... ok
+test_unknown_decision_is_not_upgraded (test_j2_d8_validation.Validation.test_unknown_decision_is_not_upgraded) ... ok
+test_unknown_relation_is_pending (test_j2_d8_validation.Validation.test_unknown_relation_is_pending) ... ok
+test_unverified_direct_rebuttal_rejected (test_j2_d8_validation.Validation.test_unverified_direct_rebuttal_rejected) ... ok
+test_valid (test_j2_d8_validation.Validation.test_valid) ... ok
+test_wrong_community_type (test_j2_d8_validation.Validation.test_wrong_community_type) ... ok
+test_wrong_locator_type (test_j2_d8_validation.Validation.test_wrong_locator_type) ... ok
+setUpClass (test_j2_private_server.HttpTests) ... ERROR
+test_community_subject_does_not_create_attribution (test_j2_private_server.SearchTests.test_community_subject_does_not_create_attribution) ... ok
+test_enum_matching_is_exact (test_j2_private_server.SearchTests.test_enum_matching_is_exact) ... ok
+test_evidence_and_relation_are_separately_searchable (test_j2_private_server.SearchTests.test_evidence_and_relation_are_separately_searchable) ... ok
+test_known_dates_filter_only_explicit_intervals (test_j2_private_server.SearchTests.test_known_dates_filter_only_explicit_intervals) ... ok
+test_multiple_passage_predicates_must_match_same_address (test_j2_private_server.SearchTests.test_multiple_passage_predicates_must_match_same_address) ... ok
+test_researcher_matches_speaker_and_creator (test_j2_private_server.SearchTests.test_researcher_matches_speaker_and_creator) ... ok
+test_stage_key_and_pagination (test_j2_private_server.SearchTests.test_stage_key_and_pagination) ... ok
+test_unapproved_free_text_is_never_returned_or_searchable (test_j2_private_server.SearchTests.test_unapproved_free_text_is_never_returned_or_searchable) ... ok
+test_unknown_date_scope_is_pending (test_j2_private_server.SearchTests.test_unknown_date_scope_is_pending) ... ok
+test_unknown_filter_or_invalid_date_fails_closed (test_j2_private_server.SearchTests.test_unknown_filter_or_invalid_date_fails_closed) ... ok
+
+======================================================================
+ERROR: setUpClass (test_j2_private_server.HttpTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scriptura/tests/test_j2_private_server.py", line 85, in setUpClass
+    cls.server = PrivatePreviewServer(sample_data(), FAKE_SECRET)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scriptura/scripts/j2_private_preview.py", line 139, in __init__
+    super().__init__(('127.0.0.1', port), Handler)
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socketserver.py", line 453, in __init__
+    self.socket = socket.socket(self.address_family,
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socket.py", line 233, in __init__
+    _socket.socket.__init__(self, family, type, proto, fileno)
+PermissionError: [Errno 1] Operation not permitted
+
+----------------------------------------------------------------------
+Ran 36 tests in 0.010s
+
+FAILED (errors=1)

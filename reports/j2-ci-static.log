@@ -1,0 +1,5 @@
+PASS: workflow YAML parsed; prior four jobs and I-2.1 UI retained
+PASS: Python J-2 synthetic tests included by existing unittest discovery; final Python suite 268 PASS, 0 FAIL, 0 SKIP
+PASS: J-2 browser test starts a synthetic-only loopback test server; no D-8 archive is used in CI; final browser 12 PASS
+PASS: prior synthetic API 6, demo UI 4 and I-2.1 UI 7; production build PASS
+PENDING: remote GitHub Actions on the final commit

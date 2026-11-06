@@ -1,0 +1,39 @@
+J-2 independent private local research check
+Input format: independent final test read handoff and D8/baselines into memory; no research bytes were written during that test
+D8 SHA-256: f5d27aca649b46b3ec17de172695adeaac13004105c516737a56dfbb1773413b
+D8 records: sources 23; editions 24; locators 29; claims 17; relations 15; rights 216; audits 27
+api_d8_claims 17
+api_no_cors 1
+api_no_store 1
+browser_candidate_detail 1
+browser_multiedition_rights 1
+cross_origin_denied 1
+edition_right_actions 153
+exact_forbidden_matches 0
+host_rebinding_denied 1
+multiedition_sources 1
+raw_claims 17
+raw_sources 23
+redacted_title_search_blocked 1
+source_edition_right_actions 216
+source_editions 24
+unauthenticated_denied 1
+unreviewed_name_fields_hidden 1
+unreviewed_projection_fields_hidden 1
+Source and handoff SHA unchanged: PASS
+D8 protected claims, source/evidence/locator/rights/status and authenticated browser: PASS
+No screenshots, metadata strings, raw IDs, raw content, paths or tokens written to this log
+Scope: exact-match disclosure check cannot detect excerpts, paraphrases, OCR or prove rights
+Production CLI RAM-only archive + controlling terminal: PASS
+Loopback-only startup, no archive path/token in stdout, graceful Ctrl+C: PASS
+Local browser automatic opening disabled for headless test: PASS
+Windows execution: NOT_RUN
+
+Earlier independent test harness attempts (not concealed):
+- Selecting exactly one cached handoff failed because multiple uploaded copies existed; selection was corrected and the pinned D8 SHA was checked.
+- The default sandbox rejected loopback binding; the requested scoped execution permission enabled the isolated local test.
+- An early edition test incorrectly assumed all 24 D8 editions belonged to new D8 sources; it was corrected to include the one edition of a prior D7 source, then all 24/216 passed.
+- An early browser test looked for a specific synonym of the redaction notice; it was corrected to match the actual clear notice, then passed.
+- A temporary test script had an indentation error and an initial CLI harness had no controlling terminal; the script and PTY setup were corrected and the tests passed.
+
+Earlier task preparation: a permission-restricted temporary D8 copy was created, then deleted after checking the handoff requirement for explicit temporary-storage approval. Final validation used memory only.
