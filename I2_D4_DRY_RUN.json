@@ -1,0 +1,1542 @@
+{
+  "additional_records": {
+    "argument_observation": 1,
+    "citation_access": 4,
+    "doi_access": 6,
+    "research_units": 11,
+    "source_access": 36
+  },
+  "authority_gaps": {
+    "axis_absent_or_empty": {
+      "argument_status": 78,
+      "authority_status": 78,
+      "independent_review_status": 78,
+      "quotation_status": 78
+    },
+    "insufficient_evidence": 78,
+    "missing_fields": {
+      "applicable_period": 78,
+      "document_issuer": 78,
+      "exact_locator": 0,
+      "formal_adoption_document": 77,
+      "jurisdiction": 78,
+      "language_and_edition": 76,
+      "original_verification_path": 78,
+      "published_or_revised": 55,
+      "tradition": 75
+    },
+    "records": [
+      {
+        "line_sha256": "2981087b1a2f3c81ce1a550230f91a14eb43c970d656f8ab589904d863af3a10",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 1,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "6691a49c69aa208ab9b4f3f21bdd7ad0302432f2ee1ca28c51479b7a7d209ba5",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 2,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "eb5db72820c936732e5ba462789ac46e8c3c223f93c4bfb6f4a02d5e3de5513c",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 3,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "86b907d973ec512b3e5029776e7ed565a22653324589957154dfbfde3f5bffa1",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 4,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "b14a8e6bd4266efc1e4c40e2c8ddb781b67c45c0008ac6d3685c0d4789f791b1",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 5,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "75c04647be716023f08b4c6869fe0ff35371a6e86f3173ba2e64fed9baadebf9",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 6,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "68ded4161d375a1b78fa72da3a7053f05cca8b024ced04fdcb119df0541700e2",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 7,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "b7099da684f6b86344ee81980ac6df9b090e767dfe20bf4630cb439b64d4ebae",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 8,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "adaa4c6338c5b1e32ce51c5938d90cc7275a86a863fa8516d6f0449f96024f93",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 9,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "15af63818c4029b736ec73ebc6a80b9db4e7424ec33e674cc8623485a0f8510b",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 10,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "59b433b23353688213ae4b2f2adf7c8bef070e79dc683009ab8629a3f64bfb68",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 11,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "e028afc3c33fb51f4896db7390b8a186bbeffdcf1702642b76f3c8aa67ff77a8",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 12,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "3f0320db24c5fbb446a5a80160882e2fc272e8fa5e642c52dd114bcb6b2eb374",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 13,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "9be77e3a38687eff06323aad3e583e39ac6c9ba7eaaf1356245cc3ba9074af43",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 14,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "fabd312b88eb7defe893a1d8ba4791d292bd3b3131e4c604bc40735b89a2dd46",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 15,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "b72c8be096399d7a6f23789a5ea718576cb2fecc0928fba6ddaff5534357f20a",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 16,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "70e856950477d9a03485171c779f283f4e4acaf66b5954c4c24d0a431d87ce2c",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 17,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "b1a432d0ab80483e6362117d674dbff36b9ea9dea5d99585691aeace7774947b",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 18,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "45cf5238597ffc8fd223fdb45b273dfb770466ca66b5909f7b19fcba6e333eed",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 19,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "fddad13a24c1d4666364128b11c58d1f2080a2f923fe338a4a740b791e618f05",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 20,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "5a7eea18a3298538f8cdc53f043de53e9719d98b6e08cb174e4743e423404d1c",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 21,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "599660d1b1f24363dbb111098b80224a6379c07f28e639531ddfcaf2f3fcbea2",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 22,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "29966fb2fd2d6cbd3fe02c107e4e153f6fb53495de09e60e0f6721ace838eb98",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 23,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "50568c71683607eac077b696eafc24e3567b06c97d6c90545c3a4717d83c48e5",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 24,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "a75706baffd8306b485dc1488f7fcb4ddae6cff92f56f6c1147c047aa7d8cd82",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 25,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "1e4766641f0a8b93df05d320720b43977ae3b5eeabc3f761e19e4da2c564721f",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 26,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "1f368941fd48b505e2919f3ef2a61dd768166573fb69780cdd8919f02242e63d",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 27,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "f4feccb7a320049434658e71d9dc897069e70aa9406f14f43a61e9bb71b3fc4d",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 28,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "593e02bccebcf95afaba5e12e07a97bf602dd13054a35a902788adf9a4aa9b6c",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 29,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "398a5a40cb3f4b05e1254c097605cd822b326cdcceb0d60584c94810098b17b1",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 30,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "9e2aef01fcf32edbb52a4de743f206acd0eb066292c02ac1b3f222c4f9d378bb",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 31,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "863c4da1b96dcdc7673cc0d41812172a888dbe5cdc0682809dda82add3d07451",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 32,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "e22f675d3b09fb9560b3d4435882f7dcdd61bb669e77550a9cc5783e1c1a75a2",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 33,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "b4ec46a7a353398e5422fd0a464ba30ad93899765b53fb6727f00b96a4fdf5e1",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 34,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "d3737fa8c6de38bbc2880dc31105448c779323f282de36e88182f2d4d4a47675",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 35,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "2a7a9c4cc9b583945b91a905ceb92000a2c8b2acec1dd0da28dae01e2118dcbd",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 36,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "df70544e88783763a69e1ed2c6e17894a3adb4b882ea119c501eec1759e3b7dd",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 37,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "a412c7ef39824b8b90423e95bae905762d0691e513b46faca32c7a1b7efdeee9",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 38,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "9f19e6faf0281ef7f8b9bc40e0e701c8b30799866c875bc14323daacbbe5e8fe",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 39,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "e60fe20a087c90f0282bdfaf574028c346d3e45fc89b478022b0f1613d38560b",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 40,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "a134019619c0c10acdd9524abb08b0fd8dbc9840d9a4f6bac72418748c7f5784",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 41,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "6e4b69e498f4784cc35f289f5d7bad283c69efea2e3e4fea60581e5912415fc9",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 42,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "3df97242bf15250d6967890357110c260e3ed8fbeaa9d3824103cfec2c472683",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 43,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "e9cfc1e2bcfb24bb7b9bbcb8585f501905245566cf71e60266abd977663e5381",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 44,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "d00a74e542d122ac50d49a7e147113a68b9d76beb2a45d2c7dc1a468f8321b8c",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 45,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "c46fc2eafb3ef858ad3b0ae80dab4ca65523d1b5ae9675dac41658d545085c91",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 46,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "a72b1f77e7a717c1f4c6623b5fd142ecc68a5e5687e16c392efd9e0341d2dd94",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 47,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "db81e1c30816120bd4dbb3874964e1a0c9c402c5d55bf2885ed78121e0d400bd",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 48,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "f612189a2be6b519b3755765068adb94eccd8d45b25cd6ce1fe28be7fa359d5d",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 49,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "010bc19e33a2a0434284de4d53224083f875ae7b5d901b61728e601c1bd90b3e",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 50,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "2ee4f18fbdd676371719c060f734870fb9cd88516ef11f5f70f0e78f903cb837",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 51,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "883af4b4e064a1fa37906a68dedcfe4d9995a286577326664ac8e25aed1a88fb",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 52,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "0f34b7bcfaaf581ad4f71231fd675868be9baa3b7cb288ca0e2aee78ef0cb7b0",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 53,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "11b5e8f568508066cd4c4413ce4088910539d5ccf180fdb1687dc4d0a06a794a",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 54,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "28f3687fcaf54501c2cec2f9bbc9857b09ae925c3b67cdc0d3b404de10000ce5",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 55,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "e104d50abe0676da88f1e4238ddbd7d35c1c8e6de45209384b0d296ffc07bd84",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 56,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "6c034ab15e9f6807cf2f18bf503ae0e7264c8e44b827e274ad30e193ff62e1e9",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 57,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "dc2167e5f23fcc2d61b26739b9ea581a7b2e9233e748554efc60f5dff75f32e7",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 58,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "9fc94fbd8d73c46059c7915bbaf104f12ca06d636e271614163ad0a949737fdd",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 59,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "5f18ae822a4180c4961b3fe3009aa3c77a1b832f88b939b6c4c33818b1f0802f",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 60,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "600f829ac2ed8be783109bc9fbcdfa4f2a7c2c8d83e550924e9e05466819e73b",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 61,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "e0f65d38db7bb156bee6e6c9ee1bd53ac1495d9290d1ad8a1a922ee5aa6fbc44",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 62,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "e9d6aa02be6c9c2ee6c1ff5a3d44d5a1b2a8a6d90fb68900d0a8230f61f88bbe",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 63,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "a2ed9ae8d97060e9bd494a46352904123528ed8833db6274ca759ce5e1ebaa1d",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 64,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "6b8c06de0f72d0ed8550dc07a390dc76d40dcb162dc5fb6f74a37fc33ae14c2f",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 65,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "854e4503505f21f38906cf634ef94b24bf301d3291141df50b325c3806b717ac",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 66,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "91961d250db7912c3050b9cbdf50c65292fc13f52f1e52bc33e5ba288160cc69",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 67,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "6ac525abc605cab5028da704ceaf7dc6fa862a9842415c3f99aa2f04ad68970e",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 68,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "893610a56db83295d6e5a8a7d44ad67345b252ece8fe9b2f413795244d9c84f3",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 69,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "9caadfc44bef29da474d117b4d76823a14e82429fcfb0d4539f6cb6f90a51450",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 70,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "71fa22674cadb2e24ed58da43875114368fe792c461a14e17aa742b4e1a21299",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 71,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "f2aab7d8ffe58426e774f9f959bab112882078b31565ff9746c00167f0520afa",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 72,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "81acc6c2ce48f6f59bc40bd61a51a7df5923d9f645beedde41b84aba7cb57af9",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 73,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "ac2f03f464c280fa59e12659cf493763a4a85d0e1576f8f068fa388fc5c7e8b9",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 74,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "d5cdb93da81c6dfefa42b4b3e08967000dfd271804d31867fd8d76f8a5ac79af",
+        "reason_codes": [
+          "document_issuer",
+          "tradition",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 75,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "fc31a5a1228ea88fbbe6fd34835de3c5079a4ba3c6abfc04eb43088255d18dd1",
+        "reason_codes": [
+          "document_issuer",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 76,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "0f69a22bef72e7d9432371db91fa33a1d65fa9af43d52e07803bb4d0f054b6ba",
+        "reason_codes": [
+          "document_issuer",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 77,
+        "table": "claims"
+      },
+      {
+        "line_sha256": "6cb212960b317cfe6308b9a4f9140dc7b1520ff0dff9d53ab64a2daadd6b2a4b",
+        "reason_codes": [
+          "document_issuer",
+          "jurisdiction",
+          "published_or_revised",
+          "applicable_period",
+          "language_and_edition",
+          "original_verification_path",
+          "formal_adoption_document"
+        ],
+        "result": "insufficient_evidence",
+        "row_number": 78,
+        "table": "claims"
+      }
+    ],
+    "scope": "Contract-field presence only; related source metadata may exist but has not been mapped or independently verified. Missing fields do not prove evidence does not exist. No formal adoption inferred; all D4 claims remain unapproved and quarantined."
+  },
+  "bibliographic_records": 12,
+  "bibliography": {
+    "claim_relation_conversion": false,
+    "input_status_only": true,
+    "records": [
+      {
+        "disposition": "quarantined",
+        "line_sha256": "7392fcfec926b5752ab93f2570bd5e80ef10d4815281e263d237dcbc192e2aa9",
+        "reason_codes": [
+          "bibliographic_citation_is_not_argument_support"
+        ],
+        "row_number": 1
+      },
+      {
+        "disposition": "quarantined",
+        "line_sha256": "fbcb5dafac302ed2570d205e35090a2a1a56bef73eb135764fca5fcb54ecd81e",
+        "reason_codes": [
+          "bibliographic_citation_is_not_argument_support"
+        ],
+        "row_number": 2
+      },
+      {
+        "disposition": "quarantined",
+        "line_sha256": "bb30c63ab64cfa48e33729ecc6c49797f06c7702f8568c8fa5418cad3fbcbb62",
+        "reason_codes": [
+          "bibliographic_citation_is_not_argument_support",
+          "edge_checked_date_missing"
+        ],
+        "row_number": 3
+      },
+      {
+        "disposition": "quarantined",
+        "line_sha256": "c2bedd8864348763c8b7be84081e4b0ac6987a7e802ebae6ab6472ba198bc267",
+        "reason_codes": [
+          "bibliographic_citation_is_not_argument_support"
+        ],
+        "row_number": 4
+      },
+      {
+        "disposition": "quarantined",
+        "line_sha256": "0bd60e42338cfba3ad21e81fc7506b007e6114d9104d8c09c16238825ecba93a",
+        "reason_codes": [
+          "bibliographic_citation_is_not_argument_support",
+          "edge_checked_date_missing"
+        ],
+        "row_number": 5
+      },
+      {
+        "disposition": "quarantined",
+        "line_sha256": "a1f0ac3a5367eafddffbe1e22a8f6d2b34d70c03fa21e337ddb88be70907cb0e",
+        "reason_codes": [
+          "bibliographic_citation_is_not_argument_support"
+        ],
+        "row_number": 6
+      },
+      {
+        "disposition": "quarantined",
+        "line_sha256": "7195a48dcf60c5a96fe75ebc75fa08bacd83356e9e5fcb8b35d314f4ad698cca",
+        "reason_codes": [
+          "bibliographic_citation_is_not_argument_support"
+        ],
+        "row_number": 7
+      },
+      {
+        "disposition": "quarantined",
+        "line_sha256": "ce3208d0dadd89adaaa1fbeecbccfb77b46a849e77a428563fa666f25ffdbd5d",
+        "reason_codes": [
+          "bibliographic_citation_is_not_argument_support"
+        ],
+        "row_number": 8
+      },
+      {
+        "disposition": "quarantined",
+        "line_sha256": "5dd05469eb30d3a2062343548fb2430240d60b01764c67977e2b2b8154a29959",
+        "reason_codes": [
+          "bibliographic_citation_is_not_argument_support"
+        ],
+        "row_number": 9
+      },
+      {
+        "disposition": "quarantined",
+        "line_sha256": "9f09c90b93ebb6ee59f0e58297f5662967df51d3ee07741e4583069193464268",
+        "reason_codes": [
+          "bibliographic_citation_is_not_argument_support"
+        ],
+        "row_number": 10
+      },
+      {
+        "disposition": "quarantined",
+        "line_sha256": "709a75b91e2bf984715fb59b8e7e76ecd90563fcd6502c84896d04d04e96367d",
+        "reason_codes": [
+          "bibliographic_citation_is_not_argument_support"
+        ],
+        "row_number": 11
+      },
+      {
+        "disposition": "quarantined",
+        "line_sha256": "8a288783d626348713b338b3f4353f726986c6381ec12304de18565525946701",
+        "reason_codes": [
+          "bibliographic_citation_is_not_argument_support"
+        ],
+        "row_number": 12
+      }
+    ],
+    "source_checked_without_edge_date": 2
+  },
+  "canonical_promotion": false,
+  "checks": {
+    "baseline_delta_merged": "pass",
+    "bibliography_separate": "pass",
+    "coverage_per_work_and_csv": "pass",
+    "d3_d2_archive_pins": "pass",
+    "d4_manifest": "pass",
+    "nested_d3_manifest": "pass",
+    "rights_matrix_consistency": "pass",
+    "row_identity_and_foreign_keys": "pass"
+  },
+  "claims": {
+    "automatic_authority_adoptions": 0,
+    "automatic_scholarly_promotions": 0,
+    "original_status": {
+      "candidate": 4,
+      "scholarly_reviewed": 0,
+      "source_verified": 74
+    },
+    "raw_attribution_kind_counts": {
+      "community_explanation": 4,
+      "individual_opinion": 39,
+      "institutional_statement": 11,
+      "official_doctrine": 2,
+      "reported_view": 4,
+      "scholarly_interpretation": 17,
+      "textual_narrative": 1
+    },
+    "source_verified_is_not_adoption_or_scholarly_review": true,
+    "total": 78
+  },
+  "coverage": {
+    "address_status_counts": {
+      "not_recorded": 62,
+      "partial": 18
+    },
+    "scope": "comparison units only, not proof of canonical identity or theological agreement"
+  },
+  "coverage_rows": 80,
+  "d2_sha256": "c8b64b9144367a8526c77b121b3343f04a7c683276f9fd239b2cc51458589a47",
+  "d3_sha256": "baf206d2846544f1e1bb20622ac10c557394b71aa41cfd6e2be5bbafade347be",
+  "database_write": false,
+  "errors": {},
+  "input_sha256": "05ab5bdf3fc258f39b926257c771ef4a17138355aa072cb8bc97c56387999beb",
+  "manifest_entries": 72,
+  "quarantine": {
+    "auxiliary_records": 150,
+    "eligible": 0,
+    "primary_records": 3104,
+    "quarantined": 3254,
+    "reason": "research data is read-only and requires independent authority/rights review"
+  },
+  "rights": {
+    "browse": {
+      "blocked": 217,
+      "decisions": {
+        "allowed": 2,
+        "conditional": 10,
+        "unknown": 205
+      },
+      "effective_allowed": 0,
+      "reason": "independent_rights_review_required"
+    },
+    "collect_metadata": {
+      "blocked": 217,
+      "decisions": {
+        "allowed": 2,
+        "conditional": 5,
+        "unknown": 210
+      },
+      "effective_allowed": 0,
+      "reason": "independent_rights_review_required"
+    },
+    "embed": {
+      "blocked": 217,
+      "decisions": {
+        "conditional": 1,
+        "unknown": 216
+      },
+      "effective_allowed": 0,
+      "reason": "independent_rights_review_required"
+    },
+    "index_fulltext": {
+      "blocked": 217,
+      "decisions": {
+        "conditional": 2,
+        "unknown": 215
+      },
+      "effective_allowed": 0,
+      "reason": "independent_rights_review_required"
+    },
+    "public_link": {
+      "blocked": 217,
+      "decisions": {
+        "conditional": 3,
+        "unknown": 214
+      },
+      "effective_allowed": 0,
+      "reason": "independent_rights_review_required"
+    },
+    "redistribute": {
+      "blocked": 217,
+      "decisions": {
+        "conditional": 11,
+        "unknown": 206
+      },
+      "effective_allowed": 0,
+      "reason": "independent_rights_review_required"
+    },
+    "send_to_model": {
+      "blocked": 217,
+      "decisions": {
+        "conditional": 1,
+        "unknown": 216
+      },
+      "effective_allowed": 0,
+      "reason": "independent_rights_review_required"
+    },
+    "store_excerpt": {
+      "blocked": 217,
+      "decisions": {
+        "conditional": 5,
+        "unknown": 212
+      },
+      "effective_allowed": 0,
+      "reason": "independent_rights_review_required"
+    },
+    "store_raw": {
+      "blocked": 217,
+      "decisions": {
+        "conditional": 8,
+        "unknown": 209
+      },
+      "effective_allowed": 0,
+      "reason": "independent_rights_review_required"
+    }
+  },
+  "schema_version": "i2-d4-1",
+  "source_verification": {
+    "alignments_by_review_status": {
+      "partial_pending": 35,
+      "verified": 6
+    },
+    "claims_by_review_status": {
+      "candidate": 4,
+      "scholarly_reviewed": 0,
+      "source_verified": 74
+    },
+    "evidence_by_review_status": {
+      "proposed": 4,
+      "verified": 74
+    },
+    "independent_human_scholarly_review_events": 0,
+    "locators_by_verification_status": {
+      "edition_checked": 24,
+      "source_checked": 217,
+      "unchecked": 25
+    },
+    "relations_by_review_status": {
+      "proposed": 1,
+      "verified": 1
+    },
+    "review_events_by_decision": {
+      "approve_scholarly": 0,
+      "candidate": 6,
+      "scholarly_reviewed": 0,
+      "source_verified": 92
+    },
+    "statuses_automatically_promoted": 0
+  },
+  "status": "pass",
+  "tables": {
+    "affiliations": 12,
+    "agents": 52,
+    "alignments": 41,
+    "claims": 78,
+    "editions": 217,
+    "evidence": 78,
+    "locators": 266,
+    "passages": 92,
+    "relations": 2,
+    "reviews": 98,
+    "rights": 1953,
+    "sources": 215
+  }
+}

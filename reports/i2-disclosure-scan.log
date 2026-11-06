@@ -1,0 +1,12 @@
+I-2 D4 disclosure scan (exact value matches only)
+D4 JSONL records examined: 3820
+candidate new/modified paths examined: 41
+original ID patterns checked: 3281
+original URL patterns checked: 274
+original selected text patterns checked: 544
+files containing original ID: 0
+files containing original URL: 0
+files containing selected original text: 0
+raw data, private or secret filename candidates: 0
+non-UTF8 files not inspected: 0
+Limitations: exact-value text matching only; partial excerpts, paraphrase, OCR, indirect leakage, unknown field types and copyright status are not determined.

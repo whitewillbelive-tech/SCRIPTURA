@@ -1,0 +1,16 @@
+✔ separate view-only authority role cannot read or alter raw records (1244.853488ms)
+✔ research authority response downgrades raw official labels and masks free text (104.140644ms)
+✔ synthetic database mode is explicit and cannot mix real and synthetic records (23.386854ms)
+✔ legacy claim, search, graph and alignment paths redact unapproved free text and unproven official classification (68.638768ms)
+✔ invalid authority filters fail closed (7.718772ms)
+✔ a view role with a raw column-level grant is rejected by the API (24.258555ms)
+✔ a view role with role membership is rejected even when privileges are not inherited (25.262044ms)
+✔ documented synthetic adoption respects the requested date and a later retraction (57.500294ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1692.888703

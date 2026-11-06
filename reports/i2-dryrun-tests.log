@@ -1,0 +1,36 @@
+test_access_observations_cannot_rewrite_baseline_or_claim_review (test_i2_dryrun.D4DryRunTests.test_access_observations_cannot_rewrite_baseline_or_claim_review) ... ok
+test_all_nine_rights_actions_remain_default_denied (test_i2_dryrun.D4DryRunTests.test_all_nine_rights_actions_remain_default_denied) ... ok
+test_baseline_bytes_and_delta_merge_are_checked (test_i2_dryrun.D4DryRunTests.test_baseline_bytes_and_delta_merge_are_checked) ... ok
+test_bibliographic_id_cannot_collide_with_any_research_record (test_i2_dryrun.D4DryRunTests.test_bibliographic_id_cannot_collide_with_any_research_record) ... ok
+test_bibliographic_records_cannot_become_arguments (test_i2_dryrun.D4DryRunTests.test_bibliographic_records_cannot_become_arguments) ... ok
+test_cli_cannot_override_frozen_input_pin (test_i2_dryrun.D4DryRunTests.test_cli_cannot_override_frozen_input_pin) ... ok
+test_consistent_but_incorrect_coverage_count_is_rejected (test_i2_dryrun.D4DryRunTests.test_consistent_but_incorrect_coverage_count_is_rejected) ... ok
+test_coverage_csv_and_individual_work_counts_checked (test_i2_dryrun.D4DryRunTests.test_coverage_csv_and_individual_work_counts_checked) ... ok
+test_coverage_csv_missing_or_duplicate_headers_are_rejected (test_i2_dryrun.D4DryRunTests.test_coverage_csv_missing_or_duplicate_headers_are_rejected) ... ok
+test_coverage_enum_and_citation_url_are_checked (test_i2_dryrun.D4DryRunTests.test_coverage_enum_and_citation_url_are_checked) ... ok
+test_coverage_id_cannot_collide_with_bibliography (test_i2_dryrun.D4DryRunTests.test_coverage_id_cannot_collide_with_bibliography) ... ok
+test_doi_duplicates_are_rejected_even_if_delta_and_merged_agree (test_i2_dryrun.D4DryRunTests.test_doi_duplicates_are_rejected_even_if_delta_and_merged_agree) ... ok
+test_duplicate_and_traversal_zip_entries_are_rejected (test_i2_dryrun.D4DryRunTests.test_duplicate_and_traversal_zip_entries_are_rejected) ... /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/zipfile/__init__.py:1625: UserWarning: Duplicate name: 'baseline/records/sources.jsonl'
+  return self._open_to_write(zinfo, force_zip64=force_zip64)
+ok
+test_frozen_input_and_nested_lineage_hashes_fail_closed (test_i2_dryrun.D4DryRunTests.test_frozen_input_and_nested_lineage_hashes_fail_closed) ... ok
+test_hash_list_and_file_coverage_must_match (test_i2_dryrun.D4DryRunTests.test_hash_list_and_file_coverage_must_match) ... ok
+test_malformed_auxiliary_values_fail_without_exception (test_i2_dryrun.D4DryRunTests.test_malformed_auxiliary_values_fail_without_exception) ... ok
+test_missing_foreign_keys_are_rejected (test_i2_dryrun.D4DryRunTests.test_missing_foreign_keys_are_rejected) ... ok
+test_missing_or_duplicate_rights_columns_rejected (test_i2_dryrun.D4DryRunTests.test_missing_or_duplicate_rights_columns_rejected) ... ok
+test_nested_raw_content_is_rejected_and_never_returned (test_i2_dryrun.D4DryRunTests.test_nested_raw_content_is_rejected_and_never_returned) ... ok
+test_original_status_and_authority_axes_do_not_promote (test_i2_dryrun.D4DryRunTests.test_original_status_and_authority_axes_do_not_promote) ... ok
+test_personal_opinion_cannot_become_official_by_label (test_i2_dryrun.D4DryRunTests.test_personal_opinion_cannot_become_official_by_label) ... ok
+test_research_mode_rejects_explicit_synthetic_record (test_i2_dryrun.D4DryRunTests.test_research_mode_rejects_explicit_synthetic_record) ... ok
+test_research_unit_claim_count_checked_against_claim_links (test_i2_dryrun.D4DryRunTests.test_research_unit_claim_count_checked_against_claim_links) ... ok
+test_rights_csv_extra_values_and_evidence_mismatch_rejected (test_i2_dryrun.D4DryRunTests.test_rights_csv_extra_values_and_evidence_mismatch_rejected) ... ok
+test_source_access_cannot_report_raw_content_storage (test_i2_dryrun.D4DryRunTests.test_source_access_cannot_report_raw_content_storage) ... ok
+test_source_access_locator_must_match_source (test_i2_dryrun.D4DryRunTests.test_source_access_locator_must_match_source) ... ok
+test_source_checked_bibliography_requires_checked_locator (test_i2_dryrun.D4DryRunTests.test_source_checked_bibliography_requires_checked_locator) ... ok
+test_source_verified_claim_cannot_bypass_provenance (test_i2_dryrun.D4DryRunTests.test_source_verified_claim_cannot_bypass_provenance) ... ok
+test_valid_fixture_is_read_only_and_does_not_promote (test_i2_dryrun.D4DryRunTests.test_valid_fixture_is_read_only_and_does_not_promote) ... ok
+
+----------------------------------------------------------------------
+Ran 29 tests in 0.748s
+
+OK

@@ -1,0 +1,1 @@
+psql:tests/i2_safe_view_review.sql:21: NOTICE:  PASS: safe masking, synthetic visible, raw table/view and legacy table denied, write denied

@@ -1,0 +1,597 @@
+I-2 PostgreSQL 17, isolated synthetic-only DB, 2026-11-06 Asia/Seoul
+RUN: 001 + 002 + 003 + 006, tests/i2_authority_db.sql, tests/i2_safe_view_review.sql
+Assertion coverage: 29 expected 23514 rejections, 16 assertion blocks including independent-review true/false/null, rights and historic scope, retraction, stale evidence, and restricted safe-view role; independent reviewer safe-view block.
+BEGIN
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+COMMIT
+BEGIN
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+COMMIT
+BEGIN
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE FUNCTION
+DO
+REVOKE
+COMMIT
+BEGIN
+CREATE TABLE
+CREATE TABLE
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE VIEW
+SET
+CREATE FUNCTION
+DO
+SET
+CREATE VIEW
+REVOKE
+REVOKE
+COMMIT
+BEGIN
+INSERT 0 2
+INSERT 0 4
+INSERT 0 3
+INSERT 0 11
+INSERT 0 2
+INSERT 0 2
+INSERT 0 3
+INSERT 0 2
+INSERT 0 1
+CREATE TABLE
+INSERT 0 1
+CREATE FUNCTION
+INSERT 0 1
+DO
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+INSERT 0 1
+DO
+INSERT 0 1
+DO
+UPDATE 1
+DO
+INSERT 0 1
+ rejected 
+----------
+ 
+(1 row)
+
+INSERT 0 1
+ rejected 
+----------
+ 
+(1 row)
+
+INSERT 0 1
+ rejected 
+----------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+DO
+INSERT 0 1
+DO
+UPDATE 1
+DO
+INSERT 0 1
+UPDATE 1
+DO
+INSERT 0 1
+INSERT 0 1
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+UPDATE 1
+DO
+INSERT 0 1
+INSERT 0 1
+ rejected 
+----------
+ 
+(1 row)
+
+UPDATE 1
+DO
+INSERT 0 1
+ rejected 
+----------
+ 
+(1 row)
+
+UPDATE 1
+DO
+UPDATE 1
+DO
+INSERT 0 1
+DO
+ rejected 
+----------
+ 
+(1 row)
+
+UPDATE 1
+DO
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+CREATE ROLE
+GRANT
+GRANT
+GRANT
+SET
+DO
+RESET
+DO
+PASS: I-2 documentary scope, independent axes, authority/rights/identity negatives and append-only audit
+ROLLBACK
+BEGIN
+CREATE ROLE
+GRANT
+GRANT
+GRANT
+INSERT 0 2
+INSERT 0 2
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+SET
+psql:tests/i2_safe_view_review.sql:21: NOTICE:  PASS: safe masking, synthetic visible, raw table/view and legacy table denied, write denied
+DO
+ROLLBACK
+RUN: 006.down + 006 + both tests repeated
+BEGIN
+LOCK TABLE
+DO
+DROP VIEW
+DROP FUNCTION
+DROP VIEW
+DROP TRIGGER
+DROP TRIGGER
+DROP FUNCTION
+DROP FUNCTION
+DROP FUNCTION
+DROP FUNCTION
+DROP FUNCTION
+DROP FUNCTION
+DROP FUNCTION
+DROP FUNCTION
+DROP TRIGGER
+DROP TABLE
+DROP TABLE
+DROP FUNCTION
+COMMIT
+BEGIN
+CREATE TABLE
+CREATE TABLE
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE FUNCTION
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE TRIGGER
+CREATE VIEW
+SET
+CREATE FUNCTION
+DO
+SET
+CREATE VIEW
+REVOKE
+REVOKE
+COMMIT
+BEGIN
+INSERT 0 2
+INSERT 0 4
+INSERT 0 3
+INSERT 0 11
+INSERT 0 2
+INSERT 0 2
+INSERT 0 3
+INSERT 0 2
+INSERT 0 1
+CREATE TABLE
+INSERT 0 1
+CREATE FUNCTION
+INSERT 0 1
+DO
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+INSERT 0 1
+DO
+INSERT 0 1
+DO
+UPDATE 1
+DO
+INSERT 0 1
+ rejected 
+----------
+ 
+(1 row)
+
+INSERT 0 1
+ rejected 
+----------
+ 
+(1 row)
+
+INSERT 0 1
+ rejected 
+----------
+ 
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+DO
+INSERT 0 1
+DO
+UPDATE 1
+DO
+INSERT 0 1
+UPDATE 1
+DO
+INSERT 0 1
+INSERT 0 1
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+ rejected 
+----------
+ 
+(1 row)
+
+UPDATE 1
+DO
+INSERT 0 1
+INSERT 0 1
+ rejected 
+----------
+ 
+(1 row)
+
+UPDATE 1
+DO
+INSERT 0 1
+ rejected 
+----------
+ 
+(1 row)
+
+UPDATE 1
+DO
+UPDATE 1
+DO
+INSERT 0 1
+DO
+ rejected 
+----------
+ 
+(1 row)
+
+UPDATE 1
+DO
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+CREATE ROLE
+GRANT
+GRANT
+GRANT
+SET
+DO
+RESET
+DO
+PASS: I-2 documentary scope, independent axes, authority/rights/identity negatives and append-only audit
+ROLLBACK
+BEGIN
+CREATE ROLE
+GRANT
+GRANT
+GRANT
+INSERT 0 2
+INSERT 0 2
+INSERT 0 1
+INSERT 0 1
+INSERT 0 2
+SET
+psql:tests/i2_safe_view_review.sql:21: NOTICE:  PASS: safe masking, synthetic visible, raw table/view and legacy table denied, write denied
+DO
+ROLLBACK
+RUN: populated 006 rollback refusal
+INSERT 0 1
+BEGIN
+LOCK TABLE
+psql:db/006_authority_evidence.down.sql:8: ERROR:  rollback refused: authority evidence exists
+CONTEXT:  PL/pgSQL function inline_code_block line 3 at RAISE
+PASS: populated rollback refused and synthetic observation preserved

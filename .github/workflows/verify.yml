@@ -34,6 +34,7 @@ jobs:
           python3 scripts/check_fixture_policy.py
           python3 -m unittest discover -s tests -v
           node tests/rights-policy.test.cjs
+          node tests/i2-authority.test.mjs
       - name: Validate generated synthetic-scale snapshots
         run: |
           python3 scripts/benchmark_d2.py --sources 10000
@@ -66,6 +67,7 @@ jobs:
           done
           curl --fail --silent http://127.0.0.1:3107/ > /dev/null || { cat /tmp/scriptura-ci-web.log; exit 1; }
           node --test tests/ui.browser.cjs
+          node --test tests/ui-i2-authority.browser.cjs
 
   postgres:
     name: PostgreSQL migrations and integration
@@ -114,6 +116,8 @@ jobs:
           psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f tests/database_s1b1.sql
       - name: Exercise PostgreSQL-backed HTTP API and approval audit
         run: node --test tests/pg-api.integration.mjs
+      - name: Test I-2 authority API on isolated PostgreSQL
+        run: node --test tests/i2-authority-api.integration.mjs
       - name: Seed an isolated synthetic-only dataset
         run: psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f tests/seed_synthetic_pg.sql
       - name: Build
@@ -188,3 +192,40 @@ jobs:
           createdb --maintenance-db="$SCRIPTURA_TEST_STAGING_OWNER_URL" scriptura_staging_i1_guard
           psql -X -v ON_ERROR_STOP=1 "$SCRIPTURA_I1_OWNER_URL" -f db/004_d2_staging.sql
           SCRIPTURA_TEST_STAGING_OWNER_URL="$SCRIPTURA_I1_OWNER_URL" python3 tests/i1_staging_guard.py
+
+  i2-authority-db:
+    name: I-2 synthetic authority evidence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: scriptura_i2_owner
+          POSTGRES_PASSWORD: scriptura_i2_ci_only
+          POSTGRES_DB: scriptura_i2_synthetic_ci
+        ports:
+          - 127.0.0.1:5432:5432
+        options: >-
+          --health-cmd "pg_isready -U scriptura_i2_owner -d scriptura_i2_synthetic_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      I2_TEST_DATABASE_URL: postgresql://scriptura_i2_owner:scriptura_i2_ci_only@127.0.0.1:5432/scriptura_i2_synthetic_ci
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply prerequisite migrations in isolated synthetic database
+        run: |
+          psql -X -v ON_ERROR_STOP=1 "$I2_TEST_DATABASE_URL" -f db/001_schema.sql
+          psql -X -v ON_ERROR_STOP=1 "$I2_TEST_DATABASE_URL" -f db/002_append_only.sql
+          psql -X -v ON_ERROR_STOP=1 "$I2_TEST_DATABASE_URL" -f db/003_research_integrity.sql
+      - name: Verify authority migration, evidence and guarded rollback
+        run: |
+          psql -X -v ON_ERROR_STOP=1 "$I2_TEST_DATABASE_URL" -f db/006_authority_evidence.sql
+          psql -X -v ON_ERROR_STOP=1 "$I2_TEST_DATABASE_URL" -f tests/i2_authority_db.sql
+          psql -X -v ON_ERROR_STOP=1 "$I2_TEST_DATABASE_URL" -f tests/i2_safe_view_review.sql
+          psql -X -v ON_ERROR_STOP=1 "$I2_TEST_DATABASE_URL" -f db/006_authority_evidence.down.sql
+          psql -X -v ON_ERROR_STOP=1 "$I2_TEST_DATABASE_URL" -f db/006_authority_evidence.sql
+          psql -X -v ON_ERROR_STOP=1 "$I2_TEST_DATABASE_URL" -f tests/i2_authority_db.sql
+          psql -X -v ON_ERROR_STOP=1 "$I2_TEST_DATABASE_URL" -f tests/i2_safe_view_review.sql

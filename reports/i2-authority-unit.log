@@ -1,0 +1,25 @@
+(node:6802) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/scriptura/src/lib/authority.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /workspace/scriptura/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ documented adoption requires explicitly scoped source, adoption and rights evidence without promoting other axes (2.531205ms)
+✔ every mandatory adoption evidence field is required (1.255517ms)
+✔ a personal post on an official site or different institution cannot establish group adoption (0.446631ms)
+✔ adoption is bounded by publication, revision, scope and valid explicit or current date (0.301313ms)
+✔ historical records require evidence and are never automatically made current (0.427203ms)
+✔ direct quotation cannot be invented from translation or a secondary report (0.201052ms)
+✔ bibliographic citation alone cannot support a direct argument (0.164898ms)
+✔ peer review is not proof of independent human review of this claim (0.231949ms)
+✔ unknown or conditional rights never permit any of nine content actions (0.313602ms)
+✔ outsider reporting cannot become community self-attestation (0.307322ms)
+✔ institutional guidance requires the requesting date in an evidenced period (0.347532ms)
+✔ checked quotation and independent review need specific reviewer, scope and target (0.220201ms)
+✔ individual and historical raw unknown statuses are never automatically upgraded (0.208374ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16.451391

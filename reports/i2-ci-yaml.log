@@ -1,0 +1,2 @@
+PASS: YAML parse, preserved baseline jobs, separate loopback I-2 PostgreSQL service, test entries, both SQL suites before/after 006 rollback
+PENDING: GitHub runner execution validated separately

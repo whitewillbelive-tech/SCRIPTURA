@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { data, warning, claimDetails, interpretations, graph } from '../../../../lib/demo';
 import { authorized, createSample, listAudit, listSamples, addReview } from '../../../../lib/admin';
-import { pgRead, pgReview, pgAudit, dbWarning } from '../../../../lib/postgres';
+import { pgRead, pgReview, pgAudit, pgAuthority, dbWarning } from '../../../../lib/postgres';
+import { AUTHORITY_KINDS, isDate, syntheticAuthority, evaluateAuthority, type AuthorityKind } from '../../../../lib/authority';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,6 +16,21 @@ export async function GET(request: Request, context: Context) {
   const include = url.searchParams.get('include_unverified') === 'true';
   const dataset = url.searchParams.get('dataset');
   if (dataset && dataset !== 'database' && dataset !== 'synthetic') return respond({ error: 'Invalid dataset' }, 400);
+  if (path.length === 1 && path[0] === 'authority') {
+    const asOf = url.searchParams.get('as_of');
+    const kind = url.searchParams.get('kind');
+    const traditionId = url.searchParams.get('tradition_id');
+    if ((asOf !== null && !isDate(asOf)) || (kind !== null && !AUTHORITY_KINDS.includes(kind as AuthorityKind)) || (traditionId !== null && (!traditionId.trim() || traditionId.length > 200))) return respond({ error:'Invalid authority filter' },400);
+    if (dataset === 'database') {
+      const mode = url.searchParams.get('data_mode');
+      if (mode && mode !== 'synthetic' && mode !== 'research') return respond({dataset_kind:'database', warning:dbWarning, error:'Invalid data_mode'},400);
+      const synthetic = mode === 'synthetic';
+      try { return respond({dataset_kind:synthetic ? 'synthetic' : 'database', warning:synthetic ? warning : dbWarning, positions:await pgAuthority(url,synthetic ? 'synthetic' : 'research')}); }
+      catch { return respond({dataset_kind:synthetic ? 'synthetic' : 'database', warning:synthetic ? warning : dbWarning, error:'Database unavailable or request invalid'},503); }
+    }
+    const positions = syntheticAuthority.map(item => evaluateAuthority(item,asOf)).filter(item => (!kind || item.kind === kind) && (!traditionId || item.tradition_id === traditionId));
+    return respond({ positions });
+  }
   if (dataset === 'database') {
     const mode = url.searchParams.get('data_mode');
     if (mode && mode !== 'synthetic' && mode !== 'research') return respond({ dataset_kind:'database', warning:dbWarning, error:'Invalid data_mode' },400);

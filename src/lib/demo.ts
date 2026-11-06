@@ -8,7 +8,7 @@ export const isVisible = (status: string, includeUnverified: boolean) => include
 export function claimDetails(id: string, includeUnverified: boolean) {
   const claim = data.claim_versions.find((v) => v.id === id);
   if (!claim || !isVisible(claim.review_status, includeUnverified)) return null;
-  const attributions = data.claim_attributions.filter((a) => a.claim_version_id === id).map((a) => ({ ...a, agent: data.agents.find((agent) => agent.id === a.agent_id) ?? null }));
+  const attributions = data.claim_attributions.filter((a) => a.claim_version_id === id).map((a) => ({ ...a, attribution_kind: a.attribution_kind === 'official_doctrine' ? 'unconfirmed_authority' : a.attribution_kind, agent: data.agents.find((agent) => agent.id === a.agent_id) ?? null }));
   const evidence = data.claim_evidence.filter((e) => e.claim_version_id === id).map((e) => {
     const locator = data.source_locators.find((l) => l.id === e.source_locator_id);
     const source = data.sources.find((s) => s.id === locator?.source_id);

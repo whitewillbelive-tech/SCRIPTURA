@@ -75,3 +75,17 @@ python3 scripts/i1_bridge_cli.py ingest-preview /path/to/SCRIPTURA_D3_DATA_RESEA
 ```
 
 공개 가능한 보고서는 집계·행 해시·보류 사유만 담는다. `--private-trace`는 원 ID·참조·파일/행, 원래 검증·권리 상태 및 본문별 비교를 `.local/i1/`에 접근 권한 0600으로 생성한다. 이 파일과 실제 ZIP은 커밋하거나 외부에 배포하지 않는다. 문서 [I-1 매핑 검토](docs/I1_MAPPING_NOTES.md), [합성 스테이징 보호](docs/I1_STAGING_GUARDS.md), [I-1 수신 기록](I1_RECEIPT.md)을 참조한다. 합성/실자료 원문의 임의 자유 텍스트 저작권 판별이나 사람의 독립 학술 심사를 자동으로 수행하지 않는다.
+
+## Gate I-2 권위와 D-4 수신 검증
+
+`/authority`와 `GET /api/v1/authority?dataset=synthetic`은 가상 자료로 공식 채택·기관 설명·개인 해석·외부 비판·학술 분석과 네 가지 독립 검증 상태를 구분한다. 합성 채택 상태는 실제 공동체의 입장이 아니다. 데이터베이스 모드는 `dataset=database`와 별도의 `DATABASE_AUTHORITY_URL` 읽기 역할이 필요하다. 역할 설정과 보안 한계는 [스키마 차이](I2_SCHEMA_DIFF.md), API 계약과 미확정 기준은 [계약 차이](I2_CONTRACT_DIFF.md)를 참조한다. 원시 권위 테이블 및 내부 view 접근을 부여하지 않고 안전 view SELECT와 안전 함수 EXECUTE만 허용한다. 운영 인증이나 실제 자료의 이용권 확인을 대체하지 않는다.
+
+D-4 동결 ZIP을 저장소 밖에 두고 다음 명령으로 읽기 전용 검사와 격리 보고서를 생성한다. 출력은 존재하지 않는 새 파일이어야 한다. 이 명령은 DB에 연결하거나 자료를 승격하지 않는다.
+
+```sh
+python3 scripts/i2_d4_dryrun.py /path/to/SCRIPTURA_D4_RESEARCH.zip --output /path/to/new-i2-report.json
+python3 -m unittest discover -s tests -v
+node tests/i2-authority.test.mjs
+```
+
+PostgreSQL 시험은 빈 전용 합성 시험 DB에 기존 001·002·003을 적용한 뒤 `psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/006_authority_evidence.sql` 및 `psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f tests/i2_authority_db.sql`을 실행한다. 빈 I-2 테이블의 역방향 마이그레이션은 `psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f db/006_authority_evidence.down.sql`이다. 실자료나 비어 있지 않은 I-2 구조를 파괴적으로 되돌리지 않는다. 실행 결과와 보류 사항은 [I-2 보고서](I2_REPORT.md)를 참조한다.

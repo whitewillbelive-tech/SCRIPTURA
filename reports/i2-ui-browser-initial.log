@@ -1,0 +1,60 @@
+✖ 합성 고지와 별도 범주의 실제 API 응답을 표시한다 (2661.575624ms)
+✖ 대표성·발행·확인 경로·권리와 네 독립 검증 상태를 표시한다 (4.447586ms)
+✔ 개인 의견과 전언을 채택된 공동체 입장과 분리한다 (30.759262ms)
+✖ 기준일 밖의 채택은 미확정이며 과거 간행물을 현재 입장으로 승격하지 않는다 (30142.452306ms)
+✔ 전통과 범주 필터는 개인 의견만 분리하고 서버 실패 시 이전 결과를 지운다 (217.357162ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 2
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 33587.5392
+
+✖ failing tests:
+
+test at tests/ui-i2-authority.browser.cjs:16:1
+✖ 합성 고지와 별도 범주의 실제 API 응답을 표시한다 (2661.575624ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(await group('official').getByText('가상 공동체의 채택 문헌', { exact: true }).isVisible())
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-i2-authority.browser.cjs:22:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/ui-i2-authority.browser.cjs:26:1
+✖ 대표성·발행·확인 경로·권리와 네 독립 검증 상태를 표시한다 (4.447586ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(await official.getByText('집단 대표성의 근거', { exact: true }).isVisible())
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-i2-authority.browser.cjs:28:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/ui-i2-authority.browser.cjs:47:1
+✖ 기준일 밖의 채택은 미확정이며 과거 간행물을 현재 입장으로 승격하지 않는다 (30142.452306ms)
+  locator.waitFor: Timeout 30000ms exceeded.
+  Call log:
+  [2m  - waiting for locator('section[aria-labelledby="group-official"]').getByText('가상 공동체의 채택 문헌', { exact: true }) to be visible[22m
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-i2-authority.browser.cjs:54:71) {
+    name: 'TimeoutError',
+    log: [ `  - waiting for locator('section[aria-labelledby="group-official"]').getByText('가상 공동체의 채택 문헌', { exact: true }) to be visible` ]
+  }
