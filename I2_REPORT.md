@@ -14,7 +14,7 @@
 | 실존 공식 문헌 및 채택 사실 직접 확인 | PENDING | 환경의 공식 기관 호스트 outbound 미허용으로 공식 문서 두 곳에 대한 프록시 CONNECT 요청이 403으로 차단됐다. 대상 서버 응답에 도달하지 못했으므로 직접 확인을 주장하지 않는다. 대조 가능한 환경에서 판본·정확 locator·관할·기간과 채택 절차를 검토해야 한다. |
 | 실제 D-5 자료·행위별 권리·독립 검수 | PENDING | 미수신 D-5를 추정하지 않는다. 9개 행위는 기본 거부이며 실제 자료·메타데이터의 권리 및 개인정보 검토가 필요하다. |
 | 운영 인증·전체 직접 DB 권한 경계 | PENDING | 분리된 제한 역할의 합성 시범이다. 기존 광범위 DB 역할, 고권한 소유자, 잘못 합성으로 분류된 실자료와 임의 텍스트의 저작권 판별은 보장하지 않는다. |
-| GitHub Actions | PENDING | 워크플로를 구성했으며 원격 실행 결과는 push 후 별도로 확인한다. |
+| GitHub Actions | PASS | 구현 커밋 `0a547c3bcdc453a2e267abe619d71021b99c405d`의 [실행 42145564930](https://github.com/whitewillbelive-tech/SCRIPTURA/actions/runs/42145564930)에서 4개 작업 모두 성공했다. |
 | I-3 통합·운영 배포 | PENDING | D-5 실제 증거와 계약 대조 및 별도 승인 이전에 수행하지 않는다. |
 
 ## 동결 D-4 결과
@@ -38,3 +38,7 @@
 이 설계는 공식 근거의 존재·범위를 구조화하고 확인이 부족하면 보류하지만, 사람의 자격이나 자료의 진위·저작권을 자동 증명하지 않는다. 006은 현재 발행/개정 및 시작/종료일을 모두 요구하므로 종료일이 없는 실제 문서도 안전하게 보류될 수 있다. 날짜를 임의로 채우지 않는다.
 
 개발 중 API가 변경되는 동안 먼저 실행한 I-2 브라우저 시험은 2 PASS / 3 FAIL이었다. 변경을 반영한 이후 같은 기능을 production 빌드에서 다시 실행해 위와 같이 5 PASS / 0 FAIL을 확인했다. 초기 결과도 [로그](reports/i2-ui-browser-initial.log)에 보존한다.
+
+## GitHub 반영
+
+구현 커밋 `0a547c3bcdc453a2e267abe619d71021b99c405d`를 `codex/scriptura-i2-authority`에 push했다. 기준 브랜치 `codex/scriptura-i1-d3-receipt`를 대상으로 초안 PR 생성을 시도했으나 GitHub GraphQL 요청이 `Forbidden`으로 차단되어 PR 번호는 없다. [브랜치 비교](https://github.com/whitewillbelive-tech/SCRIPTURA/compare/codex/scriptura-i1-d3-receipt...codex/scriptura-i2-authority)에서 변경을 검토할 수 있다. 우회하지 않았다.
