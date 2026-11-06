@@ -260,6 +260,8 @@ def _build_projection(layers):
             speaker=None
             if p and any(x.get('reference') is None for x in p): mapped.discard('passage_ids')
             unmapped=sorted({_code(k,'unrecognized_field') for k in row if k not in mapped} | ({'source_title','source_creator'} if src else set()))
+            if (row.get('source_locator_id') or row.get('locator_id')) and not (loc and ed and src):
+                unmapped=sorted(set(unmapped)|{'source_chain'})
             events=access.get(row.get('source_locator_id') or row.get('locator_id'),[])
             events=[item for item in events if (not item.get('source_id') or item['source_id']==src.get('id'))
                     and (not item.get('edition_id') or item['edition_id']==ed.get('id'))]
@@ -267,6 +269,11 @@ def _build_projection(layers):
                             'result':'redacted_rights_unresolved'} for item in events]
             access_value=loc.get('access_method') or loc.get('source_access_method') or (events[0].get('method') if len(events)==1 else None)
             record={'key':coordinates.get(ident),'stage':stage,'record_kind':'claim','attribution':attribution,'original_attribution':original,
+                    # Preserve the source chain without exposing raw research
+                    # IDs. Coordinates are linkable with the original ZIP;
+                    # they are private references, not anonymisation.
+                    'source_key':coordinates.get(src.get('id')),'edition_key':coordinates.get(ed.get('id')),
+                    'locator_key':coordinates.get(loc.get('id')),
                     'authority_status':'pending_authority','input_authority_status':_code(row.get('authority_status') or row.get('document_authority')),
                     'verification_status':checked,'quotation_status':quotation,'argument_status':argument,
                     'reported_independent_review_status':reported_review,'independent_review_status':human_status,'audit_observation_key':audit_key,

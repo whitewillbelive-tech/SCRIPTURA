@@ -7,6 +7,7 @@ api_no_cors 1
 api_no_store 1
 browser_candidate_detail 1
 browser_multiedition_rights 1
+browser_source_link 1
 cross_origin_denied 1
 edition_right_actions 153
 exact_forbidden_matches 0
@@ -24,14 +25,22 @@ Source and handoff SHA unchanged: PASS
 D8 protected claims, source/evidence/locator/rights/status and authenticated browser: PASS
 No screenshots, metadata strings, raw IDs, raw content, paths or tokens written to this log
 Scope: exact-match disclosure check cannot detect excerpts, paraphrases, OCR or prove rights
+
 Production CLI RAM-only archive + controlling terminal: PASS
 Loopback-only startup, no archive path/token in stdout, graceful Ctrl+C: PASS
 Local browser automatic opening disabled for headless test: PASS
 Windows execution: NOT_RUN
 
+D4–D8 raw record rows examined: 5688
+identifier candidate exact patterns: 5625 matches: 0
+url candidate exact patterns: 362 matches: 0
+free_text candidate exact patterns: 700 matches: 0
+All-stage projection records scanned: 508
+Scope: exact strings only; partial excerpt, paraphrase, OCR and legal rights not assessed
+
 Earlier independent test harness attempts (not concealed):
 - Selecting exactly one cached handoff failed because multiple uploaded copies existed; selection was corrected and the pinned D8 SHA was checked.
-- The default sandbox rejected loopback binding; the requested scoped execution permission enabled the isolated local test.
+- The default sandbox rejected loopback binding; the scoped execution permission enabled the isolated local test.
 - An early edition test incorrectly assumed all 24 D8 editions belonged to new D8 sources; it was corrected to include the one edition of a prior D7 source, then all 24/216 passed.
 - An early browser test looked for a specific synonym of the redaction notice; it was corrected to match the actual clear notice, then passed.
 - A temporary test script had an indentation error and an initial CLI harness had no controlling terminal; the script and PTY setup were corrected and the tests passed.

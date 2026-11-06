@@ -212,6 +212,37 @@ test('제목이 가려진 후보는 안전한 임시 좌표로 구별하고 원�
   await candidates.first().click();
   assert.ok(await page.getByRole('region',{name:'후보 상세'}).getByText('d8:claims:1',{exact:true}).isVisible());
 });
+test('주장 상세는 안전한 좌표의 문헌 후보로 이동하고 판본과 위치를 구분한다', async () => {
+  await page.unroute('**/api/candidates**');
+  const claim = row({key:'d8:claims:1',source_title:null,source_key:'d8:sources:4',edition_key:'d8:editions:2',locator_key:'d8:locators:3'});
+  const source = row({key:'d8:sources:4',record_kind:'source',source_title:'연결된 가상 문헌'});
+  await page.route('**/api/candidates**', route => {
+    const key = new URL(route.request().url()).searchParams.get('key');
+    return reply(route,payload([key === 'd8:sources:4' ? source : claim]));
+  });
+  await page.getByRole('button',{name:'초기화'}).click();
+  await page.getByRole('button',{name:/서지 제목 표시 보류/}).waitFor();
+  await page.getByRole('button',{name:/서지 제목 표시 보류/}).click();
+  const detail = page.getByRole('region',{name:'후보 상세'});
+  assert.ok(await detail.getByText('d8:editions:2',{exact:true}).isVisible());
+  assert.ok(await detail.getByText('d8:locators:3',{exact:true}).isVisible());
+  await detail.getByRole('button',{name:'연결된 문헌 후보 열기'}).click();
+  await detail.getByRole('heading',{name:'연결된 가상 문헌'}).waitFor();
+});
+test('임의 URL이나 원본 ID는 문헌 좌표로 사용하지 않는다', async () => {
+  await page.unroute('**/api/candidates**');
+  const claim = row({source_key:'https://example.invalid/sources/4',edition_key:'RAW_EDITION_ID',locator_key:'RAW_LOCATOR_ID'});
+  await page.route('**/api/candidates**', route => reply(route,payload([claim])));
+  await page.getByRole('button',{name:'초기화'}).click();
+  await page.getByRole('button',{name:/가상 문헌/}).waitFor();
+  await page.getByRole('button',{name:/가상 문헌/}).click();
+  const detail = page.getByRole('region',{name:'후보 상세'});
+  assert.equal(await detail.getByRole('button',{name:'연결된 문헌 후보 열기'}).count(),0);
+  assert.ok(await detail.getByText('연결된 문헌 후보 미확인').isVisible());
+  assert.equal(await detail.getByText('RAW_EDITION_ID').count(),0);
+  assert.equal(await detail.getByText('RAW_LOCATOR_ID').count(),0);
+  assert.equal(await page.locator('a[href*="example.invalid"]').count(),0);
+});
 test('실제 합성 테스트 서버의 인증·필터 응답으로 후보를 검색한다', async () => {
   await page.unroute('**/api/candidates**');
   const ok = page.waitForResponse(r => r.url().includes('/api/candidates') && r.status() === 200);

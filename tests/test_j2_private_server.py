@@ -92,6 +92,20 @@ class SearchTests(unittest.TestCase):
         self.assertEqual(len(self.run_filter(stage='D8', offset='100')['records']), 1)
         self.assertEqual(self.run_filter(key='synthetic:100')['records'][0]['key'], 'synthetic:100')
         self.assertEqual(self.run_filter(key='synthetic:10')['total'], 1)
+    def test_claim_source_link_uses_typed_coordinates_not_raw_ids(self):
+        claim = self.data['records'][0]
+        claim.update(source_key='d8:sources:2', edition_key='d8:editions:3', locator_key='d8:locators:4')
+        source = dict(self.data['records'][1], key='d8:sources:2', record_kind='source')
+        self.data['records'].append(source)
+        claim_out = self.run_filter(key=claim['key'])['records'][0]
+        self.assertEqual((claim_out['source_key'], claim_out['edition_key'], claim_out['locator_key']), ('d8:sources:2', 'd8:editions:3', 'd8:locators:4'))
+        self.assertEqual(self.run_filter(key=claim_out['source_key'])['records'][0]['record_kind'], 'source')
+        for field, bad in (('source_key','private-source-id'), ('edition_key','d8:sources:3'), ('locator_key','https://example.invalid/private')):
+            original = claim[field]
+            claim[field] = bad
+            out = self.run_filter(key=claim['key'])['records'][0]
+            self.assertIsNone(out[field])
+            claim[field] = original
     def test_unknown_date_scope_is_pending(self):
         r = self.run_filter(as_of='2025-01-01')
         self.assertEqual(r['total'], 2)
@@ -113,7 +127,7 @@ class SearchTests(unittest.TestCase):
     def test_unreviewed_research_names_and_titles_are_not_returned_or_searchable(self):
         self.data['dataset'] = 'D8'
         row = self.data['records'][0]
-        row.update(source_title='SYNTHETIC-UNREVIEWED-TITLE', source_creator='SYNTHETIC-UNREVIEWED-NAME', researcher='SYNTHETIC-UNREVIEWED-NAME', speaker='SYNTHETIC-UNREVIEWED-NAME', tradition='SYNTHETIC-UNREVIEWED-GROUP', community_reference='SYNTHETIC-UNREVIEWED-GROUP', evaluated_subject='SYNTHETIC-UNREVIEWED-GROUP', community_role='target')
+        row.update(key='d8:claims:1', source_title='SYNTHETIC-UNREVIEWED-TITLE', source_creator='SYNTHETIC-UNREVIEWED-NAME', researcher='SYNTHETIC-UNREVIEWED-NAME', speaker='SYNTHETIC-UNREVIEWED-NAME', tradition='SYNTHETIC-UNREVIEWED-GROUP', community_reference='SYNTHETIC-UNREVIEWED-GROUP', evaluated_subject='SYNTHETIC-UNREVIEWED-GROUP', community_role='target')
         result = self.run_filter(key=row['key'])
         for field in ('source_title', 'source_creator', 'researcher', 'speaker', 'tradition', 'community_reference', 'evaluated_subject'):
             self.assertIsNone(result['records'][0][field])
@@ -121,6 +135,13 @@ class SearchTests(unittest.TestCase):
         self.assertEqual(self.run_filter(researcher='SYNTHETIC-UNREVIEWED-NAME')['total'], 0)
         self.assertEqual(self.run_filter(community='SYNTHETIC-UNREVIEWED-GROUP')['total'], 0)
         self.assertEqual(result['records'][0]['community_role'], 'target')
+    def test_research_record_key_cannot_be_a_raw_identifier(self):
+        self.data['dataset'] = 'D8'
+        self.data['records'][0]['key'] = 'private-source-identifier'
+        output = self.run_filter()
+        self.assertIsNone(output['records'][0]['key'])
+        self.assertNotIn('private-source-identifier', json.dumps(output))
+        self.assertEqual(self.run_filter(key='private-source-identifier')['total'], 0)
     def test_unknown_filter_or_invalid_date_fails_closed(self):
         for bad in ({'hidden_text':['x']}, {'as_of':['2025-02-31']}, {'offset':['-1']}, {'stage':['D8','D7']}):
             with self.subTest(bad=bad), self.assertRaises(ValueError):

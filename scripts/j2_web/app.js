@@ -30,6 +30,7 @@
   };
   // Only generated layer/table/row coordinates are displayed; never raw source IDs.
   const safeRef = key => typeof key === 'string' && /^(base|d[5-8]):(claims|sources):[1-9][0-9]{0,6}$/.test(key) ? key : '미확인';
+  const safeCoordinate = (key, table) => typeof key === 'string' && new RegExp(`^(base|d[5-8]):${table}:[1-9][0-9]{0,6}$`).test(key) ? key : '미확인';
   const node = (tag, text, className) => {
     const el = document.createElement(tag);
     if (text !== undefined) el.textContent = text;
@@ -98,6 +99,8 @@
     fact(fields, '발화 주체 유형 · 미확정', selected.speaker_type);
     body.append(node('p', '발화 주체 표기는 형식만 검사된 연구 후보입니다. 개인·기관 여부와 공식 대표성, 개인정보 및 표시권은 확인되지 않았습니다.', 'field-notice'));
     fact(fields, '문헌 · 저자', [selected.source_title,selected.source_creator].filter(v => typeof v === 'string' && v).join(' · '));
+    fact(fields, '판본 임시 참조 번호', safeCoordinate(selected.edition_key, 'editions'));
+    fact(fields, '위치 임시 참조 번호', safeCoordinate(selected.locator_key, 'locators'));
     fact(fields, '문헌 종류 · 발행 연도 · DOI', [selected.source_kind,selected.source_year,selected.source_doi].filter(v => (typeof v === 'string' && v) || typeof v === 'number').join(' · '));
     const passages = Array.isArray(selected.passages) ? selected.passages : [];
     if (passages.length) {
@@ -115,6 +118,12 @@
     fact(fields, '독립 인간 학술 심사', readable(selected.independent_review_status));
     fact(fields, '권리 상태', selected.rights_status);
     body.append(fields);
+    if (selected.record_kind === 'claim') {
+      if (safeCoordinate(selected.source_key, 'sources') !== '미확인') {
+        const source = node('button', '연결된 문헌 후보 열기', 'target-button');
+        source.type = 'button'; source.addEventListener('click', () => openTarget(selected.source_key)); body.append(source);
+      } else body.append(node('p', '연결된 문헌 후보 미확인', 'muted'));
+    }
     body.append(node('h4', '판본별 권리 기록'));
     const actions = {browse:'열람',collect_metadata:'메타데이터 수집',store_raw:'원문 저장',store_excerpt:'발췌 저장',index_fulltext:'전문 색인',embed:'임베딩',send_to_model:'모델 전송',redistribute:'재배포',public_link:'공개 링크'};
     const editions = Array.isArray(selected.edition_rights) ? selected.edition_rights.filter(item => item && typeof item === 'object') : [];

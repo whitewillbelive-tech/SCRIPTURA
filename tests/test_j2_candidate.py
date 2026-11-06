@@ -39,6 +39,16 @@ class CandidateProjectionTests(unittest.TestCase):
   records=m._build_projection(layers_fixture())
   self.assertNotIn('SECRET_FORBIDDEN_CONTENT',str(records));self.assertNotIn('quoted secret fragment',str(records))
   self.assertIn('statement_ko',next(r for r in records if r['key']=='d8:claims:1')['unmapped'])
+ def test_claim_source_chain_uses_coordinates_only(self):
+  records=m._build_projection(layers_fixture());r=next(r for r in records if r['key']=='d8:claims:1')
+  self.assertEqual(r['source_key'],'d8:sources:1');self.assertEqual(r['edition_key'],'d8:editions:1');self.assertEqual(r['locator_key'],'d8:locators:1')
+  self.assertIn(r['source_key'],[x['key'] for x in records if x['record_kind']=='source'])
+  self.assertNotIn('synthetic:source',str(records));self.assertNotIn('synthetic:edition',str(records));self.assertNotIn('synthetic:locator',str(records))
+ def test_unresolvable_source_chain_never_exposes_ids(self):
+  layers=layers_fixture();layers['d8']['claims'][0]['value']['source_locator_id']='synthetic:missing'
+  r=next(r for r in m._build_projection(layers) if r['key']=='d8:claims:1')
+  self.assertIsNone(r['source_key']);self.assertIsNone(r['edition_key']);self.assertIsNone(r['locator_key'])
+  self.assertIn('source_chain',r['unmapped']);self.assertNotIn('synthetic:missing',str(r))
  def test_d8_metadata_coordinate_and_format_gate(self):
   layers=layers_fixture();source=layers['d8']['sources'][0];source['line']=16
   self.assertIsNone(next(r for r in m._build_projection(layers) if r['key']=='d8:claims:1')['source_title'])

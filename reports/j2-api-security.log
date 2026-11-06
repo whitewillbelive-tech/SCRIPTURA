@@ -10,6 +10,7 @@ test_server_binds_ipv4_loopback_only (test_j2_private_server.HttpTests.test_serv
 test_static_policy_and_no_directory_browsing (test_j2_private_server.HttpTests.test_static_policy_and_no_directory_browsing) ... ok
 test_success_resets_failed_attempts (test_j2_private_server.HttpTests.test_success_resets_failed_attempts) ... ok
 test_wrong_host_and_cross_origin_are_rejected (test_j2_private_server.HttpTests.test_wrong_host_and_cross_origin_are_rejected) ... ok
+test_claim_source_link_uses_typed_coordinates_not_raw_ids (test_j2_private_server.SearchTests.test_claim_source_link_uses_typed_coordinates_not_raw_ids) ... ok
 test_community_subject_does_not_create_attribution (test_j2_private_server.SearchTests.test_community_subject_does_not_create_attribution) ... ok
 test_enum_matching_is_exact (test_j2_private_server.SearchTests.test_enum_matching_is_exact) ... ok
 test_evidence_and_relation_are_separately_searchable (test_j2_private_server.SearchTests.test_evidence_and_relation_are_separately_searchable) ... ok
@@ -17,6 +18,7 @@ test_flat_passage_fallback_when_list_absent (test_j2_private_server.SearchTests.
 test_known_dates_filter_only_explicit_intervals (test_j2_private_server.SearchTests.test_known_dates_filter_only_explicit_intervals) ... ok
 test_multiple_passage_predicates_must_match_same_address (test_j2_private_server.SearchTests.test_multiple_passage_predicates_must_match_same_address) ... ok
 test_obvious_remote_archive_path_rejected_before_open (test_j2_private_server.SearchTests.test_obvious_remote_archive_path_rejected_before_open) ... ok
+test_research_record_key_cannot_be_a_raw_identifier (test_j2_private_server.SearchTests.test_research_record_key_cannot_be_a_raw_identifier) ... ok
 test_researcher_matches_speaker_and_creator (test_j2_private_server.SearchTests.test_researcher_matches_speaker_and_creator) ... ok
 test_rights_action_and_decision_match_same_recorded_action (test_j2_private_server.SearchTests.test_rights_action_and_decision_match_same_recorded_action) ... ok
 test_rights_override_is_separate_from_original (test_j2_private_server.SearchTests.test_rights_override_is_separate_from_original) ... ok
@@ -29,6 +31,6 @@ test_unmapped_summary_rejects_arbitrary_fields (test_j2_private_server.SearchTes
 test_unreviewed_research_names_and_titles_are_not_returned_or_searchable (test_j2_private_server.SearchTests.test_unreviewed_research_names_and_titles_are_not_returned_or_searchable) ... ok
 
 ----------------------------------------------------------------------
-Ran 29 tests in 0.534s
+Ran 31 tests in 0.538s
 
 OK

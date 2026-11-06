@@ -79,6 +79,16 @@ def _safe_record(row, *, research=False):
         # or privacy suitability. Keep such fields out of response and search.
         for key in ('source_title', 'source_creator', 'researcher', 'speaker', 'tradition', 'community_reference', 'evaluated_subject'):
             result[key] = None
+        table = {'claim': 'claims', 'source': 'sources'}.get(row.get('record_kind'))
+        key = row.get('key')
+        if table is None or not isinstance(key, str) or not re.fullmatch(rf'(?:base|d[5-8]):{table}:[1-9][0-9]*', key):
+            result['key'] = None
+    # Only immutable input coordinates can link records. A raw source ID,
+    # wrong table, URL or arbitrary string is never returned as a target.
+    for field, table in (('source_key', 'sources'), ('edition_key', 'editions'), ('locator_key', 'locators')):
+        value = row.get(field)
+        pattern = rf'(?:base|d[5-8]|synthetic):{table}:[1-9][0-9]*'
+        result[field] = value if isinstance(value, str) and re.fullmatch(pattern, value) else None
     # Direct quotation and free-form claim text are not authorized in this gate.
     result['summary'] = None
     result['rights'] = _rights_map(row.get('rights'))

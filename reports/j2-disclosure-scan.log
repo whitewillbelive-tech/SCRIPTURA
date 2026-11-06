@@ -2,7 +2,7 @@ J-2 D8/D7/D6/D5 disclosure scan (exact literals; no source values recorded)
 Nested JSONL files examined: 81
 Nested JSONL records examined: 5995
 D5 selected CSV files examined: 1
-Modified, staged or untracked UTF-8 files scanned: 32
+Modified, staged or untracked UTF-8 files scanned: 16
 id patterns: 5875 ; files with new exact matches: 0 ; existing baseline file matches: 0
 url patterns: 403 ; files with new exact matches: 0 ; existing baseline file matches: 0
 selected_text patterns: 652 ; files with new exact matches: 0 ; existing baseline file matches: 0
