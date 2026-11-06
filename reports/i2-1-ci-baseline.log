@@ -1,0 +1,23 @@
+Gate I-2.1 — baseline CI evidence
+Repository: whitewillbelive-tech/SCRIPTURA
+Successful implementation commit: 0a547c3bcdc453a2e267abe619d71021b99c405d
+Failing documentation commit: 9731013f9675c3e16375db690f9fd09835c5065a
+
+Git comparison:
+  git diff --name-only 0a547c3bcdc453a2e267abe619d71021b99c405d 9731013f9675c3e16375db690f9fd09835c5065a
+  I2_REPORT.md
+Authority UI source blob at both commits: bcf7845bd8474650857e3132ef3712906fe84ed9
+I-2 authority UI test blob at both commits: f914982053b33ffaa64f176e26149ba6f81aec0d
+The commits do not differ in the implementation, tests or workflow.
+
+Public GitHub Actions run summary observations:
+  https://github.com/whitewillbelive-tech/SCRIPTURA/actions/runs/42145564930
+  Implementation commit: all four workflow jobs completed successfully.
+  https://github.com/whitewillbelive-tech/SCRIPTURA/actions/runs/42145882624
+  Documentation commit: Fixture, demo API, build and browser failed; PostgreSQL migrations and integration, Synthetic D-2 isolated staging, and I-2 synthetic authority evidence succeeded.
+  The public job page reports the 'Test demo UI in Chromium' step failed; preceding install, build and demo API steps succeeded. The generic annotation says process exited with code 1.
+  Attempting to read that step's GitHub log URL returned HTTP 404; its detailed contents could not be independently inspected here.
+
+The supplied handoff prompts/CODEX_I2_1_CI_REPAIR.md records the failure as tests/ui-i2-authority.browser.cjs:68, AssertionError 1 !== 0, in the 503/reset stale-article assertion. This line and assertion are a handoff report, not an independently observed remote log in this environment. The public job page alone does not establish the cause.
+
+The restricted network policy does not allow api.github.com; no policy bypass was attempted. Official website proxy CONNECT 403 and the GitHub PR GraphQL Forbidden observed in I-2 are separate from this browser failure.

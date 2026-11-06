@@ -1,0 +1,28 @@
+✔ 합성 고지와 별도 범주의 실제 API 응답을 표시한다 (1057.122658ms)
+✔ 대표성·발행·확인 경로·권리와 네 독립 검증 상태를 표시한다 (29.754295ms)
+✔ 개인 의견과 전언을 채택된 공동체 입장과 분리한다 (7.989138ms)
+✔ 기준일 밖의 채택은 미확정이며 과거 간행물을 현재 입장으로 승격하지 않는다 (56.259671ms)
+✖ 전통과 범주 필터는 개인 의견만 분리하고 서버 실패 시 이전 결과를 지운다 (107.136702ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1346.59186
+
+✖ failing tests:
+
+test at tests/ui-i2-authority.browser.cjs:58:1
+✖ 전통과 범주 필터는 개인 의견만 분리하고 서버 실패 시 이전 결과를 지운다 (107.136702ms)
+  locator.waitFor: Error: strict mode violation: getByRole('alert') resolved to 2 elements:
+      1) <p role="alert" class="Xr1hjq_error">권위 비교 예시를 불러오지 못했습니다. 서버 상태를 확인해 주세요.</p> aka getByText('권위 비교 예시를 불러오지 못했습니다. 서버 상태를 확인해 주세요')
+      2) <div role="alert" aria-live="assertive" id="__next-route-announcer__"></div> aka locator('[id="__next-route-announcer__"]')
+  
+  Call log:
+  [2m  - waiting for getByRole('alert') to be visible[22m
+  
+      at TestContext.<anonymous> (/tmp/i2-race-old/tests/ui-i2-authority.browser.cjs:67:33) {
+    log: [ "  - waiting for getByRole('alert') to be visible" ]
+  }

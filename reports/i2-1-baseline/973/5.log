@@ -1,0 +1,32 @@
+✔ 합성 고지와 별도 범주의 실제 API 응답을 표시한다 (973.025464ms)
+✔ 대표성·발행·확인 경로·권리와 네 독립 검증 상태를 표시한다 (34.832508ms)
+✔ 개인 의견과 전언을 채택된 공동체 입장과 분리한다 (8.934581ms)
+✔ 기준일 밖의 채택은 미확정이며 과거 간행물을 현재 입장으로 승격하지 않는다 (70.906557ms)
+✖ 전통과 범주 필터는 개인 의견만 분리하고 서버 실패 시 이전 결과를 지운다 (87.12177ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1240.135901
+
+✖ failing tests:
+
+test at tests/ui-i2-authority.browser.cjs:58:1
+✖ 전통과 범주 필터는 개인 의견만 분리하고 서버 실패 시 이전 결과를 지운다 (87.12177ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (/tmp/i2-race-old/tests/ui-i2-authority.browser.cjs:68:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

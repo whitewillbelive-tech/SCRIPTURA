@@ -1,0 +1,15 @@
+request http://127.0.0.1:3191/api/v1/authority?dataset=synthetic
+response 200 http://127.0.0.1:3191/api/v1/authority?dataset=synthetic
+request http://127.0.0.1:3191/api/v1/authority?dataset=synthetic&tradition_id=synthetic%3Atradition-a
+response 200 http://127.0.0.1:3191/api/v1/authority?dataset=synthetic&tradition_id=synthetic%3Atradition-a
+request http://127.0.0.1:3191/api/v1/authority?dataset=synthetic&tradition_id=synthetic%3Atradition-a&kind=individual_insider_view
+response 200 http://127.0.0.1:3191/api/v1/authority?dataset=synthetic&tradition_id=synthetic%3Atradition-a&kind=individual_insider_view
+before route alerts=[{"visible":true,"html":"<div aria-live=\"assertive\" id=\"__next-route-announcer__\" role=\"alert\" style=\"position: absolute; border: 0px; height: 1px; margin: -1px; padding: 0px; width: 1px; clip: rect(0px, 0px, 0px, 0px); overflow: hidden; white-space: nowrap; overflow-wrap: normal;\"></div>"}] article_count=1
+request http://127.0.0.1:3191/api/v1/authority?dataset=synthetic
+intercept http://127.0.0.1:3191/api/v1/authority?dataset=synthetic
+request blocked alerts=[{"visible":true,"html":"<div aria-live=\"assertive\" id=\"__next-route-announcer__\" role=\"alert\" style=\"position: absolute; border: 0px; height: 1px; margin: -1px; padding: 0px; width: 1px; clip: rect(0px, 0px, 0px, 0px); overflow: hidden; white-space: nowrap; overflow-wrap: normal;\"></div>"}] article_count=0
+unscoped alert resolves before 503=true
+before response alerts=[{"visible":true,"html":"<div aria-live=\"assertive\" id=\"__next-route-announcer__\" role=\"alert\" style=\"position: absolute; border: 0px; height: 1px; margin: -1px; padding: 0px; width: 1px; clip: rect(0px, 0px, 0px, 0px); overflow: hidden; white-space: nowrap; overflow-wrap: normal;\"></div>"}] article_count=0
+fulfilled 503
+response 503 http://127.0.0.1:3191/api/v1/authority?dataset=synthetic
+after 503 alerts=[{"visible":true,"html":"<p role=\"alert\" class=\"Xr1hjq_error\">권위 비교 예시를 불러오지 못했습니다. 서버 상태를 확인해 주세요.</p>"},{"visible":true,"html":"<div aria-live=\"assertive\" id=\"__next-route-announcer__\" role=\"alert\" style=\"position: absolute; border: 0px; height: 1px; margin: -1px; padding: 0px; width: 1px; clip: rect(0px, 0px, 0px, 0px); overflow: hidden; white-space: nowrap; overflow-wrap: normal;\"></div>"}] article_count=0

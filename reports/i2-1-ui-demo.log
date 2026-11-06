@@ -1,0 +1,13 @@
+RUN: SCRIPTURA_TEST_URL=http://127.0.0.1:3217 CHROMIUM_PATH=/usr/bin/chromium node tests/ui.browser.cjs
+✔ 합성 고지와 기본 검증 필터가 표시된다 (1018.722647ms)
+✔ 미검증 전환으로 합성 주장, 출처 권리와 관계가 표시된다 (120.934272ms)
+✔ 전통 필터는 근거 없는 귀속을 만들지 않는다 (83.46653ms)
+✔ 본문 선택을 바꾸면 그 본문의 결과로 갱신된다 (78.623476ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1374.346343

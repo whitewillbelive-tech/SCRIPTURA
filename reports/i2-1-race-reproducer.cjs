@@ -1,0 +1,20 @@
+const {chromium}=require('playwright');
+(async()=>{
+ const b=await chromium.launch({headless:true,executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
+ const c=await b.newContext(); await c.tracing.start({screenshots:true,snapshots:true,sources:true});
+ const p=await c.newPage(); const events=[]; let release, arrived;
+ const gate=new Promise(r=>release=r), requestArrived=new Promise(r=>arrived=r);
+ p.on('request',r=>{if(r.url().includes('/api/v1/authority?'))events.push('request '+r.url());});
+ p.on('response',r=>{if(r.url().includes('/api/v1/authority?'))events.push('response '+r.status()+' '+r.url());});
+ await p.goto('http://127.0.0.1:3191/authority',{waitUntil:'networkidle'});
+ await p.getByLabel('가상 전통').selectOption('synthetic:tradition-a'); await p.getByText('3개 예시',{exact:true}).waitFor();
+ await p.getByLabel('비교 범주').selectOption('individual_insider_view');await p.getByText('1개 예시',{exact:true}).waitFor();
+ const snap=async(label)=>{const a=p.getByRole('alert');const n=await a.count();const aa=[];for(let i=0;i<n;i++)aa.push({visible:await a.nth(i).isVisible(),html:await a.nth(i).evaluate(e=>e.outerHTML)});events.push(label+' alerts='+JSON.stringify(aa)+' article_count='+await p.locator('article').count());};
+ await snap('before route');
+ await p.route('**/api/v1/authority?*',async route=>{events.push('intercept '+route.request().url());arrived();await gate;await route.fulfill({status:503,body:'{}'});events.push('fulfilled 503');});
+ await p.getByRole('button',{name:'초기화'}).click();await requestArrived;await snap('request blocked');
+ const result=await Promise.race([p.getByRole('alert').waitFor({timeout:900}).then(()=>true).catch(()=>false),new Promise(r=>setTimeout(()=>r(false),1000))]);events.push('unscoped alert resolves before 503='+result);
+ await snap('before response');await p.screenshot({path:'/tmp/i2-race-before.png'});
+ release();await p.getByText('권위 비교 예시를 불러오지 못했습니다. 서버 상태를 확인해 주세요.').waitFor();await snap('after 503');await p.screenshot({path:'/tmp/i2-race-after.png'});
+ await c.tracing.stop({path:'/tmp/i2-race-trace.zip'});await b.close();console.log(events.join('\n'));
+})().catch(e=>{console.error(e);process.exitCode=1});

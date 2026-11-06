@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './authority.module.css';
 
 type Position = {
@@ -63,9 +63,26 @@ export default function AuthorityPage() {
   const [asOf, setAsOf] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [refresh, setRefresh] = useState(0);
+  const requestGeneration = useRef(0);
+  const activeRequest = useRef<AbortController | null>(null);
+
+  // Invalidate the old request immediately, before React runs effect cleanup.
+  // Clear actual state, so stale results are not merely hidden by an alert.
+  const clearForNewRequest = () => {
+    requestGeneration.current += 1;
+    activeRequest.current?.abort();
+    setPositions([]);
+    setError('');
+    setLoading(true);
+    setRefresh(n => n + 1);
+  };
 
   useEffect(() => {
     const controller = new AbortController();
+    const generation = ++requestGeneration.current;
+    activeRequest.current = controller;
+    const isCurrent = () => !controller.signal.aborted && requestGeneration.current === generation;
     const params = new URLSearchParams({ dataset: 'synthetic' });
     if (tradition.trim()) params.set('tradition_id', tradition.trim());
     if (asOf) params.set('as_of', asOf);
@@ -78,15 +95,23 @@ export default function AuthorityPage() {
         if (!response.ok) throw new Error('unavailable');
         const data: ApiResponse = await response.json();
         if (data.dataset_kind !== 'synthetic' || !Array.isArray(data.positions)) throw new Error('unexpected data');
-        if (!controller.signal.aborted) {
+        if (isCurrent()) {
           setPositions(data.positions);
           if (!tradition && !asOf && !kind) setTraditions([...new Set(data.positions.map(p => p.tradition_id).filter((v): v is string => Boolean(v)))]);
         }
       })
-      .catch(() => { if (!controller.signal.aborted) setError('권위 비교 예시를 불러오지 못했습니다. 서버 상태를 확인해 주세요.'); })
-      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
-    return () => controller.abort();
-  }, [tradition, asOf, kind]);
+      .catch(() => {
+        if (isCurrent()) {
+          setPositions([]);
+          setError('권위 비교 예시를 불러오지 못했습니다. 서버 상태를 확인해 주세요.');
+        }
+      })
+      .finally(() => { if (isCurrent()) setLoading(false); });
+    return () => {
+      controller.abort();
+      if (activeRequest.current === controller) activeRequest.current = null;
+    };
+  }, [tradition, asOf, kind, refresh]);
 
   return <main className={styles.main}>
     <div className={styles.banner}>합성 데모 / 실제 학술 데이터 아님 · 모든 인물, 기관, 문헌과 입장은 가상입니다</div>
@@ -95,7 +120,7 @@ export default function AuthorityPage() {
       <section className={styles.intro}><p className={styles.eyebrow}>I-2 · SYNTHETIC COMPARISON</p><h1>누가, 어떤 범위에서<br/><em>무엇을 말했을까요?</em></h1><p>발언의 출처, 공동체의 채택, 학술적 검토는 각각 다른 질문입니다.<br/>가상의 자료를 통해 근거와 불확실성을 함께 살펴보세요.</p></section>
       <section className={styles.filters} aria-label="비교 설정">
         <div><span className={styles.step}>01 / 범위</span><h2>비교 기준</h2><p>기준일을 비우면 오늘(UTC)과 명시된 유효기간을 대조합니다. 기간 근거가 없는 과거 간행물은 현재 입장으로 추정하지 않습니다.</p></div>
-        <div className={styles.filterControls}><label>가상 전통 <select value={tradition} onChange={e => setTradition(e.target.value)}><option value="">전체 전통</option>{traditions.map(value => <option key={value} value={value}>{traditionLabel[value] ?? value}</option>)}</select></label><label>비교 범주 <select value={kind} onChange={e => setKind(e.target.value)}><option value="">전체 범주</option>{kindOptions.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label><label>기준일 <input type="date" value={asOf} onChange={e => setAsOf(e.target.value)} /></label><button type="button" onClick={() => {setTradition(''); setAsOf(''); setKind('');}}>초기화</button></div>
+        <div className={styles.filterControls}><label>가상 전통 <select value={tradition} onChange={e => { clearForNewRequest(); setTradition(e.target.value); }}><option value="">전체 전통</option>{traditions.map(value => <option key={value} value={value}>{traditionLabel[value] ?? value}</option>)}</select></label><label>비교 범주 <select value={kind} onChange={e => { clearForNewRequest(); setKind(e.target.value); }}><option value="">전체 범주</option>{kindOptions.map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label><label>기준일 <input type="date" value={asOf} onChange={e => { clearForNewRequest(); setAsOf(e.target.value); }} /></label><button type="button" onClick={() => {clearForNewRequest(); setTradition(''); setAsOf(''); setKind('');}}>초기화</button></div>
       </section>
       <section aria-label="해석 비교" aria-live="polite" className={styles.results}>
         <div className={styles.resultsHeading}><div><p className={styles.eyebrow}>02 / COMPARISON</p><h2>서로 다른 권위의 자리</h2></div><span>{loading ? '불러오는 중' : `${positions.length}개 예시`}</span></div>
