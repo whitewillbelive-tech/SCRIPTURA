@@ -1,0 +1,37 @@
+test_assessment_verification_status_fallback (test_j1_d7.D7Tests.test_assessment_verification_status_fallback) ... ok
+test_audit_coverage_missing (test_j1_d7.D7Tests.test_audit_coverage_missing) ... ok
+test_audit_target_must_be_d6 (test_j1_d7.D7Tests.test_audit_target_must_be_d6) ... ok
+test_audit_wrong_target_type (test_j1_d7.D7Tests.test_audit_wrong_target_type) ... ok
+test_aux_source_index_cross_source_links_rejected (test_j1_d7.D7Tests.test_aux_source_index_cross_source_links_rejected) ... ok
+test_aux_source_index_unique_and_complete (test_j1_d7.D7Tests.test_aux_source_index_unique_and_complete) ... ok
+test_claim_community_wrong_type (test_j1_d7.D7Tests.test_claim_community_wrong_type) ... ok
+test_complete_nine_rights (test_j1_d7.D7Tests.test_complete_nine_rights) ... ok
+test_conditional_rights_require_evidence (test_j1_d7.D7Tests.test_conditional_rights_require_evidence) ... ok
+test_conflicting_baseline_status_fields (test_j1_d7.D7Tests.test_conflicting_baseline_status_fields) ... ok
+test_crosswalk_duplicate_target (test_j1_d7.D7Tests.test_crosswalk_duplicate_target) ... ok
+test_crosswalk_events_must_be_complete (test_j1_d7.D7Tests.test_crosswalk_events_must_be_complete) ... ok
+test_crosswalk_locator_correct (test_j1_d7.D7Tests.test_crosswalk_locator_correct) ... ok
+test_crosswalk_observations_correct (test_j1_d7.D7Tests.test_crosswalk_observations_correct) ... ok
+test_crosswalk_status_correct (test_j1_d7.D7Tests.test_crosswalk_status_correct) ... ok
+test_duplicate_id_across_layers (test_j1_d7.D7Tests.test_duplicate_id_across_layers) ... ok
+test_evidence_claim_locator_mismatch (test_j1_d7.D7Tests.test_evidence_claim_locator_mismatch) ... ok
+test_frozen_null_previous_status_preserved (test_j1_d7.D7Tests.test_frozen_null_previous_status_preserved) ... ok
+test_input_immutable (test_j1_d7.D7Tests.test_input_immutable) ... ok
+test_missing_source (test_j1_d7.D7Tests.test_missing_source) ... ok
+test_no_official_promotion (test_j1_d7.D7Tests.test_no_official_promotion) ... ok
+test_no_raw_stored (test_j1_d7.D7Tests.test_no_raw_stored) ... ok
+test_no_unaudited_independent_review (test_j1_d7.D7Tests.test_no_unaudited_independent_review) ... ok
+test_no_unsubstantiated_direct_rebuttal (test_j1_d7.D7Tests.test_no_unsubstantiated_direct_rebuttal) ... ok
+test_null_community_not_fabricated (test_j1_d7.D7Tests.test_null_community_not_fabricated) ... ok
+test_pending_essential_foreign_key (test_j1_d7.D7Tests.test_pending_essential_foreign_key) ... ok
+test_previous_status_not_changed (test_j1_d7.D7Tests.test_previous_status_not_changed) ... ok
+test_title_duplicates_are_pending_coordinates_only (test_j1_d7.D7Tests.test_title_duplicates_are_pending_coordinates_only) ... ok
+test_unknown_relation_is_pending_not_inferred (test_j1_d7.D7Tests.test_unknown_relation_is_pending_not_inferred) ... ok
+test_unknown_rights_preserved (test_j1_d7.D7Tests.test_unknown_rights_preserved) ... ok
+test_valid_and_multiple_audit_observations (test_j1_d7.D7Tests.test_valid_and_multiple_audit_observations) ... ok
+test_wrong_archive_rejected_before_write (test_j1_d7.D7Tests.test_wrong_archive_rejected_before_write) ... ok
+
+----------------------------------------------------------------------
+Ran 32 tests in 0.005s
+
+OK

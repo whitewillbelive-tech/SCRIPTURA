@@ -1,0 +1,35 @@
+D7 pinned ZIP: read only; no database connection
+
+mode: validate status: pass errors: {}
+input SHA256 before/after: 8a8fb8d4efde68f639b99ab8edb9eab14c320b4bc9e64e0aab882af7ee0a4820 8a8fb8d4efde68f639b99ab8edb9eab14c320b4bc9e64e0aab882af7ee0a4820
+manifests: {'d1': 28, 'd2': 65, 'd3': 69, 'd4': 72, 'd5': 53, 'd6': 32, 'd7': 42}
+totals: {'baseline_d4': 3104, 'd5': 754, 'd6': 584, 'd6_auxiliary': 65, 'd7': 770, 'd7_and_auxiliary_reference_occurrences': 1587, 'd7_auxiliary': 149}
+semantics: {'claim_truth': 'not_adjudicated', 'corrections': 'not_applied', 'd6_audit_events': 79, 'd6_audit_multiple_events': 38, 'd6_audit_targets': 41, 'd6_crosswalk_rows': 41, 'd7_attributions': {'academic_interpretation': 2, 'community_self_explanation': 31, 'external_critique': 1, 'individual_opinion': 8}, 'd7_rights': {'conditional': 6, 'unknown': 327}, 'duplicate_candidates': {'title_candidates': 1}, 'independent_human_review': 'not_inferred', 'official_adoption': 'not_inferred', 'semantic_deduplication': 'pending', 'verse_alignment': 'not_inferred'}
+pending: {'d6_auxiliary_scope_references': 3, 'd7_auxiliary_scope_references': 1, 'external_historical_handoff_manifests': True, 'semantic_deduplication': True, 'source_truth_authority_rights_review': True, 'unmapped_relation_predicates': 0, 'versification_alignment': True}
+quarantined: None
+D7 prior handoff: {'corresponding_members_checked': 3, 'entries': 6, 'remaining_require_prior_handoff': 3}
+D6 prior handoff: {'corresponding_members_checked': 2, 'entries': 5, 'remaining_require_prior_handoff': 3}
+DB writes: False canonical promotion: False
+
+mode: dry-run status: pass errors: {}
+input SHA256 before/after: 8a8fb8d4efde68f639b99ab8edb9eab14c320b4bc9e64e0aab882af7ee0a4820 8a8fb8d4efde68f639b99ab8edb9eab14c320b4bc9e64e0aab882af7ee0a4820
+manifests: {'d1': 28, 'd2': 65, 'd3': 69, 'd4': 72, 'd5': 53, 'd6': 32, 'd7': 42}
+totals: {'baseline_d4': 3104, 'd5': 754, 'd6': 584, 'd6_auxiliary': 65, 'd7': 770, 'd7_and_auxiliary_reference_occurrences': 1587, 'd7_auxiliary': 149}
+semantics: {'claim_truth': 'not_adjudicated', 'corrections': 'not_applied', 'd6_audit_events': 79, 'd6_audit_multiple_events': 38, 'd6_audit_targets': 41, 'd6_crosswalk_rows': 41, 'd7_attributions': {'academic_interpretation': 2, 'community_self_explanation': 31, 'external_critique': 1, 'individual_opinion': 8}, 'd7_rights': {'conditional': 6, 'unknown': 327}, 'duplicate_candidates': {'title_candidates': 1}, 'independent_human_review': 'not_inferred', 'official_adoption': 'not_inferred', 'semantic_deduplication': 'pending', 'verse_alignment': 'not_inferred'}
+pending: {'d6_auxiliary_scope_references': 3, 'd7_auxiliary_scope_references': 1, 'external_historical_handoff_manifests': True, 'semantic_deduplication': True, 'source_truth_authority_rights_review': True, 'unmapped_relation_predicates': 0, 'versification_alignment': True}
+quarantined: 5426
+D7 prior handoff: {'corresponding_members_checked': 3, 'entries': 6, 'remaining_require_prior_handoff': 3}
+D6 prior handoff: {'corresponding_members_checked': 2, 'entries': 5, 'remaining_require_prior_handoff': 3}
+DB writes: False canonical promotion: False
+
+mode: mapping-preview status: pass errors: {}
+input SHA256 before/after: 8a8fb8d4efde68f639b99ab8edb9eab14c320b4bc9e64e0aab882af7ee0a4820 8a8fb8d4efde68f639b99ab8edb9eab14c320b4bc9e64e0aab882af7ee0a4820
+manifests: {'d1': 28, 'd2': 65, 'd3': 69, 'd4': 72, 'd5': 53, 'd6': 32, 'd7': 42}
+totals: {'baseline_d4': 3104, 'd5': 754, 'd6': 584, 'd6_auxiliary': 65, 'd7': 770, 'd7_and_auxiliary_reference_occurrences': 1587, 'd7_auxiliary': 149}
+semantics: {'claim_truth': 'not_adjudicated', 'corrections': 'not_applied', 'd6_audit_events': 79, 'd6_audit_multiple_events': 38, 'd6_audit_targets': 41, 'd6_crosswalk_rows': 41, 'd7_attributions': {'academic_interpretation': 2, 'community_self_explanation': 31, 'external_critique': 1, 'individual_opinion': 8}, 'd7_rights': {'conditional': 6, 'unknown': 327}, 'duplicate_candidates': {'title_candidates': 1}, 'independent_human_review': 'not_inferred', 'official_adoption': 'not_inferred', 'semantic_deduplication': 'pending', 'verse_alignment': 'not_inferred'}
+pending: {'d6_auxiliary_scope_references': 3, 'd7_auxiliary_scope_references': 1, 'external_historical_handoff_manifests': True, 'semantic_deduplication': True, 'source_truth_authority_rights_review': True, 'unmapped_relation_predicates': 0, 'versification_alignment': True}
+quarantined: 5426
+D7 prior handoff: {'corresponding_members_checked': 3, 'entries': 6, 'remaining_require_prior_handoff': 3}
+D6 prior handoff: {'corresponding_members_checked': 2, 'entries': 5, 'remaining_require_prior_handoff': 3}
+DB writes: False canonical promotion: False
+coordinate references: 3637 duplicate candidate coordinates: 1

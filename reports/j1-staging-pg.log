@@ -1,0 +1,17 @@
+test_01_apply_empty_rollback_and_reapply (__main__.J1StagingPostgresTests.test_01_apply_empty_rollback_and_reapply) ... ok
+test_02_fixed_research_hashes_rejected_by_db (__main__.J1StagingPostgresTests.test_02_fixed_research_hashes_rejected_by_db) ... ok
+test_02b_prior_i3_denylist_remains_in_force (__main__.J1StagingPostgresTests.test_02b_prior_i3_denylist_remains_in_force) ... ok
+test_03_internal_api_rejects_known_research_hash_before_file_or_connection (__main__.J1StagingPostgresTests.test_03_internal_api_rejects_known_research_hash_before_file_or_connection) ... ok
+test_04_invalid_row_rolls_back_synthetic_snapshot_atomically (__main__.J1StagingPostgresTests.test_04_invalid_row_rolls_back_synthetic_snapshot_atomically) ... ok
+test_05_generated_synthetic_fixture_and_idempotent_replay (__main__.J1StagingPostgresTests.test_05_generated_synthetic_fixture_and_idempotent_replay) ... ok
+test_06_restricted_writer_cannot_mutate_or_delete (__main__.J1StagingPostgresTests.test_06_restricted_writer_cannot_mutate_or_delete) ... ok
+test_07_rights_remain_unknown_and_all_nine_actions_preserved (__main__.J1StagingPostgresTests.test_07_rights_remain_unknown_and_all_nine_actions_preserved) ... ok
+test_08_nonempty_rollback_refused_and_history_preserved (__main__.J1StagingPostgresTests.test_08_nonempty_rollback_refused_and_history_preserved) ... ok
+test_09_external_archive_cli_input_is_rejected (__main__.J1StagingPostgresTests.test_09_external_archive_cli_input_is_rejected) ... ok
+test_10_nonlocal_and_colliding_database_paths_are_rejected (__main__.J1StagingPostgresTests.test_10_nonlocal_and_colliding_database_paths_are_rejected) ... ok
+test_11_conditional_and_unknown_rights_are_never_treated_as_permission (__main__.J1StagingPostgresTests.test_11_conditional_and_unknown_rights_are_never_treated_as_permission) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 1.908s
+
+OK

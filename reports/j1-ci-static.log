@@ -1,0 +1,8 @@
+PASS: workflow YAML parses with unchanged four jobs
+PASS: unittest discovery and I-2.1 browser suite retained
+PASS: synthetic DB migration guards and J-1 staged PG test wired
+PASS: frozen research ZIP not required or embedded in CI
+PASS: equivalent PostgreSQL 17 migration, restricted writer and rollback sequence in reports/j1-staging-pg.log (12 tests)
+PASS: earlier synthetic staging tests in reports/j1-staging-regression.log (5 tests)
+PASS: preserved I-2.1 UI and demo Chromium browser tests in reports/j1-ui-regression.log (7 + 4 tests)
+PENDING: remote GitHub Actions

@@ -173,6 +173,8 @@ jobs:
         run: psql -X -v ON_ERROR_STOP=1 "$SCRIPTURA_TEST_STAGING_OWNER_URL" -f db/005_i1_research_guard.sql
       - name: Apply I-3 research archive guard
         run: psql -X -v ON_ERROR_STOP=1 "$SCRIPTURA_TEST_STAGING_OWNER_URL" -f db/007_i3_research_guard.sql
+      - name: Apply J-1 research archive guard
+        run: psql -X -v ON_ERROR_STOP=1 "$SCRIPTURA_TEST_STAGING_OWNER_URL" -f db/008_j1_research_guard.sql
       - name: Provision restricted synthetic staging writer
         run: |
           psql -X -v ON_ERROR_STOP=1 "$SCRIPTURA_TEST_STAGING_OWNER_URL" <<'SQL'
@@ -208,6 +210,21 @@ jobs:
           GRANT SELECT, INSERT ON scriptura_d2_stage.snapshots, scriptura_d2_stage.records TO scriptura_stage_writer;
           SQL
           SCRIPTURA_TEST_STAGING_OWNER_URL="$I3_OWNER_URL" SCRIPTURA_STAGING_DATABASE_URL="$I3_WRITER_URL" python3 tests/i3_staging_pg.py
+      - name: Verify J-1 guard and rollback in a separate synthetic database
+        env:
+          J1_OWNER_URL: postgresql://scriptura_stage_owner:stage_owner_ci_only@127.0.0.1:5432/scriptura_staging_j1_guard
+          J1_WRITER_URL: postgresql://scriptura_stage_writer:stage_writer_ci_only@127.0.0.1:5432/scriptura_staging_j1_guard
+        run: |
+          createdb --maintenance-db="$SCRIPTURA_TEST_STAGING_OWNER_URL" scriptura_staging_j1_guard
+          psql -X -v ON_ERROR_STOP=1 "$J1_OWNER_URL" -f db/004_d2_staging.sql
+          psql -X -v ON_ERROR_STOP=1 "$J1_OWNER_URL" -f db/005_i1_research_guard.sql
+          psql -X -v ON_ERROR_STOP=1 "$J1_OWNER_URL" -f db/007_i3_research_guard.sql
+          psql -X -v ON_ERROR_STOP=1 "$J1_OWNER_URL" <<'SQL'
+          GRANT CONNECT ON DATABASE scriptura_staging_j1_guard TO scriptura_stage_writer;
+          GRANT USAGE ON SCHEMA scriptura_d2_stage TO scriptura_stage_writer;
+          GRANT SELECT, INSERT ON scriptura_d2_stage.snapshots, scriptura_d2_stage.records TO scriptura_stage_writer;
+          SQL
+          SCRIPTURA_TEST_STAGING_OWNER_URL="$J1_OWNER_URL" SCRIPTURA_STAGING_DATABASE_URL="$J1_WRITER_URL" python3 tests/j1_staging_pg.py
 
   i2-authority-db:
     name: I-2 synthetic authority evidence
