@@ -2,6 +2,7 @@
 import contextlib
 import io
 import sys
+import types
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -76,6 +77,31 @@ class WindowsLauncherFlowTests(unittest.TestCase):
         self.assertEqual(result, 1)
         self.assertNotIn(path, output + error)
         server.assert_not_called()
+
+    def test_file_dialog_supports_d10_and_closes_without_disclosing_path(self):
+        selected = r'C:\private\SYNTHETIC-D10.zip'
+        calls = []
+
+        class FakeWindow:
+            def withdraw(self): calls.append('withdraw')
+            def attributes(self, *args): calls.append('attributes')
+            def destroy(self): calls.append('destroy')
+
+        def choose(**options):
+            calls.append(options['title'])
+            return selected
+
+        fake_tk = types.ModuleType('tkinter')
+        fake_tk.Tk = FakeWindow
+        fake_tk.filedialog = types.SimpleNamespace(askopenfilename=choose)
+        output, error = io.StringIO(), io.StringIO()
+        with patch.dict(sys.modules, {'tkinter': fake_tk}), \
+             contextlib.redirect_stdout(output), contextlib.redirect_stderr(error):
+            result = launcher._choose_archive()
+        self.assertEqual(result, selected)
+        self.assertTrue(any('D-10' in value for value in calls))
+        self.assertEqual(calls[-1], 'destroy')
+        self.assertNotIn(selected, output.getvalue() + error.getvalue())
 
 
 if __name__ == '__main__':

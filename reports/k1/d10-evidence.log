@@ -1,0 +1,23 @@
+K-1 D-10 read-only evidence review; aggregate output only
+Field eligibility records: 1270
+Conditionally visible candidates in the ledger: 1
+Other records not promoted: 1269
+Candidate entity and field-group records: 1
+Candidate target fields: title and author only
+Source, edition and locator references found exactly once each in the same earlier research layer: PASS
+Source-to-edition, edition-to-locator and ledger reference joins: PASS
+Direct evidence and locator references agree: PASS
+Review date is parseable and is not later than the execution date: PASS
+Other subfields hidden and prior record preserved flags: PASS
+Previous edition action records: 9 (conditional: 4; unknown: 5)
+Exact action-code matches between the prior records and the candidate ledger entry: 0
+The equivalence of differently named actions and conflict status remain unverified.
+Dedicated expiry fields present in the candidate ledger entry or rights-basis object: NO
+Duration, expiry and continuing legal scope: PENDING; absence of an expiry field is not approval.
+Independent third-party license text was not identified in the D-10 top-level archive.
+Direct source evidence, rights evidence and license reference hosts: 0 of 3 permitted by the enforced network policy.
+No external retrieval was attempted. Independent source/license/conditions verification: PENDING.
+Candidate title and author disclosure: PENDING; the ledger alone is not independent permission.
+D-10 top-level checksum manifest: 38 of 38 entries match.
+Another checksum list has 6 matches and 2 references unavailable at the top-level archive scope; its target scope is not yet established.
+No research values, source identifiers, paths, direct links, individual file hashes, document excerpts or credentials are included in this log.

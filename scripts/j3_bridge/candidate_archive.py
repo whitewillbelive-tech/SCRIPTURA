@@ -130,5 +130,10 @@ def load_versioned_archive(path):
      'unmapped_summary':unmapped,'validation_metrics':{'d9_unmapped_relations':metrics['unmapped_relation_predicates']},
      'visibility_summary':summary,'warnings':original['warnings']+['D9 metadata_candidate는 표시 승인이 아니며 이름·원문·URL은 가려집니다.'],
      'facets':{},'records':combined}
- except base.CandidateError:raise
+ except base.CandidateError as exc:
+  # Re-raise only known fixed codes; an upstream exception can otherwise
+  # smuggle a record, path or other private value into a traceback.
+  allowed={'archive_invalid','archive_not_local','archive_not_recognized','archive_changed','baseline_invalid'}
+  code=exc.args[0] if len(exc.args)==1 and type(exc.args[0]) is str and exc.args[0] in allowed else 'archive_invalid'
+  raise base.CandidateError(code) from None
  except Exception:raise base.CandidateError('archive_invalid') from None

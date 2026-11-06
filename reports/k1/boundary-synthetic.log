@@ -1,0 +1,12 @@
+test_archive_exceptions_are_whitelisted (test_k1_boundary.PrivateBoundaryTests.test_archive_exceptions_are_whitelisted) ... ok
+test_both_private_maps_refuse_string_and_generic_json (test_k1_boundary.PrivateBoundaryTests.test_both_private_maps_refuse_string_and_generic_json) ... ok
+test_diagnostics_allow_only_fixed_keys_bounded_counts_and_booleans (test_k1_boundary.PrivateBoundaryTests.test_diagnostics_allow_only_fixed_keys_bounded_counts_and_booleans) ... ok
+test_intentional_nested_access_remains_available (test_k1_boundary.PrivateBoundaryTests.test_intentional_nested_access_remains_available) ... ok
+test_missing_key_never_enters_exception_or_traceback (test_k1_boundary.PrivateBoundaryTests.test_missing_key_never_enters_exception_or_traceback) ... ok
+test_printed_reader_values_are_discarded (test_k1_boundary.PrivateBoundaryTests.test_printed_reader_values_are_discarded) ... ok
+test_reader_failure_is_generic_even_in_traceback (test_k1_boundary.PrivateBoundaryTests.test_reader_failure_is_generic_even_in_traceback) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.002s
+
+OK

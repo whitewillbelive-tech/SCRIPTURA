@@ -1,0 +1,15 @@
+test_real_mode_requires_session_and_correct_origin (test_j3_api.J3HttpTests.test_real_mode_requires_session_and_correct_origin) ... ok
+test_actual_passages_cannot_inject_hidden_text_or_mix_corpora (test_j3_api.J3SearchTests.test_actual_passages_cannot_inject_hidden_text_or_mix_corpora) ... ok
+test_ascii_identifier_cannot_hide_in_codes_fields_or_keys (test_j3_api.J3SearchTests.test_ascii_identifier_cannot_hide_in_codes_fields_or_keys) ... ok
+test_d8_mode_neither_returns_nor_counts_d9_rows_or_observations (test_j3_api.J3SearchTests.test_d8_mode_neither_returns_nor_counts_d9_rows_or_observations) ... ok
+test_d9_rights_observations_keep_edition_action_and_deny_permissions (test_j3_api.J3SearchTests.test_d9_rights_observations_keep_edition_action_and_deny_permissions) ... ok
+test_d9_safe_coordinate_and_future_eligibility_are_not_grants (test_j3_api.J3SearchTests.test_d9_safe_coordinate_and_future_eligibility_are_not_grants) ... ok
+test_eligibility_never_accepts_untrusted_values (test_j3_api.J3SearchTests.test_eligibility_never_accepts_untrusted_values) ... ok
+test_formatted_bibliographic_identifiers_are_not_display_grants (test_j3_api.J3SearchTests.test_formatted_bibliographic_identifiers_are_not_display_grants) ... ok
+test_observed_criticism_does_not_become_direct_rebuttal (test_j3_api.J3SearchTests.test_observed_criticism_does_not_become_direct_rebuttal) ... ok
+test_visibility_summary_spoof_fails_closed (test_j3_api.J3SearchTests.test_visibility_summary_spoof_fails_closed) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.511s
+
+OK

@@ -33,15 +33,16 @@
     return fallback;
   };
   // Only generated layer/table/row coordinates are displayed; never raw source IDs.
-  const safeRef = key => typeof key === 'string' && /^(base|d[5-9]):(claims|sources):[1-9][0-9]{0,6}$/.test(key) ? key : '미확인';
-  const safeCoordinate = (key, table) => typeof key === 'string' && new RegExp(`^(base|d[5-9]):${table}:[1-9][0-9]{0,6}$`).test(key) ? key : '미확인';
-  // No actual D8/D9 names or free text are approved yet. This extra UI
-  // boundary complements the server gate; synthetic tests remain labeled.
+  const safeRef = key => typeof key === 'string' && /^(base|d[5-9]|d10):(claims|sources):[1-9][0-9]{0,6}$/.test(key) ? key : '미확인';
+  const safeCoordinate = (key, table) => typeof key === 'string' && new RegExp(`^(base|d[5-9]|d10):${table}:[1-9][0-9]{0,6}$`).test(key) ? key : '미확인';
+  // Research fields remain closed until their individual use is checked by
+  // the server. This extra UI boundary is not a replacement for that gate.
+  // Synthetic tests remain labeled and never represent real approval.
   const safeRow = (row, dataset) => {
     if (!row || typeof row !== 'object') return null;
     if (dataset === 'synthetic') return row;
     const safe = {...row};
-    for (const field of ['source_title','source_creator','researcher','speaker','tradition','community_reference','evaluated_subject','summary']) safe[field] = null;
+    for (const field of ['source_title','source_creator','source_doi','source_year','locator','researcher','speaker','tradition','community_reference','evaluated_subject','summary']) safe[field] = null;
     return safe;
   };
   const node = (tag, text, className) => {
@@ -193,7 +194,7 @@
     }
     const later = Array.isArray(selected.d9_observations) ? selected.d9_observations : [];
     const laterRights = Array.isArray(selected.d9_rights_observations) ? selected.d9_rights_observations : [];
-    if (sessionDataset === 'D9' && (later.length || laterRights.length)) {
+    if ((sessionDataset === 'D9' || sessionDataset === 'D10') && (later.length || laterRights.length)) {
       body.append(node('h4', 'D-9 후속 관찰 · 원본 상태 변경 없음'));
       const list = node('ul');
       for (const item of later) if (item && typeof item === 'object') {
@@ -303,10 +304,11 @@
     renderMapping(data.unmapped_summary);
     const visibility = data.visibility_summary;
     const validCount = n => Number.isSafeInteger(n) && n >= 0 && n <= 100000;
-    // The pinned D9 handoff contains no field approved for local display.
-    // A positive count from a mismatched/invalid response is not approval.
-    if (visibility && typeof visibility === 'object' && validCount(visibility.metadata_candidate) && validCount(visibility.candidate_visible_local) && (data.dataset !== 'D9' || visibility.candidate_visible_local === 0)) {
-      visibilityStatus.textContent = `표시 적격성: 검토 후보 ${visibility.metadata_candidate}건 · 로컬 표시 승인 ${visibility.candidate_visible_local}건. 검토 후보는 표시 승인이 아닙니다.`;
+    // Until the individual D-10 evidence is independently checked, no real
+    // field grant can be inferred from an aggregate or a row-level flag.
+    if (visibility && typeof visibility === 'object' && validCount(visibility.metadata_candidate) && validCount(visibility.candidate_visible_local) && (data.dataset === 'synthetic' || visibility.candidate_visible_local === 0)) {
+      const conditional = data.dataset === 'D10' && validCount(visibility.conditional_candidate) ? ` · 조건부 후보 ${visibility.conditional_candidate}건` : '';
+      visibilityStatus.textContent = `표시 적격성: 검토 후보 ${visibility.metadata_candidate}건${conditional} · 로컬 표시 승인 ${visibility.candidate_visible_local}건. 검토 후보와 조건부 후보는 표시 승인이 아닙니다.`;
     } else {
       visibilityStatus.textContent = '표시 적격성 정보: 미확인';
     }
@@ -315,7 +317,7 @@
     pageSize = Number.isSafeInteger(data.page_size) && data.page_size > 0 ? data.page_size : 100;
     prev.disabled = offset <= 0; next.disabled = offset + rows.length >= total || rows.length === 0;
     pageStatus.textContent = total ? `${offset + 1}–${offset + rows.length} / ${total}` : '';
-    connection.textContent = data.dataset === 'synthetic' ? '합성 시험 자료 / 실제 연구 데이터 아님.' : `${data.dataset === 'D9' ? 'D-9' : 'D-8'} 연구 후보 · 선택한 로컬 자료에서 조회했습니다. 모든 결과는 연구 후보입니다.`;
+    connection.textContent = data.dataset === 'synthetic' ? '합성 시험 자료 / 실제 연구 데이터 아님.' : `${data.dataset === 'D10' ? 'D-10' : data.dataset === 'D9' ? 'D-9' : 'D-8'} 연구 후보 · 선택한 로컬 자료에서 조회했습니다. 모든 결과는 연구 후보입니다.`;
     empty.hidden = rows.length > 0;
     for (const row of rows) {
       if (!row || typeof row !== 'object') continue;
@@ -357,7 +359,7 @@
       if (!response.ok) throw new Error('unavailable');
       const data = await response.json();
       if (current !== generation) return;
-      if (!data || !Array.isArray(data.records) || !['D8','D9','synthetic'].includes(data.dataset)) throw new Error('unexpected');
+      if (!data || !Array.isArray(data.records) || !['D8','D9','D10','synthetic'].includes(data.dataset)) throw new Error('unexpected');
       if (sessionDataset && sessionDataset !== data.dataset) throw new Error('dataset mismatch');
       sessionDataset = data.dataset;
       if (sessionDataset !== 'synthetic' && nameSearchBlocked()) { showNameSearchBlocked(); return; }

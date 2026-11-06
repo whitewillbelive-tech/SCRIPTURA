@@ -1,0 +1,21 @@
+test_audit_cannot_rewrite_past (test_j3_validation.D9ValidationTests.test_audit_cannot_rewrite_past) ... ok
+test_eligibility_bad_entity_and_duplicate_id (test_j3_validation.D9ValidationTests.test_eligibility_bad_entity_and_duplicate_id) ... ok
+test_missing_and_wrong_reference (test_j3_validation.D9ValidationTests.test_missing_and_wrong_reference) ... ok
+test_missing_required_field_and_id_collision (test_j3_validation.D9ValidationTests.test_missing_required_field_and_id_collision) ... ok
+test_queue_and_evidence_cannot_change_source (test_j3_validation.D9ValidationTests.test_queue_and_evidence_cannot_change_source) ... ok
+test_rights_incomplete_and_unknown_not_granted (test_j3_validation.D9ValidationTests.test_rights_incomplete_and_unknown_not_granted) ... ok
+test_rights_observation_cannot_change_original (test_j3_validation.D9ValidationTests.test_rights_observation_cannot_change_original) ... ok
+test_scope_reports_cannot_hide_duplicates (test_j3_validation.D9ValidationTests.test_scope_reports_cannot_hide_duplicates) ... ok
+test_unapproved_raw_text_rejected (test_j3_validation.D9ValidationTests.test_unapproved_raw_text_rejected) ... ok
+test_unverified_official_and_human_review_denied (test_j3_validation.D9ValidationTests.test_unverified_official_and_human_review_denied) ... ok
+test_valid_candidate_and_no_automatic_approval (test_j3_validation.D9ValidationTests.test_valid_candidate_and_no_automatic_approval) ... ok
+test_visibility_candidate_never_promoted (test_j3_validation.D9ValidationTests.test_visibility_candidate_never_promoted) ... ok
+test_wrong_queue_target_coverage (test_j3_validation.D9ValidationTests.test_wrong_queue_target_coverage) ... ok
+test_aux_dict_cannot_be_confused_with_counter (test_j3_validation.PrivateOutputTests.test_aux_dict_cannot_be_confused_with_counter) ... ok
+test_carrier_repr_hides_values (test_j3_validation.PrivateOutputTests.test_carrier_repr_hides_values) ... ok
+test_no_sensitive_exception_or_logging (test_j3_validation.PrivateOutputTests.test_no_sensitive_exception_or_logging) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.003s
+
+OK

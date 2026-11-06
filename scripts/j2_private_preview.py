@@ -18,7 +18,7 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from j3_bridge.candidate_archive import load_versioned_archive
+from k1_bridge.candidate_archive import load_k1_archive as load_versioned_archive
 from j2_bridge import candidate_readonly as candidate
 
 WEB_ROOT = Path(__file__).resolve().parent / 'j2_web'
@@ -30,7 +30,21 @@ PAGE_SIZE = 100
 RIGHTS_ACTIONS = frozenset(('browse', 'collect_metadata', 'store_raw', 'store_excerpt', 'index_fulltext', 'embed', 'send_to_model', 'redistribute', 'public_link'))
 RIGHTS_DECISIONS = frozenset(('unknown', 'conditional', 'allowed', 'prohibited', 'not_recorded', 'conflicting', 'unmapped'))
 SAFE_RECORD_FIELDS = frozenset(('key', 'stage', 'record_kind', 'category', 'attribution', 'original_attribution', 'authority_status', 'input_authority_status', 'verification_status', 'quotation_status', 'argument_status', 'reported_independent_review_status', 'independent_review_status', 'audit_observation_key', 'rights_status', 'tradition', 'community_reference', 'community_role', 'evaluated_subject', 'researcher', 'speaker', 'speaker_type', 'passage_corpus', 'passage_scheme', 'passage_reference', 'source_title', 'source_creator', 'source_kind', 'source_doi', 'source_year', 'access_path', 'locator', 'unmapped', 'checked_at', 'as_of', 'valid_from', 'valid_until', 'display_status'))
-SAFE_STAGES = frozenset(('base', 'd5', 'd6', 'd7', 'd8', 'd9'))
+SAFE_STAGES = frozenset(('base', 'd5', 'd6', 'd7', 'd8', 'd9', 'd10'))
+RESEARCH_DATASETS = frozenset(('D8', 'D9', 'D10'))
+ALLOWED_DATASETS = RESEARCH_DATASETS | {'synthetic'}
+
+
+def _stage_pattern(dataset, *, research=True):
+    """Exact version boundary; unknown research versions never become synthetic."""
+    if not research:
+        return r'(?:base|d[5-9]|d10|synthetic)'
+    return {'D8': r'(?:base|d[5-8])', 'D9': r'(?:base|d[5-9])',
+            'D10': r'(?:base|d[5-9]|d10)'}.get(dataset, r'(?!)')
+
+
+def _stage_allowed(stage, dataset):
+    return isinstance(stage, str) and re.fullmatch(_stage_pattern(dataset), stage) is not None
 SAFE_TABLES = frozenset(('sources', 'editions', 'locators', 'rights', 'passages', 'alignments', 'agents', 'affiliations', 'claims', 'evidence', 'relations', 'reviews', 'audit_conflicts', 'authority_documents', 'authority_registries', 'claim_scope_audits', 'cross_corpus_topics', 'interpretive_evidence', 'position_attestations', 'rights_delta', 'source_access_events', 'communities', 'assessments', 'relationships', 'authority', 'audit_reviews', 'correction_candidates', 'research_gaps', 'conflicts', 'institutional_assertions', 'rights_overrides', 'unresolved_gaps', 'authority_scope', 'review_queue', 'rights_actions', 'sample_manifest'))
 SAFE_FIELD_NAMES = frozenset(('id', 'source_id', 'source_locator_id', 'locator_id', 'edition_id', 'source_title', 'source_creator', 'title', 'creator', 'speaker', 'community_id', 'community_id_role', 'claim_id', 'claim_ids', 'baseline_claim_id', 'baseline_record_id', 'baseline_target_id', 'target_community_id', 'authority_registry_id', 'authority_document_id', 'document_id', 'position_attestation_id', 'passage_ids', 'subject_id', 'object_id', 'source_locator_ids', 'evidence_locator_id', 'additional_evidence_locator_ids', 'baseline_edition_id', 'baseline_right_id', 'source_right_id', 'statement_ko', 'summary', 'note', 'notes', 'scope_note', 'rights_basis', 'action_specific_basis', 'jurisdiction', 'territory', 'limitations', 'url', 'doi', 'source_url', 'source_full_text', 'full_text', 'raw_text', 'full_text_url', 'original_content_stored', 'raw_text_stored', 'reference', 'reference_scheme', 'alignment_status', 'reviewer', 'checked_at', 'reviewed_at', 'verification_status', 'source_verification', 'previous_verification_status', 'status', 'decision', 'source_chain', 'source_metadata', 'rights_scope', 'formal_adoption_evidence', 'independent_human_review', 'unreviewed_source_text', 'position_scope', 'claim_statement', 'unrecognized_field', 'unmapped'))
 SAFE_STATUS_CODES = frozenset(('unknown', 'unmapped', 'pending', 'none', 'not_done', 'not_recorded', 'not_assessed', 'unverified', 'verified', 'checked', 'source_checked', 'source_verified', 'scholarly_reviewed', 'direct_checked', 'translation_checked', 'secondary_report', 'search_only', 'unchecked', 'adoption_documented', 'issuer_documented', 'historical_only', 'individual_only', 'disputed', 'documented_argument', 'externally_challenged', 'cross_checked', 'contested', 'human_review_documented', 'published_critique_documented', 'independent_review_not_done', 'pending_authority', 'pending_academic', 'pending_language_review', 'redacted_rights_unresolved', 'candidate', 'candidate_source', 'metadata_candidate', 'not_performed', 'not_reviewed', 'source_checked_secondary_transmission', 'collaborator_checked_not_self_checked', 'direct_full_text_section_checked', 'ongoing', 'not_applicable', 'multiple_editions', 'conditional', 'allowed', 'prohibited', 'conflicting', 'recorded', 'missing', 'active', 'historical', 'proposed', 'draft', 'not_verified', 'translation_only', 'ai_translation_pending'))
@@ -54,6 +68,15 @@ def _safe_visibility(value, *, dataset=None):
     # candidate-visible fields. Input counters never authorize display.
     if dataset == 'D9' and result and (result.get('metadata_candidate') != 9 or result.get('candidate_visible_local') != 0):
         return {'status': 'pending_inconsistent'}
+    if dataset == 'D10' and result:
+        # The source ledger calls one row candidate_visible_local, but the
+        # contract says this is conditional, not an operational approval.
+        # Do not let a supplied counter authorize a real field.
+        conditional = result.get('candidate_visible_local')
+        if conditional != 1:
+            return {'status': 'pending_inconsistent'}
+        result['conditional_candidate'] = conditional
+        result['candidate_visible_local'] = 0
     return result
 
 
@@ -65,8 +88,8 @@ def _safe_counts(value, *, dataset):
     count = value.get('display_records')
     if isinstance(count, int) and not isinstance(count, bool) and 0 <= count <= 100000:
         result['display_records'] = count
-    for stage in ('d8', 'd9'):
-        if dataset == 'D8' and stage == 'd9':
+    for stage in ('d8', 'd9', 'd10'):
+        if not _stage_allowed(stage, dataset):
             continue
         tables = value.get(stage)
         if isinstance(tables, dict):
@@ -76,7 +99,7 @@ def _safe_counts(value, *, dataset):
     if isinstance(by_stage, dict):
         safe = {}
         for stage, tables in by_stage.items():
-            if stage not in SAFE_STAGES or (dataset == 'D8' and stage == 'd9') or not isinstance(tables, dict):
+            if not _stage_allowed(stage, dataset) or not isinstance(tables, dict):
                 continue
             safe[stage] = {key: n for key, n in tables.items() if key in SAFE_TABLES
                            and isinstance(n, int) and not isinstance(n, bool) and 0 <= n <= 100000}
@@ -90,7 +113,7 @@ def _safe_unmapped(value, *, dataset=None):
         return {}
     result = {}
     for stage, tables in value.items():
-        if stage not in SAFE_STAGES or (dataset == 'D8' and stage == 'd9') or not isinstance(tables, dict):
+        if (stage not in SAFE_STAGES if dataset in (None, 'synthetic') else not _stage_allowed(stage, dataset)) or not isinstance(tables, dict):
             continue
         accepted = {}
         for table, details in tables.items():
@@ -100,6 +123,29 @@ def _safe_unmapped(value, *, dataset=None):
             if isinstance(count, int) and not isinstance(count, bool) and 0 <= count <= 100000 and mapping in ('partial', 'unmapped'):
                 accepted[table] = {'input_count': count, 'mapping': mapping}
         result[stage] = accepted
+    return result
+
+
+def _safe_d10_receipt(value, *, dataset):
+    """D10 quarantine is reported only as bounded fixed-name counts."""
+    if dataset != 'D10' or not isinstance(value, dict):
+        return {}
+    result = {}
+    for key in ('source_count', 'quarantined_source_count', 'conditional_candidate_count', 'effective_visible_fields'):
+        count = value.get(key)
+        if isinstance(count, int) and not isinstance(count, bool) and 0 <= count <= 100000:
+            result[key] = count
+    if result.get('effective_visible_fields') != 0:
+        return {'status': 'pending_inconsistent'}
+    fixed_duplicates = {prefix + field for prefix in ('cross_', 'within_') for field in ('id', 'title', 'doi', 'url')}
+    fixed_links = {table + '_' + field + '_' + suffix
+                   for table, field in (('editions', 'source_id'), ('locators', 'edition_id'), ('locators', 'source_id'), ('rights', 'edition_id'))
+                   for suffix in ('present', 'resolved')}
+    for section, names in (('duplicate_counts', fixed_duplicates), ('linkage_counts', fixed_links)):
+        items = value.get(section)
+        if isinstance(items, dict):
+            result[section] = {key: count for key, count in items.items() if key in names
+                               and isinstance(count, int) and not isinstance(count, bool) and 0 <= count <= 100000}
     return result
 
 
@@ -151,7 +197,7 @@ def _safe_eligibility(value, *, research):
 
 def _safe_d9_observations(row, *, dataset):
     """Only fixed observations, with no text, ID, URL, or automatic grant."""
-    if dataset not in ('D9', 'synthetic'):
+    if dataset not in ('D9', 'D10', 'synthetic'):
         return [], []
     observed, rights = [], []
     for item in row.get('d9_observations', []) if isinstance(row.get('d9_observations'), list) else []:
@@ -163,12 +209,12 @@ def _safe_d9_observations(row, *, dataset):
                          'method': item.get('method') if item.get('method') in SAFE_METHOD_CODES else 'unmapped',
                          'direction': item.get('direction') if item.get('direction') in ('incoming', 'outgoing') else 'unknown',
                          'relation_type': item.get('relation_type') if item.get('kind') == 'relationship' and item.get('relation_type') in SAFE_RELATION_KINDS else 'unmapped',
-                         'target_key': target if isinstance(target, str) and re.fullmatch(r'(?:base|d[5-9]|synthetic):(?:claims|sources):[1-9][0-9]*' if dataset == 'synthetic' else r'(?:base|d[5-9]):(?:claims|sources):[1-9][0-9]*', target) else None})
+                         'target_key': target if isinstance(target, str) and re.fullmatch(_stage_pattern(dataset, research=dataset != 'synthetic') + r':(?:claims|sources):[1-9][0-9]*', target) else None})
     for item in row.get('d9_rights_observations', []) if isinstance(row.get('d9_rights_observations'), list) else []:
         if not isinstance(item, dict) or item.get('action') not in RIGHTS_ACTIONS:
             continue
         edition = item.get('edition_key')
-        rights.append({'edition_key': edition if isinstance(edition, str) and re.fullmatch(r'(?:base|d[5-9]|synthetic):editions:[1-9][0-9]*' if dataset == 'synthetic' else r'(?:base|d[5-9]):editions:[1-9][0-9]*', edition) else None,
+        rights.append({'edition_key': edition if isinstance(edition, str) and re.fullmatch(_stage_pattern(dataset, research=dataset != 'synthetic') + r':editions:[1-9][0-9]*', edition) else None,
                        'action': item['action'], 'decision': item.get('decision') if item.get('decision') in RIGHTS_DECISIONS else 'unmapped'})
     return observed, rights
 
@@ -192,9 +238,9 @@ def _safe_record(row, *, research=False, dataset=None):
             result[key] = None
         table = {'claim': 'claims', 'source': 'sources'}.get(row.get('record_kind'))
         key = row.get('key')
-        stages = r'(?:base|d[5-9])' if dataset == 'D9' else r'(?:base|d[5-8])'
+        stages = _stage_pattern(dataset)
         stage = str(row.get('stage') or '').lower()
-        if stage not in SAFE_STAGES or (dataset == 'D8' and stage == 'd9'):
+        if not _stage_allowed(stage, dataset):
             result['stage'] = 'unmapped'
         if table is None:
             result['record_kind'] = 'unmapped'
@@ -202,7 +248,7 @@ def _safe_record(row, *, research=False, dataset=None):
             result['key'] = None
         # No field review from an input record or an HTTP request can authorize
         # actual display. Future reviewed permissions require a separate gate.
-        result['display_status'] = 'redacted_rights_unresolved' if stage == 'd9' else 'metadata_candidate'
+        result['display_status'] = 'redacted_rights_unresolved' if stage in ('d9', 'd10') else 'metadata_candidate'
         result['authority_status'] = 'pending_authority'
         if result.get('attribution') == 'official_doctrine':
             result['attribution'] = 'unconfirmed_authority'
@@ -212,7 +258,7 @@ def _safe_record(row, *, research=False, dataset=None):
     # wrong table, URL or arbitrary string is never returned as a target.
     for field, table in (('source_key', 'sources'), ('edition_key', 'editions'), ('locator_key', 'locators')):
         value = row.get(field)
-        stages = (r'(?:base|d[5-8])' if dataset == 'D8' else r'(?:base|d[5-9])') if research else r'(?:base|d[5-9]|synthetic)'
+        stages = _stage_pattern(dataset, research=research)
         pattern = rf'{stages}:{table}:[1-9][0-9]*'
         result[field] = value if isinstance(value, str) and re.fullmatch(pattern, value) else None
     # Direct quotation and free-form claim text are not authorized in this gate.
@@ -222,7 +268,7 @@ def _safe_record(row, *, research=False, dataset=None):
     result['rights_overrides'] = _rights_overrides(row.get('rights_overrides'))
     editions = row.get('edition_rights', [])
     result['edition_rights'] = [
-        {'key': item.get('key') if isinstance(item.get('key'), str) and re.fullmatch(((r'(?:base|d[5-8])' if dataset == 'D8' else r'(?:base|d[5-9])') if research else r'(?:base|d[5-9]|synthetic)') + r':editions:[1-9][0-9]*', item['key']) else None,
+        {'key': item.get('key') if isinstance(item.get('key'), str) and re.fullmatch(_stage_pattern(dataset, research=research) + r':editions:[1-9][0-9]*', item['key']) else None,
          'rights': _rights_map(item.get('rights')),
          'rights_overrides': _rights_overrides(item.get('rights_overrides')),
          'effective_permissions': {a: False for a in sorted(RIGHTS_ACTIONS)}}
@@ -287,7 +333,7 @@ def _safe_record(row, *, research=False, dataset=None):
             if item.get('assessment') not in ('pending_evidence_review', 'pending', 'unmapped'): item['assessment'] = 'unmapped'
             if item.get('direction') not in ('incoming', 'outgoing'): item['direction'] = 'unknown'
             key = item.get('target_key')
-            stages = r'(?:base|d[5-8])' if dataset == 'D8' else r'(?:base|d[5-9])'
+            stages = _stage_pattern(dataset)
             if not isinstance(key, str) or not re.fullmatch(stages + r':(?:claims|sources):[1-9][0-9]*', key):
                 item['target_key'] = None
         for item in result['attestation_observations']:
@@ -322,6 +368,8 @@ def local_archive_path(value):
 
 def filter_records(dataset, params):
     """Search the pre-redacted projection only; unknown temporal scope stays pending."""
+    if not isinstance(dataset, dict) or dataset.get('dataset') not in ALLOWED_DATASETS or not isinstance(dataset.get('records'), list):
+        raise ValueError('invalid dataset')
     allowed = set(FILTERS) | {'q', 'as_of', 'offset', 'key', 'evidence_kind', 'evidence_status', 'relation_kind', 'relation_status', 'relation_direction', 'rights_action', 'rights_decision'}
     if set(params) - allowed or any(len(v) != 1 for v in params.values()):
         raise ValueError('invalid query')
@@ -345,9 +393,9 @@ def filter_records(dataset, params):
     for original in dataset['records']:
         # D8 mode must not include newer D9 records, even if the dataset is
         # accidentally assembled from mixed snapshots.
-        if mode == 'D8' and str(original.get('stage') or '').lower() == 'd9':
+        if mode in RESEARCH_DATASETS and not _stage_allowed(str(original.get('stage') or '').lower(), mode):
             continue
-        row = _safe_record(original, research=mode in ('D8', 'D9'), dataset=mode)
+        row = _safe_record(original, research=mode in RESEARCH_DATASETS, dataset=mode)
         if q.get('key') and row.get('key') != q['key']:
             continue
         if search and not (any(search in _text(row.get(key)) for key in SEARCH_FIELDS) or any(search in _text(p.get(field)) for p in row.get('passages', []) for field in ('corpus', 'scheme', 'reference'))):
@@ -406,15 +454,16 @@ def filter_records(dataset, params):
             except (TypeError, ValueError):
                 projected['date_filter_status'] = 'pending'
         found.append(projected)
-    research = mode in ('D8', 'D9')
+    research = mode in RESEARCH_DATASETS
     counts = _safe_counts(dataset.get('counts'), dataset=mode) if research else dataset['counts']
-    if mode == 'D8' and 'display_records' in counts:
-        counts['display_records'] = sum(1 for row in dataset['records'] if str(row.get('stage') or '').lower() != 'd9')
+    if mode in RESEARCH_DATASETS and 'display_records' in counts:
+        counts['display_records'] = sum(1 for row in dataset['records'] if _stage_allowed(str(row.get('stage') or '').lower(), mode))
     return {'dataset': dataset['dataset'],
             'counts': counts,
             'warnings': ['비공개 연구 후보이며 표시·권리·공식성은 별도 확인이 필요합니다.'] if research else dataset['warnings'],
             'facets': {} if research else dataset.get('facets', {}),
             'visibility_summary': _safe_visibility(dataset.get('visibility_summary'), dataset=mode),
+            'd10_receipt': _safe_d10_receipt(dataset.get('d10_receipt'), dataset=mode),
             'unmapped_summary': _safe_unmapped(dataset.get('unmapped_summary'), dataset=mode),
             'total': len(found), 'offset': offset, 'page_size': PAGE_SIZE, 'records': found[offset:offset + PAGE_SIZE]}
 
@@ -426,7 +475,7 @@ class PrivatePreviewServer(ThreadingHTTPServer):
     def __init__(self, data, secret, port=0):
         if not isinstance(secret, str) or len(secret) < 20 or not secret.strip() or len(secret.encode('utf-8')) > 256 or any(ord(c) < 32 or ord(c) > 126 for c in secret):
             raise ValueError('세션 비밀은 출력 가능한 ASCII 문자 20자 이상이어야 합니다.')
-        if not isinstance(data, dict) or not isinstance(data.get('records'), list) or data.get('dataset') not in ('D8', 'D9', 'synthetic'):
+        if not isinstance(data, dict) or not isinstance(data.get('records'), list) or data.get('dataset') not in ALLOWED_DATASETS:
             raise ValueError('후보 자료를 불러올 수 없습니다.')
         self.dataset = data
         self._secret = secret.encode('utf-8')
@@ -533,13 +582,13 @@ class Handler(BaseHTTPRequestHandler):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description='로컬 연구 후보 탐색기 (루프백 전용)')
-    parser.add_argument('--archive', required=True, help='고정 D-8 또는 D-9 ZIP 파일')
+    parser.add_argument('--archive', required=True, help='고정 D-8, D-9 또는 D-10 ZIP 파일')
     args = parser.parse_args(argv)
     try:
         archive = local_archive_path(args.archive)
         dataset = load_versioned_archive(archive)
     except Exception:
-        print('고정 D-8/D-9 자료를 확인할 수 없습니다. 경로와 무결성을 확인하세요.', file=sys.stderr)
+        print('고정 D-8/D-9/D-10 자료를 확인할 수 없습니다. 경로와 무결성을 확인하세요.', file=sys.stderr)
         return 1
     try:
         if not sys.stdin.isatty():

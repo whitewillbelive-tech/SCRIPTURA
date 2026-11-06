@@ -1,0 +1,50 @@
+test_archive_exceptions_are_whitelisted (test_k1_boundary.PrivateBoundaryTests.test_archive_exceptions_are_whitelisted) ... ok
+test_both_private_maps_refuse_string_and_generic_json (test_k1_boundary.PrivateBoundaryTests.test_both_private_maps_refuse_string_and_generic_json) ... ok
+test_diagnostics_allow_only_fixed_keys_bounded_counts_and_booleans (test_k1_boundary.PrivateBoundaryTests.test_diagnostics_allow_only_fixed_keys_bounded_counts_and_booleans) ... ok
+test_intentional_nested_access_remains_available (test_k1_boundary.PrivateBoundaryTests.test_intentional_nested_access_remains_available) ... ok
+test_missing_key_never_enters_exception_or_traceback (test_k1_boundary.PrivateBoundaryTests.test_missing_key_never_enters_exception_or_traceback) ... ok
+test_printed_reader_values_are_discarded (test_k1_boundary.PrivateBoundaryTests.test_printed_reader_values_are_discarded) ... ok
+test_reader_failure_is_generic_even_in_traceback (test_k1_boundary.PrivateBoundaryTests.test_reader_failure_is_generic_even_in_traceback) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.002s
+
+OK
+test_audit_cannot_rewrite_past (test_j3_validation.D9ValidationTests.test_audit_cannot_rewrite_past) ... ok
+test_eligibility_bad_entity_and_duplicate_id (test_j3_validation.D9ValidationTests.test_eligibility_bad_entity_and_duplicate_id) ... ok
+test_missing_and_wrong_reference (test_j3_validation.D9ValidationTests.test_missing_and_wrong_reference) ... ok
+test_missing_required_field_and_id_collision (test_j3_validation.D9ValidationTests.test_missing_required_field_and_id_collision) ... ok
+test_queue_and_evidence_cannot_change_source (test_j3_validation.D9ValidationTests.test_queue_and_evidence_cannot_change_source) ... ok
+test_rights_incomplete_and_unknown_not_granted (test_j3_validation.D9ValidationTests.test_rights_incomplete_and_unknown_not_granted) ... ok
+test_rights_observation_cannot_change_original (test_j3_validation.D9ValidationTests.test_rights_observation_cannot_change_original) ... ok
+test_scope_reports_cannot_hide_duplicates (test_j3_validation.D9ValidationTests.test_scope_reports_cannot_hide_duplicates) ... ok
+test_unapproved_raw_text_rejected (test_j3_validation.D9ValidationTests.test_unapproved_raw_text_rejected) ... ok
+test_unverified_official_and_human_review_denied (test_j3_validation.D9ValidationTests.test_unverified_official_and_human_review_denied) ... ok
+test_valid_candidate_and_no_automatic_approval (test_j3_validation.D9ValidationTests.test_valid_candidate_and_no_automatic_approval) ... ok
+test_visibility_candidate_never_promoted (test_j3_validation.D9ValidationTests.test_visibility_candidate_never_promoted) ... ok
+test_wrong_queue_target_coverage (test_j3_validation.D9ValidationTests.test_wrong_queue_target_coverage) ... ok
+test_aux_dict_cannot_be_confused_with_counter (test_j3_validation.PrivateOutputTests.test_aux_dict_cannot_be_confused_with_counter) ... ok
+test_carrier_repr_hides_values (test_j3_validation.PrivateOutputTests.test_carrier_repr_hides_values) ... ok
+test_no_sensitive_exception_or_logging (test_j3_validation.PrivateOutputTests.test_no_sensitive_exception_or_logging) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.002s
+
+OK
+test_bad_urls_and_dates_rejected (test_j3_candidate.SyntheticEligibilityTests.test_bad_urls_and_dates_rejected) ... ok
+test_complete_approval_is_only_synthetic (test_j3_candidate.SyntheticEligibilityTests.test_complete_approval_is_only_synthetic) ... ok
+test_dates_and_scope_must_be_current (test_j3_candidate.SyntheticEligibilityTests.test_dates_and_scope_must_be_current) ... ok
+test_different_content_and_permissions_are_denied (test_j3_candidate.SyntheticEligibilityTests.test_different_content_and_permissions_are_denied) ... ok
+test_each_required_value_is_necessary (test_j3_candidate.SyntheticEligibilityTests.test_each_required_value_is_necessary) ... ok
+test_no_arbitrary_asserted_real_approval (test_j3_candidate.SyntheticEligibilityTests.test_no_arbitrary_asserted_real_approval) ... ok
+test_scope_and_exact_field_must_match (test_j3_candidate.SyntheticEligibilityTests.test_scope_and_exact_field_must_match) ... ok
+test_changed_d8_path_rejected_before_return (test_j3_candidate.SyntheticVersionTests.test_changed_d8_path_rejected_before_return) ... ok
+test_empty_and_unknown_input_fail_closed (test_j3_candidate.SyntheticVersionTests.test_empty_and_unknown_input_fail_closed) ... ok
+test_overlays_leave_old_source_status_and_input_intact (test_j3_candidate.SyntheticVersionTests.test_overlays_leave_old_source_status_and_input_intact) ... ok
+test_remote_path_is_rejected_without_read (test_j3_candidate.SyntheticVersionTests.test_remote_path_is_rejected_without_read) ... ok
+test_visibility_matrix_never_grants_actual_fields (test_j3_candidate.SyntheticVersionTests.test_visibility_matrix_never_grants_actual_fields) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.002s
+
+OK

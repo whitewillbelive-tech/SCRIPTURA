@@ -73,6 +73,8 @@ jobs:
           node tests/ui-j2-candidate.browser.cjs
           # J-3 version switching/visibility uses synthetic input only.
           node tests/ui-j3-candidate.browser.cjs
+          # K-1 boundary and visibility checks use synthetic data only.
+          node tests/ui-k1-candidate.browser.cjs
 
   postgres:
     name: PostgreSQL migrations and integration

@@ -21,7 +21,7 @@ def _choose_archive():
         window.attributes('-topmost', True)
         return filedialog.askopenfilename(
             parent=window,
-            title='SCRIPTURA D-8 또는 D-9 연구 ZIP 선택',
+            title='SCRIPTURA D-8, D-9 또는 D-10 연구 ZIP 선택',
             filetypes=(('ZIP archive', '*.zip'),),
         )
     finally:
