@@ -152,6 +152,67 @@ class PrivateMetadataCandidates:
     def __repr__(self):
         return '<PrivateMetadataCandidates redacted>'
 
+    def plan_public_matches(self, public_records):
+        """Compare in memory only; matches never grant use or API access.
+
+        The caller must obtain its public snapshot independently of the private
+        dataset. No source IDs, titles, names or DOI values are used to select
+        network requests. A separate verifier must authenticate the snapshot,
+        check individual usage and privacy conditions, and issue any grant.
+        """
+        from k12_bridge.matching import plan_private_matches
+        return plan_private_matches(self.__records, public_records)
+
+    def attach_public_snapshot(self, dataset, snapshot):
+        """Attach only fields matched against an authenticated public snapshot.
+
+        Unknown snapshots are rejected by the loader. Matching, review policy,
+        and field copying occur locally without network access or diagnostics.
+        A snapshot-level review covers bibliographic fields only, not community
+        names, research text, or any scholarly/theological conclusion.
+        """
+        from k12_bridge.matching import plan_private_matches
+        from k12_bridge.snapshot import _snapshot_contents
+        if not isinstance(dataset, dict) or dataset.get('dataset') != self.__dataset:
+            raise ValueError('metadata_dataset_mismatch')
+        public_rows, policy = _snapshot_contents(snapshot)
+        plan = plan_private_matches(self.__records, public_rows)
+        matches = plan._PrivateMatchPlan__matches
+        eligible = {}
+        for key, fields in matches.items():
+            row = self.__records.get(key)
+            if not isinstance(row, dict):
+                continue
+            if policy.get('synthetic_only') is True:
+                if not all(isinstance(row.get(name), str) and row[name].startswith('synthetic:')
+                           for name in ('source_id', 'edition_id')):
+                    continue
+            selected = {}
+            for field, value in fields.items():
+                if field not in policy['allowed_fields']:
+                    continue
+                if policy.get('synthetic_only') is True:
+                    if field == 'source_year' and value not in ('2098', '2099'):
+                        continue
+                    if field != 'source_year' and not value.startswith('SYNTHETIC-'):
+                        continue
+                try:
+                    # Static trusted application code must confirm privacy for
+                    # this specific source, edition, field and value. Snapshot
+                    # JSON and HTTP callers cannot supply that callback.
+                    with _PRIVATE_READ_LOCK, redirect_stdout(_DISCARD), redirect_stderr(_DISCARD):
+                        privacy_ok = policy['privacy_verifier'](row, field, value) is True
+                except Exception:
+                    privacy_ok = False
+                if not privacy_ok:
+                    continue
+                selected[field] = value
+            if selected:
+                eligible[key] = selected
+        result = dict(dataset)
+        result['_verified_metadata_index'] = VerifiedMetadataIndex(_SEAL, self.__dataset, eligible)
+        return result
+
     def attach_reviewed(self, dataset, reviews, *, today, independent_verifier):
         """Return a new dataset with individually verified fields attached.
 
@@ -218,5 +279,13 @@ def prepare_private_candidates(dataset, layers):
             year = day[:4] if isinstance(day, str) and _valid_date(day) else None
         if isinstance(year, str):
             fields['source_year'] = year
-        result[key] = {'source_id': source['id'], 'edition_id': edition['id'], 'fields': fields}
+        # DOI is an internal comparison key only. It is neither an approved
+        # display field nor a search value and must never enter API responses,
+        # diagnostics, exception messages, or outbound requests.
+        identifiers = {}
+        doi = source.get('doi')
+        if isinstance(doi, str) and doi.strip() and len(doi) <= 512:
+            identifiers['doi'] = doi.strip()
+        result[key] = {'source_id': source['id'], 'edition_id': edition['id'],
+                       'fields': fields, 'identifiers': identifiers}
     return PrivateMetadataCandidates(dataset.get('dataset'), result)

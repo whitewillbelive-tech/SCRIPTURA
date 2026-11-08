@@ -1,0 +1,15 @@
+test_each_policy_review_is_required_and_untrusted_inputs_remain_hidden (test_k12_snapshot.SnapshotTests.test_each_policy_review_is_required_and_untrusted_inputs_remain_hidden) ... ok
+test_forged_objects_and_invalid_content_fail_without_values_in_errors (test_k12_snapshot.SnapshotTests.test_forged_objects_and_invalid_content_fail_without_values_in_errors) ... ok
+test_forged_snapshot_cannot_be_used_to_attach_metadata (test_k12_snapshot.SnapshotTests.test_forged_snapshot_cannot_be_used_to_attach_metadata) ... ok
+test_local_snapshot_integration_is_offline_and_bound_to_the_fixed_policy (test_k12_snapshot.SnapshotTests.test_local_snapshot_integration_is_offline_and_bound_to_the_fixed_policy) ... ok
+test_local_snapshot_rejects_network_paths_and_forged_candidate_objects (test_k12_snapshot.SnapshotTests.test_local_snapshot_rejects_network_paths_and_forged_candidate_objects) ... ok
+test_no_production_sources_are_registered (test_k12_snapshot.SnapshotTests.test_no_production_sources_are_registered) ... ok
+test_pinned_synthetic_snapshot_can_enable_only_individually_matched_fields (test_k12_snapshot.SnapshotTests.test_pinned_synthetic_snapshot_can_enable_only_individually_matched_fields) ... ok
+test_privacy_callback_failure_and_prints_are_suppressed (test_k12_snapshot.SnapshotTests.test_privacy_callback_failure_and_prints_are_suppressed) ... ok
+test_privacy_is_individually_verified_for_each_field (test_k12_snapshot.SnapshotTests.test_privacy_is_individually_verified_for_each_field) ... ok
+test_synthetic_snapshot_cannot_approve_non_synthetic_source (test_k12_snapshot.SnapshotTests.test_synthetic_snapshot_cannot_approve_non_synthetic_source) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.003s
+
+OK

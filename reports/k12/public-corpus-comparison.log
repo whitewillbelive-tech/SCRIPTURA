@@ -1,0 +1,29 @@
+K-1.2 independent public bibliography comparison
+
+All remote requests used fixed public URLs or fixed general subject queries, with no input derived from the private research archive. Public metadata was downloaded first; the private archive was read only in a separate offline process. No private strings, identifiers, URLs, or raw hashes are recorded here. The public metadata was not committed.
+
+public bibliographic registry official public example XML metadata:
+  Public files checked: 6
+  Private source records compared: 352
+  DOI exact candidates: 0
+  Title exact candidates: 0
+  Author exact candidates: 0
+  Result: no suitable match in this small example corpus; it is not a representative public bibliographic registry-wide search.
+
+Goodbooks-10k public repository fixed metadata snapshot:
+  Public URL: https://raw.githubusercontent.com/zygmuntz/goodbooks-10k/master/books.csv
+  Public metadata records checked: 10000
+  Private source records compared: 352
+  Normalization: Unicode NFKC, case folding, whitespace normalization; no fuzzy matching.
+  Title candidates: 1
+  Author candidates: 3
+  Same-record title plus author exact candidates: 0
+  Result: no same-record title/author match. The repository declares CC BY-SA 4.0, but rights in its upstream source data and its merged editions were not established. No source was approved on this basis.
+
+Fixed general public subject searches found eight public repositories. One available bibliography file had no explicit license identified. Its comparison produced no DOI or title match and one author substring candidate, which was not a work/edition match and was not used as display evidence. Searches and these small corpora cannot establish that matching public bibliographies do not exist elsewhere.
+
+Work handoff in-memory audit: no JSONL row was found with a structured, field-specific observed/verified title or creator alongside a source evidence locator using the tested standard observation keys. This does not establish that no relevant free-text or non-JSONL evidence exists. Raw Work research data was neither emitted nor transmitted.
+
+Effective real-data display grants created by this investigation: 0.
+
+Expanded fixed-subject search: seven additional generic subject queries identified 21 public repositories; inspection of their root directories found no BibTeX/RIS bibliography files. Neither the queries nor downloads contained private dataset values. This was a limited repository-root survey, not an exhaustive search.

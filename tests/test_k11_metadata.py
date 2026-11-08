@@ -187,6 +187,35 @@ class MetadataProjectionTests(unittest.TestCase):
         self.assertNotIn(sentinel, out.getvalue() + err.getvalue())
         self.assertEqual(filter_records(rejected, {})['records'][0]['verified_metadata'], {})
 
+    def test_doi_is_a_private_comparison_key_not_an_approved_field(self):
+        doi = '10.55555/synthetic-private-doi'
+        layers = {'d8': {'sources': [{'line': 1, 'value': {'id': 'synthetic:source',
+                    'title': DATA[KEY]['source_title'], 'doi': doi}}],
+                  'editions': [{'line': 1, 'value': {'id': 'synthetic:edition',
+                                 'source_id': 'synthetic:source'}}]}}
+        candidates = prepare_private_candidates(dataset(), layers)
+        self.assertNotIn(doi, repr(candidates))
+        approved = candidates.attach_reviewed(dataset(), [evidence()], today='2026-06-01',
+                                              independent_verifier=lambda row, review: True)
+        result = filter_records(approved, {})
+        self.assertNotIn(doi, json.dumps(result))
+        self.assertEqual(filter_records(approved, {'q': [doi]})['total'], 0)
+
+    def test_public_match_plan_never_grants_private_metadata(self):
+        layers = {'d8': {'sources': [{'line': 1, 'value': {
+                    'id': 'synthetic:source', 'title': DATA[KEY]['source_title'],
+                    'creator': DATA[KEY]['source_creator'], 'doi': '10.55555/synthetic-doi'}}],
+                  'editions': [{'line': 1, 'value': {'id': 'synthetic:edition',
+                                 'source_id': 'synthetic:source'}}]}}
+        original = dataset()
+        candidates = prepare_private_candidates(original, layers)
+        plan = candidates.plan_public_matches([{'doi': '10.55555/synthetic-doi',
+                    'fields': {'source_title': DATA[KEY]['source_title'],
+                               'source_creator': DATA[KEY]['source_creator']}}])
+        self.assertEqual(plan.summary()['matched_cards'], 1)
+        self.assertNotIn('SYNTHETIC-TITLE', repr(plan))
+        self.assertEqual(filter_records(original, {})['records'][0]['verified_metadata'], {})
+
 
 if __name__ == '__main__':
     unittest.main()

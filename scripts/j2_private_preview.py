@@ -19,7 +19,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from k1_bridge.candidate_archive import load_k1_archive as load_versioned_archive
-from k11_bridge.metadata import FIELDS as VERIFIED_METADATA_FIELDS, metadata_for_record
+from k11_bridge.metadata import FIELDS as VERIFIED_METADATA_FIELDS, PrivateMetadataCandidates, metadata_for_record
+from k12_bridge.snapshot import load_authenticated_snapshot
 from j2_bridge import candidate_readonly as candidate
 
 WEB_ROOT = Path(__file__).resolve().parent / 'j2_web'
@@ -367,6 +368,27 @@ def local_archive_path(value):
     return Path(value)
 
 
+def attach_local_public_snapshot(dataset, snapshot_id, path, *, today=None):
+    """Attach an independently reviewed fixed snapshot from a local file only.
+
+    No snapshot is currently registered, so real inputs fail closed. The file
+    is never sent to an external service and its path/content never enters API
+    output or diagnostics. The approved static provider policy must cover the
+    exact snapshot digest, source provenance, metadata use and privacy.
+    """
+    try:
+        candidates = dataset.get('_private_metadata_candidates') if isinstance(dataset, dict) else None
+        if type(candidates) is not PrivateMetadataCandidates or not isinstance(snapshot_id, str) or not snapshot_id:
+            raise ValueError('public_snapshot_untrusted')
+        location = local_archive_path(path)
+        with location.open('rb') as handle:
+            content = handle.read(32 * 1024 * 1024 + 1)
+        snapshot = load_authenticated_snapshot(snapshot_id, content, today=today or dt.date.today().isoformat())
+        return candidates.attach_public_snapshot(dataset, snapshot)
+    except Exception:
+        raise ValueError('public_snapshot_untrusted') from None
+
+
 def filter_records(dataset, params):
     """Search the pre-redacted projection only; unknown temporal scope stays pending."""
     if not isinstance(dataset, dict) or dataset.get('dataset') not in ALLOWED_DATASETS or not isinstance(dataset.get('records'), list):
@@ -598,10 +620,16 @@ class Handler(BaseHTTPRequestHandler):
 def main(argv=None):
     parser = argparse.ArgumentParser(description='로컬 연구 후보 탐색기 (루프백 전용)')
     parser.add_argument('--archive', required=True, help='고정 D-8, D-9 또는 D-10 ZIP 파일')
+    parser.add_argument('--public-snapshot', help='검토된 고정 공개 서지 스냅샷의 로컬 파일')
+    parser.add_argument('--public-snapshot-id', help='코드에 등록된 스냅샷 정책 이름')
     args = parser.parse_args(argv)
     try:
         archive = local_archive_path(args.archive)
         dataset = load_versioned_archive(archive)
+        if bool(args.public_snapshot) != bool(args.public_snapshot_id):
+            raise ValueError('public_snapshot_untrusted')
+        if args.public_snapshot:
+            dataset = attach_local_public_snapshot(dataset, args.public_snapshot_id, args.public_snapshot)
     except Exception:
         print('고정 D-8/D-9/D-10 자료를 확인할 수 없습니다. 경로와 무결성을 확인하세요.', file=sys.stderr)
         return 1

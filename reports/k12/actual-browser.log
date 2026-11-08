@@ -1,0 +1,15 @@
+dataset_d10: true
+retained_candidate_count: 528
+source_title_searchable_count: 0
+source_creator_searchable_count: 0
+source_publisher_searchable_count: 0
+source_year_searchable_count: 0
+community_name_searchable_count: 0
+browser_ui_axes_visible: true
+browser_scope_notice_visible: true
+actual_title_search: NOT_RUN
+actual_creator_search: NOT_RUN
+research_values_output: false
+windows_k12_execution: NOT_RUN
+user_research_utility: FAIL
+RESULT: PASS

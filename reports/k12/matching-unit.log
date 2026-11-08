@@ -1,0 +1,15 @@
+test_comparison_never_performs_network_requests (test_k12_matching.PublicMatchingTests.test_comparison_never_performs_network_requests) ... ok
+test_conflicting_identity_fields_or_year_reject_entire_match (test_k12_matching.PublicMatchingTests.test_conflicting_identity_fields_or_year_reject_entire_match) ... ok
+test_duplicate_doi_for_other_source_or_edition_fails_closed (test_k12_matching.PublicMatchingTests.test_duplicate_doi_for_other_source_or_edition_fails_closed) ... ok
+test_duplicate_public_doi_is_ambiguous_even_for_identical_rows (test_k12_matching.PublicMatchingTests.test_duplicate_public_doi_is_ambiguous_even_for_identical_rows) ... ok
+test_exact_match_counts_each_field_without_disclosing_values (test_k12_matching.PublicMatchingTests.test_exact_match_counts_each_field_without_disclosing_values) ... ok
+test_invalid_input_uses_fixed_error_only (test_k12_matching.PublicMatchingTests.test_invalid_input_uses_fixed_error_only) ... ok
+test_missing_or_invalid_doi_is_never_used_as_an_identity (test_k12_matching.PublicMatchingTests.test_missing_or_invalid_doi_is_never_used_as_an_identity) ... ok
+test_missing_publisher_or_year_cannot_be_inferred (test_k12_matching.PublicMatchingTests.test_missing_publisher_or_year_cannot_be_inferred) ... ok
+test_same_source_and_edition_may_be_related_to_two_cards (test_k12_matching.PublicMatchingTests.test_same_source_and_edition_may_be_related_to_two_cards) ... ok
+test_snapshot_match_itself_cannot_enable_api_or_private_search (test_k12_matching.PublicMatchingTests.test_snapshot_match_itself_cannot_enable_api_or_private_search) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.001s
+
+OK

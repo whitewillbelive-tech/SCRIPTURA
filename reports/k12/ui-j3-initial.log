@@ -1,0 +1,199 @@
+✖ D9 후보 상태는 승인 0과 미승인 이름을 분리한다 (105.405713ms)
+✖ 근거 없는 승인 플래그는 표시 승인으로 나타내지 않는다 (0.124627ms)
+✖ 명시적 이름 검색 보류와 다른 조건의 0건을 구분한다 (0.05291ms)
+✖ 다른 데이터셋 응답은 목록이나 상세에 혼합하지 않는다 (0.07965ms)
+✖ D9 후속 관찰을 기존 D8의 원본 권리·검증 상태와 합치지 않는다 (0.074792ms)
+✖ D9의 503은 이전 카드·상세를 지우고 초기화로 복구한다 (0.052339ms)
+✖ 늦은 D9 응답이 최신 D9 검색을 덮지 않는다 (0.042594ms)
+✖ 세션 종료 후 새 D8 세션을 열 수 있고 이전 D9 결과는 없다 (0.053801ms)
+✖ 명시 승인된 표시 예시는 합성 모드에서만 표시한다 (0.11953ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 0
+ℹ fail 9
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 128.058478
+
+✖ failing tests:
+
+test at tests/ui-j3-candidate.browser.cjs:39:1
+✖ D9 후보 상태는 승인 0과 미승인 이름을 분리한다 (105.405713ms)
+  Error: synthetic server exited 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 47, in <module>
+      server = PrivatePreviewServer(sample_data(), secret)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 522, in __init__
+      super().__init__(('127.0.0.1', port), Handler)
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socketserver.py", line 453, in __init__
+      self.socket = socket.socket(self.address_family,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socket.py", line 233, in __init__
+      _socket.socket.__init__(self, family, type, proto, fileno)
+  PermissionError: [Errno 1] Operation not permitted
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:27:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)
+
+test at tests/ui-j3-candidate.browser.cjs:60:1
+✖ 근거 없는 승인 플래그는 표시 승인으로 나타내지 않는다 (0.124627ms)
+  Error: synthetic server exited 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 47, in <module>
+      server = PrivatePreviewServer(sample_data(), secret)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 522, in __init__
+      super().__init__(('127.0.0.1', port), Handler)
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socketserver.py", line 453, in __init__
+      self.socket = socket.socket(self.address_family,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socket.py", line 233, in __init__
+      _socket.socket.__init__(self, family, type, proto, fileno)
+  PermissionError: [Errno 1] Operation not permitted
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:27:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)
+
+test at tests/ui-j3-candidate.browser.cjs:74:1
+✖ 명시적 이름 검색 보류와 다른 조건의 0건을 구분한다 (0.05291ms)
+  Error: synthetic server exited 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 47, in <module>
+      server = PrivatePreviewServer(sample_data(), secret)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 522, in __init__
+      super().__init__(('127.0.0.1', port), Handler)
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socketserver.py", line 453, in __init__
+      self.socket = socket.socket(self.address_family,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socket.py", line 233, in __init__
+      _socket.socket.__init__(self, family, type, proto, fileno)
+  PermissionError: [Errno 1] Operation not permitted
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:27:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)
+
+test at tests/ui-j3-candidate.browser.cjs:89:1
+✖ 다른 데이터셋 응답은 목록이나 상세에 혼합하지 않는다 (0.07965ms)
+  Error: synthetic server exited 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 47, in <module>
+      server = PrivatePreviewServer(sample_data(), secret)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 522, in __init__
+      super().__init__(('127.0.0.1', port), Handler)
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socketserver.py", line 453, in __init__
+      self.socket = socket.socket(self.address_family,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socket.py", line 233, in __init__
+      _socket.socket.__init__(self, family, type, proto, fileno)
+  PermissionError: [Errno 1] Operation not permitted
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:27:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)
+
+test at tests/ui-j3-candidate.browser.cjs:109:1
+✖ D9 후속 관찰을 기존 D8의 원본 권리·검증 상태와 합치지 않는다 (0.074792ms)
+  Error: synthetic server exited 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 47, in <module>
+      server = PrivatePreviewServer(sample_data(), secret)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 522, in __init__
+      super().__init__(('127.0.0.1', port), Handler)
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socketserver.py", line 453, in __init__
+      self.socket = socket.socket(self.address_family,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socket.py", line 233, in __init__
+      _socket.socket.__init__(self, family, type, proto, fileno)
+  PermissionError: [Errno 1] Operation not permitted
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:27:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)
+
+test at tests/ui-j3-candidate.browser.cjs:130:1
+✖ D9의 503은 이전 카드·상세를 지우고 초기화로 복구한다 (0.052339ms)
+  Error: synthetic server exited 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 47, in <module>
+      server = PrivatePreviewServer(sample_data(), secret)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 522, in __init__
+      super().__init__(('127.0.0.1', port), Handler)
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socketserver.py", line 453, in __init__
+      self.socket = socket.socket(self.address_family,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socket.py", line 233, in __init__
+      _socket.socket.__init__(self, family, type, proto, fileno)
+  PermissionError: [Errno 1] Operation not permitted
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:27:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)
+
+test at tests/ui-j3-candidate.browser.cjs:146:1
+✖ 늦은 D9 응답이 최신 D9 검색을 덮지 않는다 (0.042594ms)
+  Error: synthetic server exited 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 47, in <module>
+      server = PrivatePreviewServer(sample_data(), secret)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 522, in __init__
+      super().__init__(('127.0.0.1', port), Handler)
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socketserver.py", line 453, in __init__
+      self.socket = socket.socket(self.address_family,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socket.py", line 233, in __init__
+      _socket.socket.__init__(self, family, type, proto, fileno)
+  PermissionError: [Errno 1] Operation not permitted
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:27:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)
+
+test at tests/ui-j3-candidate.browser.cjs:166:1
+✖ 세션 종료 후 새 D8 세션을 열 수 있고 이전 D9 결과는 없다 (0.053801ms)
+  Error: synthetic server exited 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 47, in <module>
+      server = PrivatePreviewServer(sample_data(), secret)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 522, in __init__
+      super().__init__(('127.0.0.1', port), Handler)
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socketserver.py", line 453, in __init__
+      self.socket = socket.socket(self.address_family,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socket.py", line 233, in __init__
+      _socket.socket.__init__(self, family, type, proto, fileno)
+  PermissionError: [Errno 1] Operation not permitted
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:27:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)
+
+test at tests/ui-j3-candidate.browser.cjs:179:1
+✖ 명시 승인된 표시 예시는 합성 모드에서만 표시한다 (0.11953ms)
+  Error: synthetic server exited 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 47, in <module>
+      server = PrivatePreviewServer(sample_data(), secret)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 522, in __init__
+      super().__init__(('127.0.0.1', port), Handler)
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socketserver.py", line 453, in __init__
+      self.socket = socket.socket(self.address_family,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socket.py", line 233, in __init__
+      _socket.socket.__init__(self, family, type, proto, fileno)
+  PermissionError: [Errno 1] Operation not permitted
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:27:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)
