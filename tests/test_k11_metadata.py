@@ -1,5 +1,7 @@
 """Synthetic K-1.1 metadata projection and evidence separation tests."""
 import copy
+import contextlib
+import io
 import json
 import sys
 import unittest
@@ -155,6 +157,35 @@ class MetadataProjectionTests(unittest.TestCase):
             candidates = prepare_private_candidates(dataset(), {'d8': {'sources': [source], 'editions': editions}})
             approved = candidates.attach_reviewed(dataset(), [evidence()], today='2026-06-01', independent_verifier=lambda row, review: True)
             self.assertEqual(filter_records(approved, {})['records'][0]['verified_metadata'], {})
+
+    def test_private_verifier_stdout_stderr_are_discarded(self):
+        layers = {'d8': {'sources': [{'line': 1, 'value': {'id': 'synthetic:source', 'title': DATA[KEY]['source_title']}}],
+                         'editions': [{'line': 1, 'value': {'id': 'synthetic:edition', 'source_id': 'synthetic:source'}}]}}
+        candidates = prepare_private_candidates(dataset(), layers)
+        sentinel = 'SYNTHETIC-CALLBACK-PRIVATE-SENTINEL'
+        def noisy(row, review):
+            print(sentinel, row)
+            print(sentinel, review, file=sys.stderr)
+            return True
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            approved = candidates.attach_reviewed(dataset(), [evidence()], today='2026-06-01', independent_verifier=noisy)
+        self.assertNotIn(sentinel, out.getvalue() + err.getvalue())
+        self.assertEqual(filter_records(approved, {})['records'][0]['verified_metadata'], {'source_title': 'SYNTHETIC-TITLE'})
+
+    def test_private_verifier_exception_is_suppressed_and_fails_closed(self):
+        layers = {'d8': {'sources': [{'line': 1, 'value': {'id': 'synthetic:source', 'title': DATA[KEY]['source_title']}}],
+                         'editions': [{'line': 1, 'value': {'id': 'synthetic:edition', 'source_id': 'synthetic:source'}}]}}
+        candidates = prepare_private_candidates(dataset(), layers)
+        sentinel = 'SYNTHETIC-EXCEPTION-PRIVATE-SENTINEL'
+        def failing(row, review):
+            print(sentinel, file=sys.stderr)
+            raise RuntimeError(sentinel)
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            rejected = candidates.attach_reviewed(dataset(), [evidence()], today='2026-06-01', independent_verifier=failing)
+        self.assertNotIn(sentinel, out.getvalue() + err.getvalue())
+        self.assertEqual(filter_records(rejected, {})['records'][0]['verified_metadata'], {})
 
 
 if __name__ == '__main__':

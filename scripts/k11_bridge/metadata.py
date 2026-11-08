@@ -6,8 +6,10 @@ supply that review. The application configures no such real verifier yet.
 Values stay in memory and are intentionally opaque to diagnostics.
 """
 from datetime import date
+from contextlib import redirect_stderr, redirect_stdout
 import re
 from urllib.parse import urlsplit
+from j3_bridge.private_io import _PRIVATE_READ_LOCK, _DISCARD
 
 FIELDS = frozenset(('source_title', 'source_creator', 'source_publisher', 'source_year', 'community_name'))
 BASES = frozenset(('licensed_permission', 'public_domain', 'applicable_law_private_factual_metadata'))
@@ -104,8 +106,13 @@ def build_verified_index(dataset, records, reviews, *, today, independent_verifi
         if not all(_valid_date(x) for x in (start, end, checked)) or not start <= checked <= today <= end:
             continue
         try:
-            # A verifier error cannot print or embed any research values.
-            verified = independent_verifier(row, review) is True
+            # The review callback receives private data. Reuse the reader's
+            # process-wide Python stream guard against accidental print calls;
+            # the lock coordinates only callers using the same guard. Native fd
+            # writes, pre-existing log handlers and subprocesses are outside
+            # this mechanism and the verifier must not emit private data.
+            with _PRIVATE_READ_LOCK, redirect_stdout(_DISCARD), redirect_stderr(_DISCARD):
+                verified = independent_verifier(row, review) is True
         except Exception:
             verified = False
         if verified:

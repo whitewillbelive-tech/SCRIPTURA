@@ -290,6 +290,8 @@ test_missing_and_conflicting_or_duplicate_reviews_fail_closed (test_k11_metadata
 test_missing_or_multiple_editions_do_not_infer_a_source (test_k11_metadata.MetadataProjectionTests.test_missing_or_multiple_editions_do_not_infer_a_source) ... ok
 test_non_synthetic_records_and_evidence_never_enter_test_index (test_k11_metadata.MetadataProjectionTests.test_non_synthetic_records_and_evidence_never_enter_test_index) ... ok
 test_only_reviewed_projection_is_searchable (test_k11_metadata.MetadataProjectionTests.test_only_reviewed_projection_is_searchable) ... ok
+test_private_verifier_exception_is_suppressed_and_fails_closed (test_k11_metadata.MetadataProjectionTests.test_private_verifier_exception_is_suppressed_and_fails_closed) ... ok
+test_private_verifier_stdout_stderr_are_discarded (test_k11_metadata.MetadataProjectionTests.test_private_verifier_stdout_stderr_are_discarded) ... ok
 test_raw_sources_are_bound_in_memory_and_require_independent_verifier (test_k11_metadata.MetadataProjectionTests.test_raw_sources_are_bound_in_memory_and_require_independent_verifier) ... ok
 test_source_and_edition_mismatch_never_grant_same_value (test_k11_metadata.MetadataProjectionTests.test_source_and_edition_mismatch_never_grant_same_value) ... ok
 test_three_usage_basis_types_are_independent_of_research_truth (test_k11_metadata.MetadataProjectionTests.test_three_usage_basis_types_are_independent_of_research_truth) ... ok
@@ -371,6 +373,6 @@ test_zip_excessive_compression_ratio_is_rejected (test_s1b2_validator.SyntheticV
 test_zip_slip_entry_is_rejected (test_s1b2_validator.SyntheticValidationTests.test_zip_slip_entry_is_rejected) ... ok
 
 ----------------------------------------------------------------------
-Ran 365 tests in 3.399s
+Ran 367 tests in 3.454s
 
 OK
