@@ -1,0 +1,11 @@
+test_cli_error_does_not_echo_sensitive_argument_or_exception (test_k11_private_source_check.PrivateSourceCheckTests.test_cli_error_does_not_echo_sensitive_argument_or_exception) ... ok
+test_denies_other_hosts_insecure_schemes_and_credentials (test_k11_private_source_check.PrivateSourceCheckTests.test_denies_other_hosts_insecure_schemes_and_credentials) ... ok
+test_exceptions_are_aggregated_without_error_details (test_k11_private_source_check.PrivateSourceCheckTests.test_exceptions_are_aggregated_without_error_details) ... ok
+test_network_is_bounded_and_only_fixed_aggregate_is_returned (test_k11_private_source_check.PrivateSourceCheckTests.test_network_is_bounded_and_only_fixed_aggregate_is_returned) ... ok
+test_offline_mode_makes_no_request (test_k11_private_source_check.PrivateSourceCheckTests.test_offline_mode_makes_no_request) ... ok
+test_redirect_to_another_host_is_rejected (test_k11_private_source_check.PrivateSourceCheckTests.test_redirect_to_another_host_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.001s
+
+OK

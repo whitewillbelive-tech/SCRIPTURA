@@ -75,6 +75,8 @@ jobs:
           node tests/ui-j3-candidate.browser.cjs
           # K-1 boundary and visibility checks use synthetic data only.
           node tests/ui-k1-candidate.browser.cjs
+          # K-1.1 bibliography policy and search use synthetic data only.
+          node tests/ui-k11-metadata.browser.cjs
 
   postgres:
     name: PostgreSQL migrations and integration

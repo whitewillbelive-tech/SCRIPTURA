@@ -16,7 +16,7 @@
       <h1>출처와 해석을 <em>차근히 살펴보세요.</em></h1>
       <p>이 화면은 로컬에서 선택한 자료의 연구 후보를 보여줍니다. 출처 확인, 공식 채택, 논증 평가, 독립 학술 심사와 이용권은 서로 다른 상태입니다.</p>
       <p class="notice">학술적으로 확정되지 않은 자료입니다. 표시 권리나 출처가 불확실한 원문·자유 텍스트는 가립니다. 결과를 정본이나 공식 교리로 자동 승격하지 않습니다.</p>
-      <p class="notice">실제 자료의 공동체명·교단명·문헌명·연구자명·발화 주체는 개별 표시 자격 검토 전까지 가려져 해당 이름으로 검색되지 않습니다. 검토는 진행 전입니다.</p>
+      <p class="notice">공동체명·교단명·문헌명·연구자명·발화 주체는 개별 표시 자격 검토 전까지 가려져 검색되지 않습니다. 출처와 로컬 이용 조건이 확인된 문헌명·저자·발행기관·연도·공동체명은 표시하고 검색할 수 있습니다.</p>
     </section>
     <section class="session panel" aria-label="비공개 세션">
       <form id="session-form" autocomplete="off"><label>세션 비밀 <input id="session-secret" type="password" autocomplete="off" minlength="20" required placeholder="터미널에서 지정한 세션 비밀"></label><button class="primary" type="submit">세션 열기</button><button id="session-close" type="button">세션 닫기</button></form>
@@ -24,6 +24,7 @@
     </section>
     <div id="connection" role="status" class="connection">세션을 열면 선택한 자료를 불러옵니다.</div>
     <p id="visibility-status" class="subtle" aria-live="polite">표시 적격성 정보: 미확인</p>
+    <p id="metadata-coverage" class="subtle" aria-live="polite">서지 검색 범위: 미확인</p>
     <details class="panel mapping" aria-label="자료 범위와 미대응">
       <summary>자료 단계별 대응 범위 보기</summary>
       <p class="subtle">입력 건수와 화면에 일부만 대응했거나 아직 대응하지 않은 유형입니다. 이는 이용권 승인이나 정본 수가 아닙니다.</p>
@@ -36,7 +37,8 @@
           <div class="pair"><label>자료 단계 <select name="stage"><option value="">전체</option><option value="base">D-4 기준</option><option value="d5">D-5</option><option value="d6">D-6</option><option value="d7">D-7</option><option value="d8">D-8</option><option value="d9">D-9</option><option value="d10">D-10</option></select></label><label>결과 유형 <select name="record_kind"><option value="">전체</option><option value="claim">해석 주장</option><option value="source">문헌</option></select></label></div>
           <label>통합 검색 <input name="q" type="search" maxlength="200" placeholder="표시가 허용된 메타데이터"></label>
           <label>종교 · 교단 · 단체 <input name="community" type="search" maxlength="200" placeholder="전통 또는 공동체"></label>
-          <label>연구자 · 발화 주체 <input name="researcher" type="search" maxlength="200" placeholder="저자 또는 연구자"></label>
+          <label>연구자 · 발화 주체 <input name="researcher" type="search" maxlength="200" placeholder="확인된 문헌 저자만 검색"></label>
+          <p class="subtle">저자 필터는 확인된 문헌 저자를 검색합니다. 별도 연구자와 발화 주체 이름은 아직 검색에 포함되지 않습니다.</p>
           <div class="pair"><label>본문 코퍼스 <input name="corpus" type="search" maxlength="100" placeholder="코퍼스"></label><label>장절 체계 <input name="scheme" type="search" maxlength="100" placeholder="체계"></label></div>
           <label>본문 주소 <input name="reference" type="search" maxlength="100" placeholder="책 · 장 · 절"></label>
           <label>문헌 종류 <input name="source_kind" type="search" maxlength="100" placeholder="원본 문헌 유형 코드 (정확히 입력)"></label>

@@ -1,0 +1,16 @@
+K-1.1 D10/D9/D8/D7/D6/D5 disclosure scan (exact literals; no source values recorded)
+Nested JSONL files examined: 117
+Nested JSONL records examined: 8469
+D5 selected CSV files examined: 1
+Modified, staged or untracked UTF-8 snapshots scanned: 55
+id patterns: 9042 ; files with new exact matches: 0 ; existing baseline file matches: 0
+url patterns: 433 ; files with new exact matches: 0 ; existing baseline file matches: 0
+selected_text patterns: 682 ; files with new exact matches: 0 ; existing baseline file matches: 0
+personal_name patterns: 494 ; files with new exact matches: 0 ; existing baseline file matches: 0
+raw_hash patterns: 7 ; files with new exact matches: 0 ; existing baseline file matches: 0
+Research archive / JSONL / credential-like filename candidates: 0
+Files not inspected as UTF-8: 0
+Note: generic source-label matches inside three fixed enum declarations excluded; exact names were never output.
+Method: parse selected D10/D9/D8/D7/D6/D5 JSONL and D5 coverage CSV fields entirely in memory, compare literal IDs, full URLs, selected text and names with new/modified worktree and staged index snapshots; source values are not saved or printed. Ignored unstaged files are not commit candidates.
+Limitations: does not detect excerpts, paraphrase, OCR, semantic matches, unselected fields, other input layers, binary contents, copyright/privacy issues, or future file edits; generic strings are filtered by minimum length. Exact match does not establish rights.
+Exception: one generic bibliography schema key is ignored only in five specified code, synthetic-test, and aggregate-log files.

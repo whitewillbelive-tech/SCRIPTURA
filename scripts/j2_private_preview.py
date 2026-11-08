@@ -19,6 +19,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from k1_bridge.candidate_archive import load_k1_archive as load_versioned_archive
+from k11_bridge.metadata import FIELDS as VERIFIED_METADATA_FIELDS, metadata_for_record
 from j2_bridge import candidate_readonly as candidate
 
 WEB_ROOT = Path(__file__).resolve().parent / 'j2_web'
@@ -390,21 +391,33 @@ def filter_records(dataset, params):
     search = q.get('q', '').casefold()
     found = []
     mode = dataset.get('dataset')
+    # This object can only be supplied by trusted in-process verification code;
+    # JSON records and recorded status flags are never treated as grants.
+    metadata_index = dataset.get('_verified_metadata_index')
+    metadata_coverage = {field: 0 for field in sorted(VERIFIED_METADATA_FIELDS)}
     for original in dataset['records']:
         # D8 mode must not include newer D9 records, even if the dataset is
         # accidentally assembled from mixed snapshots.
         if mode in RESEARCH_DATASETS and not _stage_allowed(str(original.get('stage') or '').lower(), mode):
             continue
         row = _safe_record(original, research=mode in RESEARCH_DATASETS, dataset=mode)
+        row['verified_metadata'] = metadata_for_record(metadata_index, mode, row.get('key'))
+        # A claim's verification/review label is not evidence that any source
+        # bibliography has been independently verified.
+        bibliographic_fields = {'source_title', 'source_creator', 'source_publisher', 'source_year'}
+        row['source_verification_status'] = 'verified_fields_only' if bibliographic_fields.intersection(row['verified_metadata']) else 'unconfirmed'
+        for field in row['verified_metadata']:
+            if field in metadata_coverage:
+                metadata_coverage[field] += 1
         if q.get('key') and row.get('key') != q['key']:
             continue
-        if search and not (any(search in _text(row.get(key)) for key in SEARCH_FIELDS) or any(search in _text(p.get(field)) for p in row.get('passages', []) for field in ('corpus', 'scheme', 'reference'))):
+        if search and not (any(search in _text(row.get(key)) for key in SEARCH_FIELDS) or any(search in _text(value) for value in row['verified_metadata'].values()) or any(search in _text(p.get(field)) for p in row.get('passages', []) for field in ('corpus', 'scheme', 'reference'))):
             continue
         community = q.get('community', '').casefold()
-        if community and not any(community in _text(row.get(key)) for key in ('tradition', 'community_reference', 'evaluated_subject')):
+        if community and not (any(community in _text(row.get(key)) for key in ('tradition', 'community_reference', 'evaluated_subject')) or community in _text(row['verified_metadata'].get('community_name'))):
             continue
         researcher = q.get('researcher', '').casefold()
-        if researcher and not any(researcher in _text(row.get(key)) for key in ('researcher', 'speaker', 'source_creator')):
+        if researcher and not (any(researcher in _text(row.get(key)) for key in ('researcher', 'speaker', 'source_creator')) or researcher in _text(row['verified_metadata'].get('source_creator'))):
             continue
         # Enumerations use exact matches: e.g. "verified" must never also
         # select a record labeled "unverified".
@@ -459,6 +472,8 @@ def filter_records(dataset, params):
     if mode in RESEARCH_DATASETS and 'display_records' in counts:
         counts['display_records'] = sum(1 for row in dataset['records'] if _stage_allowed(str(row.get('stage') or '').lower(), mode))
     return {'dataset': dataset['dataset'],
+            'metadata_projection': 'k1.1-verified',
+            'metadata_coverage': metadata_coverage,
             'counts': counts,
             'warnings': ['비공개 연구 후보이며 표시·권리·공식성은 별도 확인이 필요합니다.'] if research else dataset['warnings'],
             'facets': {} if research else dataset.get('facets', {}),

@@ -1,0 +1,17 @@
+test_community_verification_does_not_claim_source_confirmation (test_k11_metadata.MetadataProjectionTests.test_community_verification_does_not_claim_source_confirmation) ... ok
+test_confirmed_fields_do_not_depend_on_theological_or_authority_status (test_k11_metadata.MetadataProjectionTests.test_confirmed_fields_do_not_depend_on_theological_or_authority_status) ... ok
+test_index_is_bound_to_dataset_and_does_not_repr_values (test_k11_metadata.MetadataProjectionTests.test_index_is_bound_to_dataset_and_does_not_repr_values) ... ok
+test_invalid_scope_source_license_and_privacy_review_deny_independently (test_k11_metadata.MetadataProjectionTests.test_invalid_scope_source_license_and_privacy_review_deny_independently) ... ok
+test_missing_and_conflicting_or_duplicate_reviews_fail_closed (test_k11_metadata.MetadataProjectionTests.test_missing_and_conflicting_or_duplicate_reviews_fail_closed) ... ok
+test_missing_or_multiple_editions_do_not_infer_a_source (test_k11_metadata.MetadataProjectionTests.test_missing_or_multiple_editions_do_not_infer_a_source) ... ok
+test_non_synthetic_records_and_evidence_never_enter_test_index (test_k11_metadata.MetadataProjectionTests.test_non_synthetic_records_and_evidence_never_enter_test_index) ... ok
+test_only_reviewed_projection_is_searchable (test_k11_metadata.MetadataProjectionTests.test_only_reviewed_projection_is_searchable) ... ok
+test_raw_sources_are_bound_in_memory_and_require_independent_verifier (test_k11_metadata.MetadataProjectionTests.test_raw_sources_are_bound_in_memory_and_require_independent_verifier) ... ok
+test_source_and_edition_mismatch_never_grant_same_value (test_k11_metadata.MetadataProjectionTests.test_source_and_edition_mismatch_never_grant_same_value) ... ok
+test_three_usage_basis_types_are_independent_of_research_truth (test_k11_metadata.MetadataProjectionTests.test_three_usage_basis_types_are_independent_of_research_truth) ... ok
+test_untrusted_input_objects_and_raw_fields_do_not_authorize (test_k11_metadata.MetadataProjectionTests.test_untrusted_input_objects_and_raw_fields_do_not_authorize) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.003s
+
+OK

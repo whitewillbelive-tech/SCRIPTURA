@@ -1,0 +1,22 @@
+K-1.1 offline research evidence, aggregated without identifiers or contents
+Prior source candidates: 352
+Sources with a title value: 352
+Sources with a creator value: 352
+Sources with a publisher value: 8
+Sources with a publication-year value: 136
+Sources with a checked_at value: 72
+The presence of any of the preceding values does not verify field accuracy or grant display rights.
+Prior source URL hosts in the current network allowlist: 5 of 352
+Default-sandbox connection attempts: 5 connection failures, no source response received
+An escalated repeat was rejected by automatic approval review: the proposed requests would send private research-derived source URLs to external hosts without the required explicit authorisation.
+No escalated requests were performed after rejection.
+Editions with both browse and collect_metadata marked allowed: 2, belonging to 2 sources
+Of those 2 sources: title and creator recorded 2 each; publisher and publication year recorded 0 each
+Of those 2 sources: one has a source-linked access event with a locator, access date, verification status and scope
+That event contains no structured exact title or creator observation to establish field-level identity
+Related allowed action rows: 4; all have a date, evidence reference, reviewer, purpose and territory recorded
+Those 4 territory values remain unknown or pending; none explicitly establishes private-local display scope
+The D-10 conditional bibliography candidate is not one of these two sources.
+Claim attribution source verification, field identity and display rights remain distinct.
+External source verification and rights-scope validation: PENDING
+Researcher or community name privacy and identity: PENDING

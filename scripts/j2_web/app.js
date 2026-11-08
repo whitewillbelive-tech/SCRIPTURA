@@ -15,6 +15,7 @@
   const pageStatus = document.getElementById('page-status');
   const mappingSummary = document.getElementById('mapping-summary');
   const visibilityStatus = document.getElementById('visibility-status');
+  const metadataCoverage = document.getElementById('metadata-coverage');
   let secret = '';
   let controller = null;
   let generation = 0;
@@ -26,6 +27,12 @@
   // The selected archive is fixed for one authenticated session. A response
   // that changes dataset must never replace results from the selected archive.
   let sessionDataset = null;
+  // Set only from the authenticated server response, not an input record's
+  // eligibility flag. The server must enforce field-level permissions before
+  // producing this projection and before using any values in search.
+  let verifiedMetadataProjection = false;
+  let metadataNameCoverage = null;
+  const METADATA_PROJECTION = 'k1.1-verified';
 
   const value = (v, fallback = '표시 보류 또는 미확인') => {
     if (typeof v === 'string' && v.trim()) return v;
@@ -38,11 +45,19 @@
   // Research fields remain closed until their individual use is checked by
   // the server. This extra UI boundary is not a replacement for that gate.
   // Synthetic tests remain labeled and never represent real approval.
-  const safeRow = (row, dataset) => {
+  const safeRow = (row, dataset, projection) => {
     if (!row || typeof row !== 'object') return null;
     if (dataset === 'synthetic') return row;
     const safe = {...row};
-    for (const field of ['source_title','source_creator','source_doi','source_year','locator','researcher','speaker','tradition','community_reference','evaluated_subject','summary']) safe[field] = null;
+    for (const field of ['source_title','source_creator','source_publisher','source_doi','source_year','locator','researcher','speaker','tradition','community_reference','evaluated_subject','summary']) safe[field] = null;
+    const metadata = row.verified_metadata;
+    if (projection === METADATA_PROJECTION && metadata && typeof metadata === 'object' && !Array.isArray(metadata)) {
+      for (const key of ['source_title','source_creator','source_publisher']) {
+        if (Object.hasOwn(metadata, key) && typeof metadata[key] === 'string' && metadata[key].trim()) safe[key] = metadata[key];
+      }
+      if (Object.hasOwn(metadata, 'source_year') && ((typeof metadata.source_year === 'string' && /^\d{4}$/.test(metadata.source_year)) || (Number.isInteger(metadata.source_year) && metadata.source_year >= 1 && metadata.source_year <= 9999))) safe.source_year = metadata.source_year;
+      if (Object.hasOwn(metadata, 'community_name') && typeof metadata.community_name === 'string' && metadata.community_name.trim()) safe.tradition = metadata.community_name;
+    }
     return safe;
   };
   const node = (tag, text, className) => {
@@ -68,6 +83,7 @@
     prev.disabled = true; next.disabled = true; pageStatus.textContent = '';
     mappingSummary.replaceChildren(node('p', '미확인', 'empty'));
     visibilityStatus.textContent = '표시 적격성 정보: 미확인';
+    metadataCoverage.textContent = '서지 검색 범위: 미확인';
   };
   const showError = message => {
     rows = [];
@@ -89,6 +105,7 @@
     official_doctrine:'공식 교리라고 기록된 주장 · 별도 검증 필요', unconfirmed_authority:'원본 공식 교리 귀속 · 미확인',
     metadata_candidate:'연구 후보', candidate_visible_local:'로컬 후보 표시',
     redacted_rights_unresolved:'표시 범위 미확인', not_done:'독립 심사 미실시',
+    verified_fields_only:'일부 서지 필드 확인', unconfirmed:'미확인',
   };
   const readable = v => typeof v === 'string' && labels[v] ? labels[v] : value(v);
   const OBSERVATION_KINDS = new Set(['audit_review','review_queue','evidence','relationship','audit']);
@@ -129,6 +146,7 @@
     fact(fields, '발화 주체 유형 · 미확정', selected.speaker_type);
     body.append(node('p', '발화 주체 표기는 형식만 검사된 연구 후보입니다. 개인·기관 여부와 공식 대표성, 개인정보 및 표시권은 확인되지 않았습니다.', 'field-notice'));
     fact(fields, '문헌 · 저자', [selected.source_title,selected.source_creator].filter(v => typeof v === 'string' && v).join(' · '));
+    fact(fields, '발행기관', selected.source_publisher);
     fact(fields, '판본 임시 참조 번호', safeCoordinate(selected.edition_key, 'editions'));
     fact(fields, '위치 임시 참조 번호', safeCoordinate(selected.locator_key, 'locators'));
     fact(fields, '문헌 종류 · 발행 연도 · DOI', [selected.source_kind,selected.source_year,selected.source_doi].filter(v => (typeof v === 'string' && v) || typeof v === 'number').join(' · '));
@@ -138,7 +156,8 @@
     } else fact(fields, '본문 코퍼스 · 장절 체계 · 주소', [selected.passage_corpus,selected.passage_scheme,selected.passage_reference].filter(v => typeof v === 'string' && v).join(' · '));
     fact(fields, '정확 위치', value(selected.locator, '권리·형식 검토 전 표시 보류'));
     fact(fields, '확인 경로', selected.access_path);
-    fact(fields, '출처 확인 상태', selected.verification_status);
+    fact(fields, '출처 확인 상태', readable(selected.source_verification_status));
+    fact(fields, '입력 검증 상태', selected.verification_status);
     fact(fields, '인용 확인 상태', selected.quotation_status);
     fact(fields, '공식성 상태', selected.authority_status);
     fact(fields, '입력에 기록된 공식성 상태 · 미확정', selected.input_authority_status);
@@ -275,7 +294,7 @@
       const data = await response.json();
       if (current !== detailGeneration) return;
       if (!data || data.dataset !== sessionDataset) throw new Error('dataset mismatch');
-      const target = Array.isArray(data.records) ? safeRow(data.records.find(row => row && row.key === key), data.dataset) : null;
+      const target = Array.isArray(data.records) ? safeRow(data.records.find(row => row && row.key === key), data.dataset, data.metadata_projection) : null;
       if (!target) { detail.replaceChildren(node('p', '연결 대상의 표시 가능한 후보가 없습니다.', 'empty')); return; }
       showDetail(target);
     } catch (e) {
@@ -300,15 +319,21 @@
     mappingSummary.replaceChildren(list);
   };
   const render = data => {
-    rows = Array.isArray(data.records) ? data.records.map(row => safeRow(row, data.dataset)).filter(Boolean) : [];
+    rows = Array.isArray(data.records) ? data.records.map(row => safeRow(row, data.dataset, data.metadata_projection)).filter(Boolean) : [];
     renderMapping(data.unmapped_summary);
     const visibility = data.visibility_summary;
     const validCount = n => Number.isSafeInteger(n) && n >= 0 && n <= 100000;
+    const coverage = data.metadata_coverage;
+    const coverageLabels = {source_title:'문헌명',source_creator:'저자',source_publisher:'발행기관',source_year:'출판 연도',community_name:'공동체명'};
+    if (data.metadata_projection === METADATA_PROJECTION && coverage && typeof coverage === 'object' && !Array.isArray(coverage) && Object.keys(coverageLabels).every(key => validCount(coverage[key]))) {
+      metadataCoverage.textContent = `확인된 필드 검색 범위 (전체 후보 카드): ${Object.entries(coverageLabels).map(([key,label]) => `${label} ${coverage[key]}건`).join(' · ')}. 표시 보류 필드는 검색되지 않습니다.`;
+    } else metadataCoverage.textContent = '서지 검색 범위: 미확인';
     // Until the individual D-10 evidence is independently checked, no real
     // field grant can be inferred from an aggregate or a row-level flag.
     if (visibility && typeof visibility === 'object' && validCount(visibility.metadata_candidate) && validCount(visibility.candidate_visible_local) && (data.dataset === 'synthetic' || visibility.candidate_visible_local === 0)) {
       const conditional = data.dataset === 'D10' && validCount(visibility.conditional_candidate) ? ` · 조건부 후보 ${visibility.conditional_candidate}건` : '';
-      visibilityStatus.textContent = `표시 적격성: 검토 후보 ${visibility.metadata_candidate}건${conditional} · 로컬 표시 승인 ${visibility.candidate_visible_local}건. 검토 후보와 조건부 후보는 표시 승인이 아닙니다.`;
+      const distinction = data.metadata_projection === METADATA_PROJECTION ? ' 이 원장 집계와 확인된 서지 필드의 표시 범위는 별도입니다.' : '';
+      visibilityStatus.textContent = `표시 적격성: 검토 후보 ${visibility.metadata_candidate}건${conditional} · 로컬 표시 승인 ${visibility.candidate_visible_local}건. 검토 후보와 조건부 후보는 표시 승인이 아닙니다.${distinction}`;
     } else {
       visibilityStatus.textContent = '표시 적격성 정보: 미확인';
     }
@@ -325,8 +350,10 @@
       button.type = 'button'; if (safeRef(row.key) !== '미확인') button.dataset.key = safeRef(row.key); button.setAttribute('aria-pressed', 'false');
       button.append(node('span', readable(row.attribution), 'tag'));
       button.append(node('strong', value(row.source_title, '서지 제목 표시 보류')));
+      const bibliography = [row.source_creator,row.source_publisher,row.source_year,row.tradition].filter(v => (typeof v === 'string' && v.trim()) || typeof v === 'number');
+      if (bibliography.length) button.append(node('small', bibliography.join(' · ')));
       button.append(node('small', `임시 참조 번호 · ${safeRef(row.key)}`));
-      button.append(node('small', [value(row.stage, '단계 미확인'), value(row.verification_status, '확인 대기')].join(' · ')));
+      button.append(node('small', [value(row.stage, '단계 미확인'), `출처 ${row.source_verification_status ? readable(row.source_verification_status) : '미확인'}`, `공식성 ${value(row.authority_status, '미확인')}`, `학술 심사 ${value(row.independent_review_status, '미확인')}`].join(' · ')));
       button.addEventListener('click', () => showDetail(row));
       results.append(button);
     }
@@ -339,11 +366,16 @@
     controller = new AbortController();
     const query = new URLSearchParams();
     for (const [key, item] of new FormData(form)) if (typeof item === 'string' && item.trim()) query.set(key, item.trim());
-    const nameSearchBlocked = () => Boolean(query.get('community') || query.get('researcher'));
+    const nameSearchBlocked = () => {
+      if (!query.get('community') && !query.get('researcher')) return false;
+      if (!verifiedMetadataProjection || !metadataNameCoverage) return true;
+      return Boolean((query.get('community') && metadataNameCoverage.community_name === 0) ||
+        (query.get('researcher') && metadataNameCoverage.source_creator === 0));
+    };
     const showNameSearchBlocked = () => {
       count.textContent = '검색 보류';
-      connection.textContent = '이름 필드는 표시 자격 검토 전까지 검색할 수 없습니다.';
-      empty.textContent = '공동체명·교단명·연구자명·발화 주체 이름 검색은 보류 중입니다. 보류는 일치하는 자료가 없다는 뜻이 아닙니다.';
+      connection.textContent = '요청한 이름 필드에서 검색 가능한 값이 없어 검색이 보류됐습니다.';
+      empty.textContent = '요청한 이름 검색은 보류 중입니다. 표시 보류는 일치하는 자료가 없다는 뜻이 아닙니다.';
       empty.hidden = false;
     };
     if (sessionDataset && sessionDataset !== 'synthetic' && nameSearchBlocked()) {
@@ -362,6 +394,11 @@
       if (!data || !Array.isArray(data.records) || !['D8','D9','D10','synthetic'].includes(data.dataset)) throw new Error('unexpected');
       if (sessionDataset && sessionDataset !== data.dataset) throw new Error('dataset mismatch');
       sessionDataset = data.dataset;
+      verifiedMetadataProjection = data.metadata_projection === METADATA_PROJECTION;
+      const nameCoverage = data.metadata_coverage;
+      metadataNameCoverage = verifiedMetadataProjection && nameCoverage && typeof nameCoverage === 'object' &&
+        Number.isSafeInteger(nameCoverage.community_name) && nameCoverage.community_name >= 0 && nameCoverage.community_name <= 100000 &&
+        Number.isSafeInteger(nameCoverage.source_creator) && nameCoverage.source_creator >= 0 && nameCoverage.source_creator <= 100000 ? nameCoverage : null;
       if (sessionDataset !== 'synthetic' && nameSearchBlocked()) { showNameSearchBlocked(); return; }
       empty.textContent = '표시 가능한 필드에서 조건에 맞는 후보가 없습니다. 표시 보류된 필드의 일치 여부는 확인할 수 없습니다.';
       render(data);
@@ -375,12 +412,14 @@
     event.preventDefault();
     offset = 0;
     sessionDataset = null;
+    verifiedMetadataProjection = false;
+    metadataNameCoverage = null;
     secret = secretInput.value;
     secretInput.value = '';
     search();
   });
   document.getElementById('session-close').addEventListener('click', () => {
-    secret = ''; sessionDataset = null; secretInput.value = ''; clear(); connection.textContent = '세션이 닫혔습니다.';
+    secret = ''; sessionDataset = null; verifiedMetadataProjection = false; metadataNameCoverage = null; secretInput.value = ''; clear(); connection.textContent = '세션이 닫혔습니다.';
   });
   form.addEventListener('input', () => { offset = 0; clear(); connection.textContent = secret ? '조건이 변경됐습니다. 후보 검색을 눌러 주세요.' : '세션 비밀을 입력해 주세요.'; });
   form.addEventListener('change', () => { offset = 0; clear(); connection.textContent = secret ? '조건이 변경됐습니다. 후보 검색을 눌러 주세요.' : '세션 비밀을 입력해 주세요.'; });

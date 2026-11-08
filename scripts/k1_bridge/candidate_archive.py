@@ -16,6 +16,7 @@ from j2_bridge import candidate_readonly as base
 from j3_bridge.candidate_archive import load_versioned_archive
 from j3_bridge.d9_validation import TABLE_COUNTS
 from j3_bridge.private_io import read_checked_d8_layers
+from k11_bridge.metadata import prepare_private_candidates
 
 D10_SHA = '0420be8eee136cbef3559caac23436c5e4fcbe9b8602db77010a35343fc7bb9e'
 _D10_TABLES = {'sources': 16, 'editions': 5, 'locators': 16,
@@ -220,6 +221,10 @@ def _read_d10(blob):
         # as returned by the validated D9 loader.
         result = dict(original)
         result['dataset'] = 'D10'
+        # Keep unverified input opaque and in memory, solely for a separately
+        # configured independent verifier. It is never an HTTP response or
+        # grant. No real verifier is configured in the application yet.
+        result['_private_metadata_candidates'] = prepare_private_candidates(result, layers)
         result['visibility_summary'] = summary
         result['d10_receipt'] = {'source_count': len(new['sources']),
                                  'quarantined_source_count': len(new['sources']),
