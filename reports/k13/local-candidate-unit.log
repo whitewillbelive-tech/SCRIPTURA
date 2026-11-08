@@ -1,0 +1,20 @@
+test_community_requires_exact_target_role_and_unique_join (test_k13_local_candidate.LocalCandidateTests.test_community_requires_exact_target_role_and_unique_join) ... ok
+test_conditional_and_permission_alias_restrict_only_display_actions (test_k13_local_candidate.LocalCandidateTests.test_conditional_and_permission_alias_restrict_only_display_actions) ... ok
+test_field_level_restriction_does_not_hide_other_fields (test_k13_local_candidate.LocalCandidateTests.test_field_level_restriction_does_not_hide_other_fields) ... ok
+test_long_title_and_placeholder (test_k13_local_candidate.LocalCandidateTests.test_long_title_and_placeholder) ... ok
+test_multiedition_source_is_recorded_but_claim_chain_checked (test_k13_local_candidate.LocalCandidateTests.test_multiedition_source_is_recorded_but_claim_chain_checked) ... ok
+test_override_conflict_and_source_rights_fail_closed (test_k13_local_candidate.LocalCandidateTests.test_override_conflict_and_source_rights_fail_closed) ... ok
+test_posted_date_is_not_publication_year (test_k13_local_candidate.LocalCandidateTests.test_posted_date_is_not_publication_year) ... ok
+test_private_creator_in_author_list_or_explicit_id_is_hidden (test_k13_local_candidate.LocalCandidateTests.test_private_creator_in_author_list_or_explicit_id_is_hidden) ... ok
+test_private_name_in_title_or_publisher_is_hidden (test_k13_local_candidate.LocalCandidateTests.test_private_name_in_title_or_publisher_is_hidden) ... ok
+test_sealed_index_and_aggregate_contains_no_values (test_k13_local_candidate.LocalCandidateTests.test_sealed_index_and_aggregate_contains_no_values) ... ok
+test_sensitive_agent_and_private_source_fields_are_hidden (test_k13_local_candidate.LocalCandidateTests.test_sensitive_agent_and_private_source_fields_are_hidden) ... ok
+test_unknown_is_neither_denial_nor_confirmation (test_k13_local_candidate.LocalCandidateTests.test_unknown_is_neither_denial_nor_confirmation) ... ok
+test_unverified_is_independent_of_claim_status (test_k13_local_candidate.LocalCandidateTests.test_unverified_is_independent_of_claim_status) ... ok
+test_values_with_contact_data_markup_or_controls_are_hidden (test_k13_local_candidate.LocalCandidateTests.test_values_with_contact_data_markup_or_controls_are_hidden) ... ok
+test_whitespace_actions_and_malformed_decisions_fail_closed (test_k13_local_candidate.LocalCandidateTests.test_whitespace_actions_and_malformed_decisions_fail_closed) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.005s
+
+OK

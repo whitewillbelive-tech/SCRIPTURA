@@ -1,0 +1,18 @@
+test_duplicate_candidates_do_not_merge (test_k1_ingest.ReceiptTests.test_duplicate_candidates_do_not_merge) ... ok
+test_duplicate_new_identity_fails_closed (test_k1_ingest.ReceiptTests.test_duplicate_new_identity_fails_closed) ... ok
+test_ledger_chain_and_exact_groups_reject_wrong_edition (test_k1_ingest.ReceiptTests.test_ledger_chain_and_exact_groups_reject_wrong_edition) ... ok
+test_ledger_preserves_candidate_as_observation_only (test_k1_ingest.ReceiptTests.test_ledger_preserves_candidate_as_observation_only) ... ok
+test_ledger_rejects_duplicate_entity_group (test_k1_ingest.ReceiptTests.test_ledger_rejects_duplicate_entity_group) ... ok
+test_ledger_rejects_unknown_status_group_and_missing_entity (test_k1_ingest.ReceiptTests.test_ledger_rejects_unknown_status_group_and_missing_entity) ... ok
+test_linkage_counts_ambiguous_target_as_unresolved (test_k1_ingest.ReceiptTests.test_linkage_counts_ambiguous_target_as_unresolved) ... ok
+test_manifest_checks_bytes_missing_and_complete_coverage (test_k1_ingest.ReceiptTests.test_manifest_checks_bytes_missing_and_complete_coverage) ... ok
+test_non_archive_returns_fixed_error (test_k1_ingest.ReceiptTests.test_non_archive_returns_fixed_error) ... ok
+test_dates_missing_expired_and_before_review_fail (test_k1_ingest.SyntheticEligibilityTests.test_dates_missing_expired_and_before_review_fail) ... ok
+test_exact_synthetic_fields_can_be_simulated (test_k1_ingest.SyntheticEligibilityTests.test_exact_synthetic_fields_can_be_simulated) ... ok
+test_unverified_or_conditional_rights_and_real_identity_rejected (test_k1_ingest.SyntheticEligibilityTests.test_unverified_or_conditional_rights_and_real_identity_rejected) ... ok
+test_wrong_identity_field_scope_or_purpose_cannot_transfer (test_k1_ingest.SyntheticEligibilityTests.test_wrong_identity_field_scope_or_purpose_cannot_transfer) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.002s
+
+OK

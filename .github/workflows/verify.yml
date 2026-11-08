@@ -77,6 +77,8 @@ jobs:
           node tests/ui-k1-candidate.browser.cjs
           # K-1.1 bibliography policy and search use synthetic data only.
           node tests/ui-k11-metadata.browser.cjs
+          # K-1.3 local candidate field states and search use synthetic data only.
+          node tests/ui-k13-local-candidate.browser.cjs
 
   postgres:
     name: PostgreSQL migrations and integration

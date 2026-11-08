@@ -1,0 +1,115 @@
+✖ 원본 서지 후보는 상태·공식성·학술 상태와 분리된다 (119.741717ms)
+✖ 표시 가능한 후보 제목과 저자는 서버의 검색으로 전달된다 (0.088283ms)
+✖ 제한·누락·알 수 없는 상태와 위조 원본 필드는 출력하지 않는다 (0.052229ms)
+✖ 응답 투영 표식 없이 위조된 후보 메타데이터는 숨긴다 (0.053371ms)
+✖ 후보 값의 HTML은 실행하지 않고 텍스트로 표시한다 (0.093922ms)
+✖ 공동체 표시 가능 값이 없으면 이름 검색을 보류한다 (0.054112ms)
+✖ 503 또는 필터 변경 시 기존 후보 카드와 상세가 남지 않는다 (0.040952ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 0
+ℹ fail 7
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 130.418074
+
+✖ failing tests:
+
+test at tests/ui-k13-local-candidate.browser.cjs:51:1
+✖ 원본 서지 후보는 상태·공식성·학술 상태와 분리된다 (119.741717ms)
+  Error: synthetic server exit 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 7, in <module>
+      from j2_private_preview import PrivatePreviewServer
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 23, in <module>
+      from k13_bridge.local_candidate import LocalCandidateIndex, candidate_metadata_for_record, candidate_restriction_summary
+  ModuleNotFoundError: No module named 'k13_bridge'
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-k13-local-candidate.browser.cjs:39:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)
+
+test at tests/ui-k13-local-candidate.browser.cjs:65:1
+✖ 표시 가능한 후보 제목과 저자는 서버의 검색으로 전달된다 (0.088283ms)
+  Error: synthetic server exit 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 7, in <module>
+      from j2_private_preview import PrivatePreviewServer
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 23, in <module>
+      from k13_bridge.local_candidate import LocalCandidateIndex, candidate_metadata_for_record, candidate_restriction_summary
+  ModuleNotFoundError: No module named 'k13_bridge'
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-k13-local-candidate.browser.cjs:39:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)
+
+test at tests/ui-k13-local-candidate.browser.cjs:75:1
+✖ 제한·누락·알 수 없는 상태와 위조 원본 필드는 출력하지 않는다 (0.052229ms)
+  Error: synthetic server exit 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 7, in <module>
+      from j2_private_preview import PrivatePreviewServer
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 23, in <module>
+      from k13_bridge.local_candidate import LocalCandidateIndex, candidate_metadata_for_record, candidate_restriction_summary
+  ModuleNotFoundError: No module named 'k13_bridge'
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-k13-local-candidate.browser.cjs:39:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)
+
+test at tests/ui-k13-local-candidate.browser.cjs:86:1
+✖ 응답 투영 표식 없이 위조된 후보 메타데이터는 숨긴다 (0.053371ms)
+  Error: synthetic server exit 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 7, in <module>
+      from j2_private_preview import PrivatePreviewServer
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 23, in <module>
+      from k13_bridge.local_candidate import LocalCandidateIndex, candidate_metadata_for_record, candidate_restriction_summary
+  ModuleNotFoundError: No module named 'k13_bridge'
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-k13-local-candidate.browser.cjs:39:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)
+
+test at tests/ui-k13-local-candidate.browser.cjs:92:1
+✖ 후보 값의 HTML은 실행하지 않고 텍스트로 표시한다 (0.093922ms)
+  Error: synthetic server exit 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 7, in <module>
+      from j2_private_preview import PrivatePreviewServer
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 23, in <module>
+      from k13_bridge.local_candidate import LocalCandidateIndex, candidate_metadata_for_record, candidate_restriction_summary
+  ModuleNotFoundError: No module named 'k13_bridge'
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-k13-local-candidate.browser.cjs:39:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)
+
+test at tests/ui-k13-local-candidate.browser.cjs:101:1
+✖ 공동체 표시 가능 값이 없으면 이름 검색을 보류한다 (0.054112ms)
+  Error: synthetic server exit 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 7, in <module>
+      from j2_private_preview import PrivatePreviewServer
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 23, in <module>
+      from k13_bridge.local_candidate import LocalCandidateIndex, candidate_metadata_for_record, candidate_restriction_summary
+  ModuleNotFoundError: No module named 'k13_bridge'
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-k13-local-candidate.browser.cjs:39:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)
+
+test at tests/ui-k13-local-candidate.browser.cjs:110:1
+✖ 503 또는 필터 변경 시 기존 후보 카드와 상세가 남지 않는다 (0.040952ms)
+  Error: synthetic server exit 1: Traceback (most recent call last):
+    File "/workspace/scriptura/tests/j2_preview_test_server.py", line 7, in <module>
+      from j2_private_preview import PrivatePreviewServer
+    File "/workspace/scriptura/scripts/j2_private_preview.py", line 23, in <module>
+      from k13_bridge.local_candidate import LocalCandidateIndex, candidate_metadata_for_record, candidate_restriction_summary
+  ModuleNotFoundError: No module named 'k13_bridge'
+  
+      at ChildProcess.<anonymous> (/workspace/scriptura/tests/ui-k13-local-candidate.browser.cjs:39:54)
+      at ChildProcess.wrapper (node:events:639:12)
+      at ChildProcess.emit (node:events:514:28)
+      at ChildProcess._handle.onexit (node:internal/child_process:324:12)

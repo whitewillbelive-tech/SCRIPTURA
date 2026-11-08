@@ -1,0 +1,14 @@
+test_cancel_does_not_start_server (test_j3_windows_launcher.WindowsLauncherFlowTests.test_cancel_does_not_start_server) ... ok
+test_dialog_failure_does_not_expose_exception (test_j3_windows_launcher.WindowsLauncherFlowTests.test_dialog_failure_does_not_expose_exception) ... ok
+test_file_dialog_supports_d10_and_closes_without_disclosing_path (test_j3_windows_launcher.WindowsLauncherFlowTests.test_file_dialog_supports_d10_and_closes_without_disclosing_path) ... ok
+test_nonwindows_old_python_and_noninteractive_are_rejected (test_j3_windows_launcher.WindowsLauncherFlowTests.test_nonwindows_old_python_and_noninteractive_are_rejected) ... ok
+test_remote_path_fails_before_any_archive_read (test_j3_windows_launcher.WindowsLauncherFlowTests.test_remote_path_fails_before_any_archive_read) ... ok
+test_runner_exception_does_not_expose_selected_path (test_j3_windows_launcher.WindowsLauncherFlowTests.test_runner_exception_does_not_expose_selected_path) ... ok
+test_selected_file_is_passed_in_process_without_printing (test_j3_windows_launcher.WindowsLauncherFlowTests.test_selected_file_is_passed_in_process_without_printing) ... ok
+test_server_status_is_preserved (test_j3_windows_launcher.WindowsLauncherFlowTests.test_server_status_is_preserved) ... ok
+test_unavailable_archive_never_starts_synthetic_fallback (test_j3_windows_launcher.WindowsLauncherFlowTests.test_unavailable_archive_never_starts_synthetic_fallback) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.030s
+
+OK

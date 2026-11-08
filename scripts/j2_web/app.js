@@ -16,6 +16,9 @@
   const mappingSummary = document.getElementById('mapping-summary');
   const visibilityStatus = document.getElementById('visibility-status');
   const metadataCoverage = document.getElementById('metadata-coverage');
+  const creatorFilterLabel = document.getElementById('creator-filter-label');
+  const candidateLimits = document.getElementById('candidate-limits');
+  const candidateLimitsContent = document.getElementById('candidate-limits-content');
   let secret = '';
   let controller = null;
   let generation = 0;
@@ -33,6 +36,24 @@
   let verifiedMetadataProjection = false;
   let metadataNameCoverage = null;
   const METADATA_PROJECTION = 'k1.1-verified';
+  const CANDIDATE_PROJECTION = 'k1.3-local-candidate';
+  const isMetadataProjection = marker => marker === METADATA_PROJECTION || marker === CANDIDATE_PROJECTION;
+  const CANDIDATE_FIELDS = ['source_title','source_creator','source_publisher','source_year','community_name'];
+  const CANDIDATE_MAX_LENGTH = {source_title:1024, source_creator:512, source_publisher:512, source_year:4, community_name:512};
+  const CANDIDATE_STATES = new Set(['recorded_unverified','source_confirmed','restricted','missing_or_unmapped']);
+  const CANDIDATE_STATE_LABELS = {
+    recorded_unverified:'원본 기록 · 독립 확인 전',
+    source_confirmed:'출처 대조 완료',
+    restricted:'표시 제한',
+    missing_or_unmapped:'누락 또는 연결 미확인',
+  };
+  const CANDIDATE_REASON_LABELS = {
+    no_record:'원본 기록 없음', ambiguous_source:'출처 연결 불명확', ambiguous_edition:'판본 연결 불명확',
+    explicit_restriction:'명시적 이용 제한', conditional_use:'조건부 이용',
+    sensitive_or_personal:'민감정보 또는 개인정보', unsafe_format:'안전하지 않은 형식',
+    unmapped_relationship:'귀속 관계 미확인', community_unlinked:'공동체 레코드 미연결',
+    community_role_unconfirmed:'공동체의 발화·대상 역할 미확인',
+  };
 
   const value = (v, fallback = '표시 보류 또는 미확인') => {
     if (typeof v === 'string' && v.trim()) return v;
@@ -50,6 +71,41 @@
     if (dataset === 'synthetic') return row;
     const safe = {...row};
     for (const field of ['source_title','source_creator','source_publisher','source_doi','source_year','locator','researcher','speaker','tradition','community_reference','evaluated_subject','summary']) safe[field] = null;
+    // Only the authenticated API's explicit K-1.3 safe projection can carry
+    // a private candidate value; a raw archive field or policy flag cannot.
+    safe.candidate_field_states = null;
+    safe.candidate_field_reasons = null;
+    if (projection === CANDIDATE_PROJECTION && row.candidate_metadata && typeof row.candidate_metadata === 'object' && !Array.isArray(row.candidate_metadata)) {
+      // A community name is meaningful only when the server established its
+      // relation to this specific candidate. Never infer the role from a raw
+      // claim or reuse a label for an unlinked subject or critic.
+      safe.community_role = 'unspecified';
+      const states = {}, reasons = {};
+      for (const key of CANDIDATE_FIELDS) {
+        const item = row.candidate_metadata[key];
+        const state = item && typeof item === 'object' && !Array.isArray(item) && CANDIDATE_STATES.has(item.status) ? item.status : 'missing_or_unmapped';
+        states[key] = state;
+        if (item && typeof item.reason === 'string' && Object.hasOwn(CANDIDATE_REASON_LABELS, item.reason)) reasons[key] = item.reason;
+        const allowed = state === 'recorded_unverified' || state === 'source_confirmed';
+        const fieldValue = item && item.value;
+        if (!allowed) continue;
+        if (typeof fieldValue !== 'string' || !fieldValue.trim() || fieldValue.length > CANDIDATE_MAX_LENGTH[key] || (key === 'source_year' && !/^\d{4}$/.test(fieldValue))) {
+          states[key] = 'missing_or_unmapped';
+          continue;
+        }
+        if (key === 'community_name') {
+          if (item.relationship_role !== 'self' && item.relationship_role !== 'target') {
+            states[key] = 'missing_or_unmapped';
+            reasons[key] = 'community_role_unconfirmed';
+            continue;
+          }
+          safe.community_role = item.relationship_role;
+        }
+        safe[key === 'community_name' ? 'tradition' : key] = fieldValue;
+      }
+      safe.candidate_field_states = states;
+      safe.candidate_field_reasons = reasons;
+    }
     const metadata = row.verified_metadata;
     if (projection === METADATA_PROJECTION && metadata && typeof metadata === 'object' && !Array.isArray(metadata)) {
       for (const key of ['source_title','source_creator','source_publisher']) {
@@ -84,6 +140,8 @@
     mappingSummary.replaceChildren(node('p', '미확인', 'empty'));
     visibilityStatus.textContent = '표시 적격성 정보: 미확인';
     metadataCoverage.textContent = '서지 검색 범위: 미확인';
+    candidateLimits.hidden = true;
+    candidateLimitsContent.replaceChildren();
   };
   const showError = message => {
     rows = [];
@@ -145,8 +203,17 @@
     fact(fields, '발화 주체 · 유형 미확인', selected.speaker);
     fact(fields, '발화 주체 유형 · 미확정', selected.speaker_type);
     body.append(node('p', '발화 주체 표기는 형식만 검사된 연구 후보입니다. 개인·기관 여부와 공식 대표성, 개인정보 및 표시권은 확인되지 않았습니다.', 'field-notice'));
-    fact(fields, '문헌 · 저자', [selected.source_title,selected.source_creator].filter(v => typeof v === 'string' && v).join(' · '));
+    fact(fields, '문헌 · 기록된 작성자', [selected.source_title,selected.source_creator].filter(v => typeof v === 'string' && v).join(' · '));
     fact(fields, '발행기관', selected.source_publisher);
+    if (selected.candidate_field_states) {
+      for (const [key,label] of Object.entries({source_title:'문헌 제목',source_creator:'기록된 문헌 작성자',source_publisher:'발행기관',source_year:'발행 연도',community_name:'공동체명'})) {
+        fact(fields, `${label} 표시 상태`, CANDIDATE_STATE_LABELS[selected.candidate_field_states[key]] || CANDIDATE_STATE_LABELS.missing_or_unmapped);
+        const reason = selected.candidate_field_reasons && selected.candidate_field_reasons[key];
+        if (reason && Object.hasOwn(CANDIDATE_REASON_LABELS, reason)) fact(fields, `${label} 제한 사유`, CANDIDATE_REASON_LABELS[reason]);
+      }
+      fact(fields, '로컬 표시 범위', '비공개 로컬 연구 후보');
+      fact(fields, '공개 · 재배포', '별도 승인 필요');
+    }
     fact(fields, '판본 임시 참조 번호', safeCoordinate(selected.edition_key, 'editions'));
     fact(fields, '위치 임시 참조 번호', safeCoordinate(selected.locator_key, 'locators'));
     fact(fields, '문헌 종류 · 발행 연도 · DOI', [selected.source_kind,selected.source_year,selected.source_doi].filter(v => (typeof v === 'string' && v) || typeof v === 'number').join(' · '));
@@ -319,21 +386,52 @@
     mappingSummary.replaceChildren(list);
   };
   const render = data => {
+    // The legacy accessible label remains for earlier API versions only.
+    // In K-1.3 this filter matches recorded source creators, which can be an
+    // institution and must not be described as a claim's speaker.
+    creatorFilterLabel.textContent = data.metadata_projection === CANDIDATE_PROJECTION ? '문헌 작성자' : '연구자 · 발화 주체';
     rows = Array.isArray(data.records) ? data.records.map(row => safeRow(row, data.dataset, data.metadata_projection)).filter(Boolean) : [];
     renderMapping(data.unmapped_summary);
     const visibility = data.visibility_summary;
     const validCount = n => Number.isSafeInteger(n) && n >= 0 && n <= 100000;
     const coverage = data.metadata_coverage;
     const coverageLabels = {source_title:'문헌명',source_creator:'저자',source_publisher:'발행기관',source_year:'출판 연도',community_name:'공동체명'};
-    if (data.metadata_projection === METADATA_PROJECTION && coverage && typeof coverage === 'object' && !Array.isArray(coverage) && Object.keys(coverageLabels).every(key => validCount(coverage[key]))) {
-      metadataCoverage.textContent = `확인된 필드 검색 범위 (전체 후보 카드): ${Object.entries(coverageLabels).map(([key,label]) => `${label} ${coverage[key]}건`).join(' · ')}. 표시 보류 필드는 검색되지 않습니다.`;
+    if (isMetadataProjection(data.metadata_projection) && coverage && typeof coverage === 'object' && !Array.isArray(coverage) && Object.keys(coverageLabels).every(key => validCount(coverage[key]))) {
+      const scope = data.metadata_projection === CANDIDATE_PROJECTION ? '로컬 후보 필드 검색 범위' : '확인된 필드 검색 범위';
+      metadataCoverage.textContent = `${scope} (전체 후보 카드): ${Object.entries(coverageLabels).map(([key,label]) => `${label} ${coverage[key]}건`).join(' · ')}. 표시 보류 필드는 검색되지 않습니다.`;
     } else metadataCoverage.textContent = '서지 검색 범위: 미확인';
+    candidateLimits.hidden = true;
+    candidateLimitsContent.replaceChildren();
+    const restrictions = data.candidate_restriction_summary;
+    if (data.metadata_projection === CANDIDATE_PROJECTION && restrictions && typeof restrictions === 'object' && !Array.isArray(restrictions)) {
+      for (const [scope,scopeLabel] of [['cards','후보 카드'],['sources','출처 레코드']]) {
+        const group = restrictions[scope];
+        if (!group || typeof group !== 'object' || Array.isArray(group)) continue;
+        const list = node('ul');
+        for (const [field,label] of Object.entries(coverageLabels)) {
+          const counts = group[field];
+          if (!counts || typeof counts !== 'object' || Array.isArray(counts)) continue;
+          const reasons = Object.entries(CANDIDATE_REASON_LABELS)
+            .filter(([key]) => validCount(counts[key]) && counts[key] > 0)
+            .map(([key,reason]) => `${reason} ${counts[key]}건`);
+          if (reasons.length) list.append(node('li', `${label}: ${reasons.join(' · ')}`));
+        }
+        if (list.children.length) {
+          candidateLimitsContent.append(node('h3', scopeLabel), list);
+          candidateLimits.hidden = false;
+        }
+      }
+    }
     // Until the individual D-10 evidence is independently checked, no real
     // field grant can be inferred from an aggregate or a row-level flag.
     if (visibility && typeof visibility === 'object' && validCount(visibility.metadata_candidate) && validCount(visibility.candidate_visible_local) && (data.dataset === 'synthetic' || visibility.candidate_visible_local === 0)) {
       const conditional = data.dataset === 'D10' && validCount(visibility.conditional_candidate) ? ` · 조건부 후보 ${visibility.conditional_candidate}건` : '';
-      const distinction = data.metadata_projection === METADATA_PROJECTION ? ' 이 원장 집계와 확인된 서지 필드의 표시 범위는 별도입니다.' : '';
-      visibilityStatus.textContent = `표시 적격성: 검토 후보 ${visibility.metadata_candidate}건${conditional} · 로컬 표시 승인 ${visibility.candidate_visible_local}건. 검토 후보와 조건부 후보는 표시 승인이 아닙니다.${distinction}`;
+      if (data.metadata_projection === CANDIDATE_PROJECTION) {
+        visibilityStatus.textContent = `원본 적격성 원장: 검토 후보 ${visibility.metadata_candidate}건${conditional}. 비공개 로컬 후보 표시는 이 원장과 별도이며 공개·재배포 승인이 아닙니다.`;
+      } else {
+        const distinction = data.metadata_projection === METADATA_PROJECTION ? ' 이 원장 집계와 확인된 서지 필드의 표시 범위는 별도입니다.' : '';
+        visibilityStatus.textContent = `표시 적격성: 검토 후보 ${visibility.metadata_candidate}건${conditional} · 로컬 표시 승인 ${visibility.candidate_visible_local}건. 검토 후보와 조건부 후보는 표시 승인이 아닙니다.${distinction}`;
+      }
     } else {
       visibilityStatus.textContent = '표시 적격성 정보: 미확인';
     }
@@ -350,6 +448,7 @@
       button.type = 'button'; if (safeRef(row.key) !== '미확인') button.dataset.key = safeRef(row.key); button.setAttribute('aria-pressed', 'false');
       button.append(node('span', readable(row.attribution), 'tag'));
       button.append(node('strong', value(row.source_title, '서지 제목 표시 보류')));
+      if (row.candidate_field_states) button.append(node('small', `문헌 제목 · ${CANDIDATE_STATE_LABELS[row.candidate_field_states.source_title] || CANDIDATE_STATE_LABELS.missing_or_unmapped}`));
       const bibliography = [row.source_creator,row.source_publisher,row.source_year,row.tradition].filter(v => (typeof v === 'string' && v.trim()) || typeof v === 'number');
       if (bibliography.length) button.append(node('small', bibliography.join(' · ')));
       button.append(node('small', `임시 참조 번호 · ${safeRef(row.key)}`));
@@ -394,7 +493,7 @@
       if (!data || !Array.isArray(data.records) || !['D8','D9','D10','synthetic'].includes(data.dataset)) throw new Error('unexpected');
       if (sessionDataset && sessionDataset !== data.dataset) throw new Error('dataset mismatch');
       sessionDataset = data.dataset;
-      verifiedMetadataProjection = data.metadata_projection === METADATA_PROJECTION;
+      verifiedMetadataProjection = isMetadataProjection(data.metadata_projection);
       const nameCoverage = data.metadata_coverage;
       metadataNameCoverage = verifiedMetadataProjection && nameCoverage && typeof nameCoverage === 'object' &&
         Number.isSafeInteger(nameCoverage.community_name) && nameCoverage.community_name >= 0 && nameCoverage.community_name <= 100000 &&
@@ -412,6 +511,7 @@
     event.preventDefault();
     offset = 0;
     sessionDataset = null;
+    creatorFilterLabel.textContent = '연구자 · 발화 주체';
     verifiedMetadataProjection = false;
     metadataNameCoverage = null;
     secret = secretInput.value;
@@ -419,7 +519,7 @@
     search();
   });
   document.getElementById('session-close').addEventListener('click', () => {
-    secret = ''; sessionDataset = null; verifiedMetadataProjection = false; metadataNameCoverage = null; secretInput.value = ''; clear(); connection.textContent = '세션이 닫혔습니다.';
+    secret = ''; sessionDataset = null; verifiedMetadataProjection = false; metadataNameCoverage = null; creatorFilterLabel.textContent = '연구자 · 발화 주체'; secretInput.value = ''; clear(); connection.textContent = '세션이 닫혔습니다.';
   });
   form.addEventListener('input', () => { offset = 0; clear(); connection.textContent = secret ? '조건이 변경됐습니다. 후보 검색을 눌러 주세요.' : '세션 비밀을 입력해 주세요.'; });
   form.addEventListener('change', () => { offset = 0; clear(); connection.textContent = secret ? '조건이 변경됐습니다. 후보 검색을 눌러 주세요.' : '세션 비밀을 입력해 주세요.'; });

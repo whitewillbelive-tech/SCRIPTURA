@@ -17,6 +17,7 @@ from j3_bridge.candidate_archive import load_versioned_archive
 from j3_bridge.d9_validation import TABLE_COUNTS
 from j3_bridge.private_io import read_checked_d8_layers
 from k11_bridge.metadata import prepare_private_candidates
+from k13_bridge.local_candidate import prepare_local_candidate_index
 
 D10_SHA = '0420be8eee136cbef3559caac23436c5e4fcbe9b8602db77010a35343fc7bb9e'
 _D10_TABLES = {'sources': 16, 'editions': 5, 'locators': 16,
@@ -225,6 +226,7 @@ def _read_d10(blob):
         # configured independent verifier. It is never an HTTP response or
         # grant. No real verifier is configured in the application yet.
         result['_private_metadata_candidates'] = prepare_private_candidates(result, layers)
+        result['_local_candidate_index'] = prepare_local_candidate_index(result, layers)
         result['visibility_summary'] = summary
         result['d10_receipt'] = {'source_count': len(new['sources']),
                                  'quarantined_source_count': len(new['sources']),

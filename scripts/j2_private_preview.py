@@ -20,6 +20,7 @@ from pathlib import Path
 
 from k1_bridge.candidate_archive import load_k1_archive as load_versioned_archive
 from k11_bridge.metadata import FIELDS as VERIFIED_METADATA_FIELDS, PrivateMetadataCandidates, metadata_for_record
+from k13_bridge.local_candidate import LocalCandidateIndex, candidate_metadata_for_record, candidate_restriction_summary
 from k12_bridge.snapshot import load_authenticated_snapshot
 from j2_bridge import candidate_readonly as candidate
 
@@ -416,6 +417,9 @@ def filter_records(dataset, params):
     # This object can only be supplied by trusted in-process verification code;
     # JSON records and recorded status flags are never treated as grants.
     metadata_index = dataset.get('_verified_metadata_index')
+    local_index = dataset.get('_local_candidate_index')
+    local_mode = mode in RESEARCH_DATASETS and type(local_index) is LocalCandidateIndex
+    local_summary = candidate_restriction_summary(local_index, mode) if local_mode else {}
     metadata_coverage = {field: 0 for field in sorted(VERIFIED_METADATA_FIELDS)}
     for original in dataset['records']:
         # D8 mode must not include newer D9 records, even if the dataset is
@@ -424,22 +428,59 @@ def filter_records(dataset, params):
             continue
         row = _safe_record(original, research=mode in RESEARCH_DATASETS, dataset=mode)
         row['verified_metadata'] = metadata_for_record(metadata_index, mode, row.get('key'))
+        if local_mode:
+            # Only the sealed in-memory policy index can supply candidate
+            # values; fields on archive records and HTTP input are ignored.
+            candidates = candidate_metadata_for_record(local_index, mode, row.get('key'))
+            for field, item in candidates.items():
+                if (item.get('status') == 'recorded_unverified'
+                        and item.get('value') is not None
+                        and row['verified_metadata'].get(field) == item['value']):
+                    item['status'] = 'source_confirmed'
+                    # The sealed index reports pre-verification counts. Keep
+                    # those counts aligned with the merged per-field status.
+                    for group in (('cards', 'sources') if row.get('record_kind') == 'source' else ('cards',)):
+                        counts = local_summary.get(group, {}).get(field, {})
+                        if isinstance(counts.get('recorded_unverified'), int) and counts['recorded_unverified'] > 0:
+                            counts['recorded_unverified'] -= 1
+                            counts['source_confirmed'] = counts.get('source_confirmed', 0) + 1
+            row['candidate_metadata'] = candidates
+            community = candidates.get('community_name', {})
+            role = community.get('relationship_role')
+            # Relationship belongs to the exact sealed identity/claim. An
+            # unrelated raw role or an undisplayed name cannot authorize it.
+            row['community_role'] = (role if role in ('self', 'target')
+                                     and community.get('status') in ('recorded_unverified', 'source_confirmed')
+                                     and isinstance(community.get('value'), str) else 'unspecified')
+            # A previously confirmed value never bypasses a current local
+            # privacy/restriction decision, and mismatched values cannot be
+            # relabelled as verified.
+            row['verified_metadata'] = {
+                field: value for field, value in row['verified_metadata'].items()
+                if field in candidates and candidates[field].get('status') == 'source_confirmed'
+                and candidates[field].get('value') == value
+            }
+            row['local_visibility'] = 'private_local_candidate'
+            row['publication_status'] = 'not_granted'
         # A claim's verification/review label is not evidence that any source
         # bibliography has been independently verified.
         bibliographic_fields = {'source_title', 'source_creator', 'source_publisher', 'source_year'}
         row['source_verification_status'] = 'verified_fields_only' if bibliographic_fields.intersection(row['verified_metadata']) else 'unconfirmed'
-        for field in row['verified_metadata']:
+        available = ({field: item['value'] for field, item in row.get('candidate_metadata', {}).items()
+                      if item.get('status') in ('recorded_unverified', 'source_confirmed')
+                      and isinstance(item.get('value'), str)} if local_mode else row['verified_metadata'])
+        for field in available:
             if field in metadata_coverage:
                 metadata_coverage[field] += 1
         if q.get('key') and row.get('key') != q['key']:
             continue
-        if search and not (any(search in _text(row.get(key)) for key in SEARCH_FIELDS) or any(search in _text(value) for value in row['verified_metadata'].values()) or any(search in _text(p.get(field)) for p in row.get('passages', []) for field in ('corpus', 'scheme', 'reference'))):
+        if search and not (any(search in _text(row.get(key)) for key in SEARCH_FIELDS) or any(search in _text(value) for value in available.values()) or any(search in _text(p.get(field)) for p in row.get('passages', []) for field in ('corpus', 'scheme', 'reference'))):
             continue
         community = q.get('community', '').casefold()
-        if community and not (any(community in _text(row.get(key)) for key in ('tradition', 'community_reference', 'evaluated_subject')) or community in _text(row['verified_metadata'].get('community_name'))):
+        if community and not (any(community in _text(row.get(key)) for key in ('tradition', 'community_reference', 'evaluated_subject')) or community in _text(available.get('community_name'))):
             continue
         researcher = q.get('researcher', '').casefold()
-        if researcher and not (any(researcher in _text(row.get(key)) for key in ('researcher', 'speaker', 'source_creator')) or researcher in _text(row['verified_metadata'].get('source_creator'))):
+        if researcher and not (any(researcher in _text(row.get(key)) for key in ('researcher', 'speaker', 'source_creator')) or researcher in _text(available.get('source_creator'))):
             continue
         # Enumerations use exact matches: e.g. "verified" must never also
         # select a record labeled "unverified".
@@ -494,8 +535,9 @@ def filter_records(dataset, params):
     if mode in RESEARCH_DATASETS and 'display_records' in counts:
         counts['display_records'] = sum(1 for row in dataset['records'] if _stage_allowed(str(row.get('stage') or '').lower(), mode))
     return {'dataset': dataset['dataset'],
-            'metadata_projection': 'k1.1-verified',
+            'metadata_projection': 'k1.3-local-candidate' if local_mode else 'k1.1-verified',
             'metadata_coverage': metadata_coverage,
+            'candidate_restriction_summary': local_summary,
             'counts': counts,
             'warnings': ['비공개 연구 후보이며 표시·권리·공식성은 별도 확인이 필요합니다.'] if research else dataset['warnings'],
             'facets': {} if research else dataset.get('facets', {}),
