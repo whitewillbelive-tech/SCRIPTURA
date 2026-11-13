@@ -1,0 +1,27 @@
+✔ 코퍼스·장절체계·주소를 선택해 두 해석을 나란히 본다 (1336.970153ms)
+✖ 자료 범위를 전체로 바꾸면 단계 필터 없이 본문을 조회한다 (30001.496977ms)
+✔ 불일치한 선택이나 다른 데이터셋의 응답을 표시하지 않는다 (52.552443ms)
+✔ 검토된 요지 표식과 상태가 모두 있는 경우만 텍스트로 표시한다 (76.615993ms)
+✔ 선택 변경과 지연 응답은 기존 비교 결과를 지운다 (130.409436ms)
+✔ 세션 닫기 후 비교 결과와 선택값을 지운다 (32.351425ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 31812.173321
+
+✖ failing tests:
+
+test at tests/ui-k2-comparison.browser.cjs:63:1
+✖ 자료 범위를 전체로 바꾸면 단계 필터 없이 본문을 조회한다 (30001.496977ms)
+  locator.selectOption: Timeout 30000ms exceeded.
+  Call log:
+  [2m  - waiting for getByLabel('자료 범위', { exact: true })[22m
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-k2-comparison.browser.cjs:66:46) {
+    log: [ "  - waiting for getByLabel('자료 범위', { exact: true })" ],
+    name: 'TimeoutError'
+  }

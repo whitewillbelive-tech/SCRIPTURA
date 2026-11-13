@@ -120,4 +120,8 @@ Windows에서는 `START_SCRIPTURA.cmd`로 로컬 파일 선택기를 열고 고�
 
 ## Gate K-1.3 비공개 로컬 연구 후보
 
-기록된 서지 후보의 비공개 로컬 표시와 독립 출처 확인, 공동체 공식성·학술 심사 및 공개·재배포 허가는 별도로 표시한다. 필드별 제한과 실제 수용 결과는 [K-1.3 보고서](K13_REPORT.md), Windows에서 직접 수행할 절차는 [Windows 수용 안내](K13_WINDOWS_ACCEPTANCE_KO.md)를 참조한다. K-1.3의 Windows 실기기 시험은 아직 수행하지 않았다.
+기록된 서지 후보의 비공개 로컬 표시와 독립 출처 확인, 공동체 공식성·학술 심사 및 공개·재배포 허가는 별도로 표시한다. 필드별 제한과 수용 결과는 [K-1.3 보고서](K13_REPORT.md), Windows 절차는 [Windows 수용 안내](K13_WINDOWS_ACCEPTANCE_KO.md)를 참조한다. 이후 사용자가 Windows에서 제목·작성자 표시, 실제 검색과 검증 상태 구분을 각각 확인했다(3/3 PASS).
+
+## Gate K-2 본문별 연구 후보 비교
+
+동결 D-12 연구자료를 개인 로컬 환경에서 선택해 본문별 해석 후보와 상태를 비교한다. 자료의 권리와 검증 범위, 시험 결과는 [K-2 보고서](K2_REPORT.md), Windows 설치와 수용 시험은 [Windows 안내](K2_WINDOWS_ACCEPTANCE_KO.md)를 참조한다. K-2의 Windows 실기기 시험은 아직 실행하지 않았다.

@@ -1,0 +1,16 @@
+test_bad_edition_fails_closed (test_k2_receipt.K2ReceiptTests.test_bad_edition_fails_closed) ... ok
+test_canonical_addresses_reject_prose_and_preserve_compounds (test_k2_receipt.K2ReceiptTests.test_canonical_addresses_reject_prose_and_preserve_compounds) ... ok
+test_dangling_evidence_fails_closed (test_k2_receipt.K2ReceiptTests.test_dangling_evidence_fails_closed) ... ok
+test_dangling_passage_fails_closed (test_k2_receipt.K2ReceiptTests.test_dangling_passage_fails_closed) ... ok
+test_duplicate_claim_fails_closed (test_k2_receipt.K2ReceiptTests.test_duplicate_claim_fails_closed) ... ok
+test_evidence_other_locator_fails_closed (test_k2_receipt.K2ReceiptTests.test_evidence_other_locator_fails_closed) ... ok
+test_sealed_summary_requires_own_nonquote_and_exact_chain (test_k2_receipt.K2ReceiptTests.test_sealed_summary_requires_own_nonquote_and_exact_chain) ... ok
+test_unverified_tradition_sealed_and_private_restriction (test_k2_receipt.K2ReceiptTests.test_unverified_tradition_sealed_and_private_restriction) ... ok
+test_url_and_unc_rejected_without_path_leak (test_k2_receipt.K2ReceiptTests.test_url_and_unc_rejected_without_path_leak) ... ok
+test_valid_counts_distinguish_one_unused_address (test_k2_receipt.K2ReceiptTests.test_valid_counts_distinguish_one_unused_address) ... ok
+test_wrong_source_edition_pair_fails_closed (test_k2_receipt.K2ReceiptTests.test_wrong_source_edition_pair_fails_closed) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.002s
+
+OK

@@ -27,6 +27,9 @@
   let pageSize = 100;
   let detailGeneration = 0;
   let detailController = null;
+  let comparisonController = null;
+  let comparisonGeneration = 0;
+  let comparisonPassages = [];
   // The selected archive is fixed for one authenticated session. A response
   // that changes dataset must never replace results from the selected archive.
   let sessionDataset = null;
@@ -61,8 +64,8 @@
     return fallback;
   };
   // Only generated layer/table/row coordinates are displayed; never raw source IDs.
-  const safeRef = key => typeof key === 'string' && /^(base|d[5-9]|d10):(claims|sources):[1-9][0-9]{0,6}$/.test(key) ? key : '미확인';
-  const safeCoordinate = (key, table) => typeof key === 'string' && new RegExp(`^(base|d[5-9]|d10):${table}:[1-9][0-9]{0,6}$`).test(key) ? key : '미확인';
+  const safeRef = key => typeof key === 'string' && /^(base|d[5-9]|d1[012]):(claims|sources):[1-9][0-9]{0,6}$/.test(key) ? key : '미확인';
+  const safeCoordinate = (key, table) => typeof key === 'string' && new RegExp(`^(base|d[5-9]|d1[012]):${table}:[1-9][0-9]{0,6}$`).test(key) ? key : '미확인';
   // Research fields remain closed until their individual use is checked by
   // the server. This extra UI boundary is not a replacement for that gate.
   // Synthetic tests remain labeled and never represent real approval.
@@ -280,7 +283,7 @@
     }
     const later = Array.isArray(selected.d9_observations) ? selected.d9_observations : [];
     const laterRights = Array.isArray(selected.d9_rights_observations) ? selected.d9_rights_observations : [];
-    if ((sessionDataset === 'D9' || sessionDataset === 'D10') && (later.length || laterRights.length)) {
+    if ((sessionDataset === 'D9' || sessionDataset === 'D10' || sessionDataset === 'D12') && (later.length || laterRights.length)) {
       body.append(node('h4', 'D-9 후속 관찰 · 원본 상태 변경 없음'));
       const list = node('ul');
       for (const item of later) if (item && typeof item === 'object') {
@@ -440,7 +443,7 @@
     pageSize = Number.isSafeInteger(data.page_size) && data.page_size > 0 ? data.page_size : 100;
     prev.disabled = offset <= 0; next.disabled = offset + rows.length >= total || rows.length === 0;
     pageStatus.textContent = total ? `${offset + 1}–${offset + rows.length} / ${total}` : '';
-    connection.textContent = data.dataset === 'synthetic' ? '합성 시험 자료 / 실제 연구 데이터 아님.' : `${data.dataset === 'D10' ? 'D-10' : data.dataset === 'D9' ? 'D-9' : 'D-8'} 연구 후보 · 선택한 로컬 자료에서 조회했습니다. 모든 결과는 연구 후보입니다.`;
+    connection.textContent = data.dataset === 'synthetic' ? '합성 시험 자료 / 실제 연구 데이터 아님.' : `${data.dataset === 'D12' ? 'D-12' : data.dataset === 'D10' ? 'D-10' : data.dataset === 'D9' ? 'D-9' : 'D-8'} 연구 후보 · 선택한 로컬 자료에서 조회했습니다. 모든 결과는 연구 후보입니다.`;
     empty.hidden = rows.length > 0;
     for (const row of rows) {
       if (!row || typeof row !== 'object') continue;
@@ -490,7 +493,7 @@
       if (!response.ok) throw new Error('unavailable');
       const data = await response.json();
       if (current !== generation) return;
-      if (!data || !Array.isArray(data.records) || !['D8','D9','D10','synthetic'].includes(data.dataset)) throw new Error('unexpected');
+      if (!data || !Array.isArray(data.records) || !['D8','D9','D10','D12','synthetic'].includes(data.dataset)) throw new Error('unexpected');
       if (sessionDataset && sessionDataset !== data.dataset) throw new Error('dataset mismatch');
       sessionDataset = data.dataset;
       verifiedMetadataProjection = isMetadataProjection(data.metadata_projection);
@@ -507,8 +510,145 @@
       showError(e.message === 'dataset mismatch' ? '선택한 자료 버전과 응답이 일치하지 않습니다.' : '자료를 불러오지 못했습니다. 로컬 서버 상태와 선택한 자료를 확인해 주세요.');
     }
   };
+  const comparisonPanel = document.getElementById('comparison-panel');
+  const candidateLayout = document.getElementById('candidate-layout');
+  const comparisonStatus = document.getElementById('comparison-status');
+  const comparisonResults = document.getElementById('comparison-results');
+  const comparisonCorpus = document.getElementById('comparison-corpus');
+  const comparisonStage = document.getElementById('comparison-stage');
+  const comparisonScheme = document.getElementById('comparison-scheme');
+  const comparisonReference = document.getElementById('comparison-reference');
+  const comparisonTradition = document.getElementById('comparison-tradition');
+  const resetComparison = () => {
+    comparisonGeneration += 1;
+    if (comparisonController) comparisonController.abort();
+    comparisonController = null; comparisonPassages = [];
+    comparisonResults.replaceChildren();
+    for (const select of [comparisonCorpus, comparisonScheme, comparisonReference]) select.replaceChildren(new Option('선택', ''));
+    comparisonTradition.replaceChildren(new Option('전체', ''));
+    comparisonStatus.textContent = '세션을 열고 본문 비교를 선택하세요.';
+  };
+  const fillOptions = (select, values) => {
+    select.replaceChildren(new Option('선택', ''));
+    for (const item of [...new Set(values)].sort()) select.add(new Option(item, item));
+  };
+  const invalidateComparison = () => {
+    comparisonGeneration += 1;
+    if (comparisonController) comparisonController.abort();
+    comparisonController = null;
+    comparisonResults.replaceChildren();
+    comparisonStatus.textContent = '본문을 선택하고 해석 비교를 눌러 주세요.';
+  };
+  const refreshSchemes = () => {
+    invalidateComparison();
+    fillOptions(comparisonScheme, comparisonPassages.filter(p => p.corpus === comparisonCorpus.value).map(p => p.scheme));
+    fillOptions(comparisonReference, []);
+    comparisonResults.replaceChildren();
+  };
+  const refreshReferences = () => {
+    invalidateComparison();
+    fillOptions(comparisonReference, comparisonPassages.filter(p => p.corpus === comparisonCorpus.value && p.scheme === comparisonScheme.value).map(p => p.reference));
+    comparisonResults.replaceChildren();
+  };
+  const fetchComparison = async (query = null) => {
+    comparisonGeneration += 1;
+    const current = comparisonGeneration;
+    if (comparisonController) comparisonController.abort();
+    comparisonController = new AbortController();
+    comparisonResults.replaceChildren();
+    if (!secret || !sessionDataset) { comparisonStatus.textContent = '먼저 비공개 세션을 열어 주세요.'; return; }
+    comparisonStatus.textContent = '본문 후보를 불러오는 중입니다.';
+    try {
+      const params = new URLSearchParams();
+      if (comparisonStage.value === 'd12') params.set('stage', 'd12');
+      if (query) for (const [key,item] of Object.entries(query)) params.set(key,item);
+      const response = await fetch(`/api/comparison${params.size ? `?${params}` : ''}`, {cache:'no-store',headers:{Authorization:`Bearer ${secret}`},signal:comparisonController.signal});
+      if (current !== comparisonGeneration) return;
+      if (!response.ok) throw new Error('unavailable');
+      const data = await response.json();
+      if (current !== comparisonGeneration) return;
+      if (!data || data.dataset !== sessionDataset || !Array.isArray(data.passages) || !Array.isArray(data.claims)) throw new Error('unexpected');
+      if (!query) {
+        comparisonPassages = data.passages.filter(p => p && typeof p === 'object' && ['corpus','scheme','reference'].every(k => typeof p[k] === 'string' && p[k].trim() && p[k].length <= 150) && Number.isSafeInteger(p.claim_count) && p.claim_count >= 0);
+        fillOptions(comparisonCorpus, comparisonPassages.map(p => p.corpus));
+        fillOptions(comparisonScheme, []); fillOptions(comparisonReference, []);
+        comparisonTradition.replaceChildren(new Option('전체', ''));
+        if (data.tradition_projection === 'k2-reviewed-tradition' && Array.isArray(data.traditions)) {
+          const labels = data.traditions.filter(t => t && typeof t.value === 'string' && t.value.trim() && t.value.length <= 200 && !/[\x00-\x1f\x7f]/.test(t.value) && Number.isSafeInteger(t.claim_count) && t.claim_count > 0).map(t => t.value);
+          for (const label of [...new Set(labels)].sort()) comparisonTradition.add(new Option(label, label));
+        }
+        comparisonStatus.textContent = comparisonPassages.length ? `본문 주소 ${comparisonPassages.length}개 · 코퍼스와 장절 체계를 선택하세요.` : '비교할 본문 후보가 없습니다.';
+        return;
+      }
+      if (!data.selected || ['corpus','scheme','reference'].some(k => data.selected[k] !== query[k])) throw new Error('unexpected');
+      const cards = data.claims.map(raw => ({raw, row:safeRow(raw, data.dataset, data.metadata_projection)})).filter(item => item.row && item.row.record_kind === 'claim');
+      comparisonStatus.textContent = cards.length ? `선택한 본문의 연구 후보 ${cards.length}건` : '선택한 본문에 표시할 연구 후보가 없습니다.';
+      for (const {raw,row} of cards) {
+        const card = node('article', undefined, 'comparison-card');
+        card.append(node('p', readable(row.attribution), 'tag'));
+        card.append(node('h3', value(row.source_title, '문헌명 표시 보류')));
+        const facts = node('dl', undefined, 'facts');
+        fact(facts, '문헌 작성자', row.source_creator);
+        const candidateSummary = data.summary_projection === 'k2-reviewed-summary' && raw && raw.summary_status === 'recorded_unverified' && typeof raw.summary === 'string' && raw.summary.trim() && raw.summary.length <= 500 && !/[\x00-\x1f\x7f]/.test(raw.summary) ? raw.summary : null;
+        fact(facts, '해석 요지', candidateSummary || '표시 보류 · 권리와 인용 범위 검토 필요');
+        fact(facts, '해석 요지 확인', candidateSummary ? '원본 기록 · 독립 확인 전' : '미확인 · 표시 보류');
+        fact(facts, '출처 위치', '권리·형식 검토 전 표시 보류');
+        fact(facts, '출처 확인', readable(row.source_verification_status));
+        fact(facts, '입력 주장 검증', row.verification_status);
+        fact(facts, '공식성', row.authority_status);
+        fact(facts, '논증 검토', row.argument_status);
+        fact(facts, '독립 학술 심사', readable(row.independent_review_status));
+        fact(facts, '귀속', readable(row.attribution));
+        const tradition = data.tradition_projection === 'k2-reviewed-tradition' && raw && raw.tradition_candidate && raw.tradition_candidate.status === 'recorded_unverified' && typeof raw.tradition_candidate.value === 'string' && raw.tradition_candidate.value.trim() && raw.tradition_candidate.value.length <= 200 && !/[\x00-\x1f\x7f]/.test(raw.tradition_candidate.value) ? raw.tradition_candidate.value : null;
+        fact(facts, '원본 전통 라벨 · 귀속 및 공식성 미확인', tradition || '표시 보류 또는 미확인');
+        fact(facts, '공동체 참조 역할', row.community_role === 'self' ? '자기 설명' : row.community_role === 'target' ? '외부 비평의 대상' : '미확인');
+        fact(facts, '비공개 로컬 표시', row.candidate_field_states && CANDIDATE_STATE_LABELS[row.candidate_field_states.source_title]);
+        fact(facts, '공개 · 재배포', '별도 승인 필요');
+        card.append(facts);
+        if (safeCoordinate(row.source_key, 'sources') !== '미확인') {
+          const source = node('button', '연결 문헌 보기', 'target-button');
+          source.type = 'button';
+          source.addEventListener('click', () => {
+            document.getElementById('candidate-view').click();
+            openTarget(row.source_key);
+          });
+          card.append(source);
+        }
+        comparisonResults.append(card);
+      }
+    } catch (err) {
+      if (current !== comparisonGeneration || err.name === 'AbortError') return;
+      comparisonStatus.textContent = '본문 비교를 불러오지 못했습니다. 로컬 서버와 자료를 확인해 주세요.';
+    }
+  };
+  document.getElementById('comparison-view').addEventListener('click', () => {
+    candidateLayout.hidden = true; comparisonPanel.hidden = false;
+    document.getElementById('candidate-view').setAttribute('aria-pressed', 'false');
+    document.getElementById('comparison-view').setAttribute('aria-pressed', 'true');
+    comparisonStage.value = sessionDataset === 'D12' ? 'd12' : '';
+    fetchComparison();
+  });
+  document.getElementById('candidate-view').addEventListener('click', () => {
+    comparisonGeneration += 1; if (comparisonController) comparisonController.abort();
+    candidateLayout.hidden = false; comparisonPanel.hidden = true;
+    document.getElementById('candidate-view').setAttribute('aria-pressed', 'true');
+    document.getElementById('comparison-view').setAttribute('aria-pressed', 'false');
+  });
+  comparisonCorpus.addEventListener('change', refreshSchemes);
+  comparisonStage.addEventListener('change', () => { invalidateComparison(); fetchComparison(); });
+  comparisonScheme.addEventListener('change', refreshReferences);
+  comparisonReference.addEventListener('change', invalidateComparison);
+  comparisonTradition.addEventListener('change', invalidateComparison);
+  document.getElementById('comparison-form').addEventListener('submit', event => {
+    event.preventDefault();
+    if (!comparisonCorpus.value || !comparisonScheme.value || !comparisonReference.value) return;
+    const query = {corpus:comparisonCorpus.value,scheme:comparisonScheme.value,reference:comparisonReference.value};
+    if (comparisonTradition.value) query.tradition = comparisonTradition.value;
+    fetchComparison(query);
+  });
   document.getElementById('session-form').addEventListener('submit', event => {
     event.preventDefault();
+    resetComparison();
     offset = 0;
     sessionDataset = null;
     creatorFilterLabel.textContent = '연구자 · 발화 주체';
@@ -519,7 +659,7 @@
     search();
   });
   document.getElementById('session-close').addEventListener('click', () => {
-    secret = ''; sessionDataset = null; verifiedMetadataProjection = false; metadataNameCoverage = null; creatorFilterLabel.textContent = '연구자 · 발화 주체'; secretInput.value = ''; clear(); connection.textContent = '세션이 닫혔습니다.';
+    secret = ''; sessionDataset = null; verifiedMetadataProjection = false; metadataNameCoverage = null; creatorFilterLabel.textContent = '연구자 · 발화 주체'; secretInput.value = ''; clear(); resetComparison(); comparisonPanel.hidden = true; candidateLayout.hidden = false; document.getElementById('candidate-view').setAttribute('aria-pressed', 'true'); document.getElementById('comparison-view').setAttribute('aria-pressed', 'false'); connection.textContent = '세션이 닫혔습니다.';
   });
   form.addEventListener('input', () => { offset = 0; clear(); connection.textContent = secret ? '조건이 변경됐습니다. 후보 검색을 눌러 주세요.' : '세션 비밀을 입력해 주세요.'; });
   form.addEventListener('change', () => { offset = 0; clear(); connection.textContent = secret ? '조건이 변경됐습니다. 후보 검색을 눌러 주세요.' : '세션 비밀을 입력해 주세요.'; });

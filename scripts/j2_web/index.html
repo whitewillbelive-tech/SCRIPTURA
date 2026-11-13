@@ -32,11 +32,20 @@
       <p class="subtle">입력 건수와 화면에 일부만 대응했거나 아직 대응하지 않은 유형입니다. 이는 이용권 승인이나 정본 수가 아닙니다.</p>
       <div id="mapping-summary"><p class="empty">미확인</p></div>
     </details>
-    <section class="layout">
+    <nav class="view-switch" aria-label="탐색 화면 선택"><button id="candidate-view" type="button" aria-pressed="true">후보 탐색</button><button id="comparison-view" type="button" aria-pressed="false">본문 비교</button></nav>
+    <section id="comparison-panel" class="panel comparison" aria-label="본문별 해석 비교" hidden>
+      <div class="section-heading"><div><p class="eyebrow">PASSAGE / COMPARE</p><h2>본문별 해석 비교</h2></div></div>
+      <p class="subtle">같은 코퍼스와 장절 체계의 정확히 같은 주소에 연결된 연구 후보를 나란히 봅니다. 서로 다른 해석이 있다는 사실은 직접 반박의 근거가 아닙니다.</p>
+      <form id="comparison-form" autocomplete="off"><div class="comparison-filters"><label>자료 범위 <select id="comparison-stage" aria-label="자료 범위"><option value="d12">D-12 후보</option><option value="">모든 자료 단계</option></select></label><label>코퍼스 <select id="comparison-corpus" required><option value="">선택</option></select></label><label>장절 체계 <select id="comparison-scheme" required><option value="">선택</option></select></label><label>본문 주소 <select id="comparison-reference" required><option value="">선택</option></select></label><label>원본 전통 라벨 <select id="comparison-tradition" aria-label="원본 전통 라벨"><option value="">전체</option></select></label><button class="primary" type="submit">해석 비교</button></div></form>
+      <p class="subtle">전통 라벨은 원본의 기록이며 발화 주체, 공동체의 공식 채택이나 소속을 확인한 뜻은 아닙니다. 표시 보류된 라벨은 검색되지 않습니다.</p>
+      <p id="comparison-status" role="status" aria-live="polite" class="subtle">세션을 열고 본문 비교를 선택하세요.</p>
+      <div id="comparison-results" class="comparison-grid" aria-label="본문 비교 결과"></div>
+    </section>
+    <section id="candidate-layout" class="layout">
       <aside aria-label="검색 조건" class="panel filters">
         <div class="section-heading"><div><p class="eyebrow">01 / SEARCH</p><h2>검색 조건</h2></div><span>선택 사항</span></div>
         <form id="filters" autocomplete="off">
-          <div class="pair"><label>자료 단계 <select name="stage"><option value="">전체</option><option value="base">D-4 기준</option><option value="d5">D-5</option><option value="d6">D-6</option><option value="d7">D-7</option><option value="d8">D-8</option><option value="d9">D-9</option><option value="d10">D-10</option></select></label><label>결과 유형 <select name="record_kind"><option value="">전체</option><option value="claim">해석 주장</option><option value="source">문헌</option></select></label></div>
+          <div class="pair"><label>자료 단계 <select name="stage"><option value="">전체</option><option value="base">D-4 기준</option><option value="d5">D-5</option><option value="d6">D-6</option><option value="d7">D-7</option><option value="d8">D-8</option><option value="d9">D-9</option><option value="d10">D-10</option><option value="d11">D-11</option><option value="d12">D-12</option></select></label><label>결과 유형 <select name="record_kind"><option value="">전체</option><option value="claim">해석 주장</option><option value="source">문헌</option></select></label></div>
           <label>통합 검색 <input name="q" type="search" maxlength="200" placeholder="표시가 허용된 메타데이터"></label>
           <label>종교 · 교단 · 단체 <input name="community" type="search" maxlength="200" placeholder="전통 또는 공동체"></label>
           <label><span id="creator-filter-label">연구자 · 발화 주체</span> <input name="researcher" type="search" maxlength="200" placeholder="표시 가능한 문헌 작성자 검색"></label>

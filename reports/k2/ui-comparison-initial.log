@@ -1,0 +1,46 @@
+✖ 코퍼스·장절체계·주소를 선택해 두 해석을 나란히 본다 (29261.666555ms)
+✖ 불일치한 선택이나 다른 데이터셋의 응답을 표시하지 않는다 (0.690769ms)
+✖ 선택 변경과 지연 응답은 기존 비교 결과를 지운다 (0.633894ms)
+✖ 세션 닫기 후 비교 결과와 선택값을 지운다 (0.392951ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 29653.727623
+
+✖ failing tests:
+
+test at tests/ui-k2-comparison.browser.cjs:49:1
+✖ 코퍼스·장절체계·주소를 선택해 두 해석을 나란히 본다 (29261.666555ms)
+  locator.selectOption: Target page, context or browser has been closed
+  Call log:
+  [2m  - waiting for getByLabel('코퍼스', { exact: true })[22m
+  
+      at choose (/workspace/scriptura/tests/ui-k2-comparison.browser.cjs:44:44)
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-k2-comparison.browser.cjs:53:51) {
+    log: [ "  - waiting for getByLabel('코퍼스', { exact: true })" ]
+  }
+
+test at tests/ui-k2-comparison.browser.cjs:63:1
+✖ 불일치한 선택이나 다른 데이터셋의 응답을 표시하지 않는다 (0.690769ms)
+  page.unroute: Target page, context or browser has been closed
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-k2-comparison.browser.cjs:64:13) {
+    log: []
+  }
+
+test at tests/ui-k2-comparison.browser.cjs:68:1
+✖ 선택 변경과 지연 응답은 기존 비교 결과를 지운다 (0.633894ms)
+  page.unroute: Target page, context or browser has been closed
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-k2-comparison.browser.cjs:69:13) {
+    log: []
+  }
+
+test at tests/ui-k2-comparison.browser.cjs:77:1
+✖ 세션 닫기 후 비교 결과와 선택값을 지운다 (0.392951ms)
+  locator.click: Target page, context or browser has been closed
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-k2-comparison.browser.cjs:78:48) {
+    log: []
+  }

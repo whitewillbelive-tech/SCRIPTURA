@@ -1,0 +1,14 @@
+test_community_role_is_taken_only_from_the_linked_candidate (test_k13_candidate_api.LocalCandidateApiTests.test_community_role_is_taken_only_from_the_linked_candidate) ... ok
+test_hidden_fields_are_not_searched (test_k13_candidate_api.LocalCandidateApiTests.test_hidden_fields_are_not_searched) ... ok
+test_local_authenticated_http_search_suppresses_query_logs (test_k13_candidate_api.LocalCandidateApiTests.test_local_authenticated_http_search_suppresses_query_logs) ... ok
+test_local_scope_is_bound_to_dataset (test_k13_candidate_api.LocalCandidateApiTests.test_local_scope_is_bound_to_dataset) ... ok
+test_recorded_fields_are_local_candidates_and_searchable (test_k13_candidate_api.LocalCandidateApiTests.test_recorded_fields_are_local_candidates_and_searchable) ... ok
+test_restricted_current_candidate_cannot_be_restored_by_previous_confirmation (test_k13_candidate_api.LocalCandidateApiTests.test_restricted_current_candidate_cannot_be_restored_by_previous_confirmation) ... ok
+test_source_confirmed_is_field_specific_and_does_not_confirm_claim (test_k13_candidate_api.LocalCandidateApiTests.test_source_confirmed_is_field_specific_and_does_not_confirm_claim) ... ok
+test_unconfirmed_role_cannot_be_recovered_from_raw_projection (test_k13_candidate_api.LocalCandidateApiTests.test_unconfirmed_role_cannot_be_recovered_from_raw_projection) ... ok
+test_untrusted_raw_records_and_forged_index_cannot_display_or_search (test_k13_candidate_api.LocalCandidateApiTests.test_untrusted_raw_records_and_forged_index_cannot_display_or_search) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.509s
+
+OK

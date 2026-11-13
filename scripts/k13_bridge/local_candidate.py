@@ -224,7 +224,7 @@ def prepare_local_candidate_index(dataset, layers):
     Names remain bibliographic creator values and never become a claim speaker.
     Community identity needs an explicit verified role and is not inferred.
     """
-    if not isinstance(dataset, dict) or dataset.get('dataset') not in ('D8', 'D9', 'D10', 'synthetic') or not isinstance(dataset.get('records'), list):
+    if not isinstance(dataset, dict) or dataset.get('dataset') not in ('D8', 'D9', 'D10', 'D12', 'synthetic') or not isinstance(dataset.get('records'), list):
         raise ValueError('local_candidate_invalid')
     if not hasattr(layers, 'items'):
         raise ValueError('local_candidate_invalid')

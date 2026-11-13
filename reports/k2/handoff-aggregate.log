@@ -1,0 +1,10 @@
+K2 fixed handoff aggregate; no private record values
+D12 sources=41 editions=41 locators=42 passages=26 claims=44 evidence=44 relationships=0 rights=649 source_access_events=41
+D11 sources=8 locators=8 rights_actions=72 review_queue=11 source_access_events=3
+D12 claim summary_ko_nonempty=11 argument_summary_ko_nonempty=10 statement_ko_nonempty=44 direct_original_quote_nonempty=0
+Own-summary marker and original_text_stored=false and quote-free format candidate claims=9
+Candidate source_edition_match=9 locator_source_match=9 locator_edition_match=9 evidence_claim_locator_match=9
+Candidate display_deny_or_conditional=0 explicit_structured_privacy_flag=0 URL_or_HTML_or_linebreak=0
+Candidate local_display_unknown=9 local_display_allowed=0
+Multiple-claim passages with at least two own-summary marker candidates=3
+Marker, format, and rights counts do not independently establish absence of quoted text, private information, legal permission, theological truth or official adoption. Source data and individual identifiers are not in this log.

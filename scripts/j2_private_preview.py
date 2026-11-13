@@ -18,7 +18,7 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from k1_bridge.candidate_archive import load_k1_archive as load_versioned_archive
+from k2_bridge.receipt import load_k2_archive as load_versioned_archive, safe_k2_passage, summary_for_record, get_k2_passages, tradition_for_record
 from k11_bridge.metadata import FIELDS as VERIFIED_METADATA_FIELDS, PrivateMetadataCandidates, metadata_for_record
 from k13_bridge.local_candidate import LocalCandidateIndex, candidate_metadata_for_record, candidate_restriction_summary
 from k12_bridge.snapshot import load_authenticated_snapshot
@@ -33,21 +33,21 @@ PAGE_SIZE = 100
 RIGHTS_ACTIONS = frozenset(('browse', 'collect_metadata', 'store_raw', 'store_excerpt', 'index_fulltext', 'embed', 'send_to_model', 'redistribute', 'public_link'))
 RIGHTS_DECISIONS = frozenset(('unknown', 'conditional', 'allowed', 'prohibited', 'not_recorded', 'conflicting', 'unmapped'))
 SAFE_RECORD_FIELDS = frozenset(('key', 'stage', 'record_kind', 'category', 'attribution', 'original_attribution', 'authority_status', 'input_authority_status', 'verification_status', 'quotation_status', 'argument_status', 'reported_independent_review_status', 'independent_review_status', 'audit_observation_key', 'rights_status', 'tradition', 'community_reference', 'community_role', 'evaluated_subject', 'researcher', 'speaker', 'speaker_type', 'passage_corpus', 'passage_scheme', 'passage_reference', 'source_title', 'source_creator', 'source_kind', 'source_doi', 'source_year', 'access_path', 'locator', 'unmapped', 'checked_at', 'as_of', 'valid_from', 'valid_until', 'display_status'))
-SAFE_STAGES = frozenset(('base', 'd5', 'd6', 'd7', 'd8', 'd9', 'd10'))
-RESEARCH_DATASETS = frozenset(('D8', 'D9', 'D10'))
+SAFE_STAGES = frozenset(('base', 'd5', 'd6', 'd7', 'd8', 'd9', 'd10', 'd11', 'd12'))
+RESEARCH_DATASETS = frozenset(('D8', 'D9', 'D10', 'D12'))
 ALLOWED_DATASETS = RESEARCH_DATASETS | {'synthetic'}
 
 
 def _stage_pattern(dataset, *, research=True):
     """Exact version boundary; unknown research versions never become synthetic."""
     if not research:
-        return r'(?:base|d[5-9]|d10|synthetic)'
+        return r'(?:base|d[5-9]|d1[012]|synthetic)'
     return {'D8': r'(?:base|d[5-8])', 'D9': r'(?:base|d[5-9])',
-            'D10': r'(?:base|d[5-9]|d10)'}.get(dataset, r'(?!)')
+            'D10': r'(?:base|d[5-9]|d10)', 'D12': r'(?:base|d[5-9]|d1[012])'}.get(dataset, r'(?!)')
 
 
 def _stage_allowed(stage, dataset):
-    return isinstance(stage, str) and re.fullmatch(_stage_pattern(dataset), stage) is not None
+    return isinstance(stage, str) and re.fullmatch(_stage_pattern(dataset, research=dataset != 'synthetic'), stage) is not None
 SAFE_TABLES = frozenset(('sources', 'editions', 'locators', 'rights', 'passages', 'alignments', 'agents', 'affiliations', 'claims', 'evidence', 'relations', 'reviews', 'audit_conflicts', 'authority_documents', 'authority_registries', 'claim_scope_audits', 'cross_corpus_topics', 'interpretive_evidence', 'position_attestations', 'rights_delta', 'source_access_events', 'communities', 'assessments', 'relationships', 'authority', 'audit_reviews', 'correction_candidates', 'research_gaps', 'conflicts', 'institutional_assertions', 'rights_overrides', 'unresolved_gaps', 'authority_scope', 'review_queue', 'rights_actions', 'sample_manifest'))
 SAFE_FIELD_NAMES = frozenset(('id', 'source_id', 'source_locator_id', 'locator_id', 'edition_id', 'source_title', 'source_creator', 'title', 'creator', 'speaker', 'community_id', 'community_id_role', 'claim_id', 'claim_ids', 'baseline_claim_id', 'baseline_record_id', 'baseline_target_id', 'target_community_id', 'authority_registry_id', 'authority_document_id', 'document_id', 'position_attestation_id', 'passage_ids', 'subject_id', 'object_id', 'source_locator_ids', 'evidence_locator_id', 'additional_evidence_locator_ids', 'baseline_edition_id', 'baseline_right_id', 'source_right_id', 'statement_ko', 'summary', 'note', 'notes', 'scope_note', 'rights_basis', 'action_specific_basis', 'jurisdiction', 'territory', 'limitations', 'url', 'doi', 'source_url', 'source_full_text', 'full_text', 'raw_text', 'full_text_url', 'original_content_stored', 'raw_text_stored', 'reference', 'reference_scheme', 'alignment_status', 'reviewer', 'checked_at', 'reviewed_at', 'verification_status', 'source_verification', 'previous_verification_status', 'status', 'decision', 'source_chain', 'source_metadata', 'rights_scope', 'formal_adoption_evidence', 'independent_human_review', 'unreviewed_source_text', 'position_scope', 'claim_statement', 'unrecognized_field', 'unmapped'))
 SAFE_STATUS_CODES = frozenset(('unknown', 'unmapped', 'pending', 'none', 'not_done', 'not_recorded', 'not_assessed', 'unverified', 'verified', 'checked', 'source_checked', 'source_verified', 'scholarly_reviewed', 'direct_checked', 'translation_checked', 'secondary_report', 'search_only', 'unchecked', 'adoption_documented', 'issuer_documented', 'historical_only', 'individual_only', 'disputed', 'documented_argument', 'externally_challenged', 'cross_checked', 'contested', 'human_review_documented', 'published_critique_documented', 'independent_review_not_done', 'pending_authority', 'pending_academic', 'pending_language_review', 'redacted_rights_unresolved', 'candidate', 'candidate_source', 'metadata_candidate', 'not_performed', 'not_reviewed', 'source_checked_secondary_transmission', 'collaborator_checked_not_self_checked', 'direct_full_text_section_checked', 'ongoing', 'not_applicable', 'multiple_editions', 'conditional', 'allowed', 'prohibited', 'conflicting', 'recorded', 'missing', 'active', 'historical', 'proposed', 'draft', 'not_verified', 'translation_only', 'ai_translation_pending'))
@@ -71,7 +71,7 @@ def _safe_visibility(value, *, dataset=None):
     # candidate-visible fields. Input counters never authorize display.
     if dataset == 'D9' and result and (result.get('metadata_candidate') != 9 or result.get('candidate_visible_local') != 0):
         return {'status': 'pending_inconsistent'}
-    if dataset == 'D10' and result:
+    if dataset in ('D10', 'D12') and result:
         # The source ledger calls one row candidate_visible_local, but the
         # contract says this is conditional, not an operational approval.
         # Do not let a supplied counter authorize a real field.
@@ -91,7 +91,7 @@ def _safe_counts(value, *, dataset):
     count = value.get('display_records')
     if isinstance(count, int) and not isinstance(count, bool) and 0 <= count <= 100000:
         result['display_records'] = count
-    for stage in ('d8', 'd9', 'd10'):
+    for stage in ('d8', 'd9', 'd10', 'd11', 'd12'):
         if not _stage_allowed(stage, dataset):
             continue
         tables = value.get(stage)
@@ -131,7 +131,7 @@ def _safe_unmapped(value, *, dataset=None):
 
 def _safe_d10_receipt(value, *, dataset):
     """D10 quarantine is reported only as bounded fixed-name counts."""
-    if dataset != 'D10' or not isinstance(value, dict):
+    if dataset not in ('D10', 'D12') or not isinstance(value, dict):
         return {}
     result = {}
     for key in ('source_count', 'quarantined_source_count', 'conditional_candidate_count', 'effective_visible_fields'):
@@ -200,7 +200,7 @@ def _safe_eligibility(value, *, research):
 
 def _safe_d9_observations(row, *, dataset):
     """Only fixed observations, with no text, ID, URL, or automatic grant."""
-    if dataset not in ('D9', 'D10', 'synthetic'):
+    if dataset not in ('D9', 'D10', 'D12', 'synthetic'):
         return [], []
     observed, rights = [], []
     for item in row.get('d9_observations', []) if isinstance(row.get('d9_observations'), list) else []:
@@ -316,6 +316,11 @@ def _safe_record(row, *, research=False, dataset=None):
         safe_passages = []
         reverse_schemes = {value: key for key, value in candidate._SCHEMES.items()}
         for passage in result.get('passages', []):
+            if dataset == 'D12' and stage == 'd12':
+                checked = safe_k2_passage(passage)
+                if checked:
+                    safe_passages.append({key: checked[key] for key in ('corpus', 'scheme', 'reference')})
+                continue
             corpus = passage.get('corpus')
             scheme = passage.get('scheme')
             if corpus not in candidate._CORPORA.values() or scheme not in reverse_schemes:
@@ -547,6 +552,78 @@ def filter_records(dataset, params):
             'total': len(found), 'offset': offset, 'page_size': PAGE_SIZE, 'records': found[offset:offset + PAGE_SIZE]}
 
 
+def compare_passages(dataset, params):
+    """Group already-safe claim projections by exact corpus, scheme and address.
+
+    Sharing an address alone never creates a rebuttal, official position, or
+    independent academic finding. No unapproved claim text enters this result.
+    """
+    if not isinstance(params, dict) or set(params) - {'corpus', 'scheme', 'reference', 'stage', 'tradition'}:
+        raise ValueError('invalid query')
+    if any(not isinstance(v, list) or len(v) != 1 or not isinstance(v[0], str) for v in params.values()):
+        raise ValueError('invalid query')
+    query = {k: v[0].strip() for k, v in params.items()}
+    if any(len(v) > MAX_QUERY_LENGTH for v in query.values()):
+        raise ValueError('invalid query')
+    selected_terms = [query.get(k, '') for k in ('corpus', 'scheme', 'reference')]
+    if any(selected_terms) and not all(selected_terms):
+        raise ValueError('invalid query')
+    stage = query.get('stage', '')
+    if stage and not _stage_allowed(stage, dataset.get('dataset')):
+        raise ValueError('invalid query')
+    lookup = {'record_kind': ['claim']}
+    if stage:
+        lookup['stage'] = [stage]
+    rows = []
+    offset = 0
+    while True:
+        result = filter_records(dataset, {**lookup, 'offset': [str(offset)]})
+        batch = result['records']
+        rows.extend(batch)
+        offset += len(batch)
+        if not batch or offset >= result['total']:
+            break
+        if offset > 100000:
+            raise ValueError('invalid query')
+    groups = {}
+    traditions = {}
+    for row in rows:
+        value = tradition_for_record(dataset.get('_k2_tradition_index'), dataset.get('dataset'), row.get('key'))
+        row = dict(row)
+        row['tradition_candidate'] = {'value': value, 'status': 'recorded_unverified'} if isinstance(value, str) else {'value': None, 'status': 'missing_or_unmapped'}
+        if isinstance(value, str):
+            traditions[value] = traditions.get(value, 0) + 1
+        if query.get('tradition') and (not isinstance(value, str) or query['tradition'].casefold() != value.casefold()):
+            continue
+        seen = set()
+        for passage in row.get('passages', []):
+            if not isinstance(passage, dict):
+                continue
+            key = tuple(passage.get(k) for k in ('corpus', 'scheme', 'reference'))
+            if not all(isinstance(v, str) and v for v in key) or key in seen:
+                continue
+            seen.add(key)
+            groups.setdefault(key, []).append(row)
+    if dataset.get('dataset') == 'D12' and stage in ('', 'd12'):
+        for passage in get_k2_passages(dataset):
+            key = tuple(passage.get(k) for k in ('corpus', 'scheme', 'reference'))
+            if all(isinstance(v, str) and v for v in key):
+                groups.setdefault(key, [])
+    options = [{'corpus': key[0], 'scheme': key[1], 'reference': key[2],
+                'claim_count': len(claims)} for key, claims in sorted(groups.items())]
+    selected = tuple(selected_terms) if all(selected_terms) else None
+    claims = []
+    for row in groups.get(selected, []) if selected else []:
+        summary = summary_for_record(dataset.get('_k2_summary_index'), dataset.get('dataset'), row.get('key'))
+        claims.append(dict(row, summary=summary, summary_status='recorded_unverified' if summary is not None else 'pending_review'))
+    return {'dataset': dataset['dataset'], 'metadata_projection': result['metadata_projection'],
+            'summary_projection': 'k2-reviewed-summary',
+            'tradition_projection': 'k2-reviewed-tradition',
+            'traditions': [{'value': value, 'claim_count': count} for value, count in sorted(traditions.items())],
+            'passages': options, 'selected': dict(zip(('corpus', 'scheme', 'reference'), selected)) if selected in groups else None,
+            'claims': claims}
+
+
 class PrivatePreviewServer(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = False
@@ -646,6 +723,14 @@ class Handler(BaseHTTPRequestHandler):
                     return self._respond(400, '잘못된 요청입니다.')
                 params = urllib.parse.parse_qs(url.query, keep_blank_values=True, max_num_fields=32, encoding='utf-8', errors='strict')
                 value = filter_records(self.server.dataset, params)
+                return self._respond(200, json.dumps(value, ensure_ascii=False, separators=(',', ':')), 'application/json; charset=utf-8')
+            if url.path == '/api/comparison':
+                if not self._authenticated():
+                    return self._respond(401, '세션 인증이 필요합니다.')
+                if len(url.query) > 4096:
+                    return self._respond(400, '잘못된 요청입니다.')
+                params = urllib.parse.parse_qs(url.query, keep_blank_values=True, max_num_fields=5, encoding='utf-8', errors='strict')
+                value = compare_passages(self.server.dataset, params)
                 return self._respond(200, json.dumps(value, ensure_ascii=False, separators=(',', ':')), 'application/json; charset=utf-8')
             return self._respond(404, '요청을 찾을 수 없습니다.')
         except (ValueError, UnicodeError):
