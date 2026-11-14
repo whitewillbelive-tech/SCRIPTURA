@@ -9,6 +9,7 @@ d12_displayable_summaries 9
 d12_groups_with_two_summaries 3
 k6_reverse_navigation true
 k6_selection_persist true
+k6_three_selection true
 zoom_reflow true
 keyboard_modal true
 drawer_evidence true
