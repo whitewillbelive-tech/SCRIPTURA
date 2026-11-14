@@ -1,0 +1,180 @@
+✖ 연구 후보 화면은 명시적 세션 인증 전 자료를 조회하지 않는다 (2238.168058ms)
+✖ 세션 비밀은 메모리로 전달하고 합성 자료와 안전한 메타데이터만 표시한다 (30468.718771ms)
+✖ 필터 수정은 오래된 카드와 상세를 즉시 지우고 검색에 반영한다 (30040.388921ms)
+✔ 503은 카드와 상세를 비우고 같은 조건에서 재조회할 수 있다 (128.851593ms)
+✔ 페이지 이동은 응답의 크기를 따라가고 이전 선택 상세를 지운다 (214.438682ms)
+✔ 늦은 이전 응답이 최신 검색 결과를 덮지 않는다 (179.499716ms)
+✔ 자료 문자열은 HTML로 실행하지 않고 텍스트로만 표시한다 (102.477954ms)
+✖ 외부 평가 대상·관계 방향·권리 원본과 후속 관찰을 분리한다 (116.207442ms)
+✖ 복수 판본의 권리 판단과 추가 관찰을 섞지 않는다 (119.072615ms)
+✖ 제목이 가려진 후보는 안전한 임시 좌표로 구별하고 원본 ID는 표시하지 않는다 (113.143982ms)
+✖ 주장 상세는 안전한 좌표의 문헌 후보로 이동하고 판본과 위치를 구분한다 (120.662121ms)
+✖ 임의 URL이나 원본 ID는 문헌 좌표로 사용하지 않는다 (116.395504ms)
+✖ 실제 합성 테스트 서버의 인증·필터 응답으로 후보를 검색한다 (121.043858ms)
+✔ 세션을 닫으면 결과와 메모리의 인증을 지운다 (96.542121ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 5
+ℹ fail 9
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 65063.588421
+
+✖ failing tests:
+
+test at tests/ui-j2-candidate.browser.cjs:38:1
+✖ 연구 후보 화면은 명시적 세션 인증 전 자료를 조회하지 않는다 (2238.168058ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(await page.getByText(/공동체명·교단명·문헌명·연구자명·발화 주체는 개별 표시 자격 검토 전까지 가려져/).isVisible())
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j2-candidate.browser.cjs:40:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/ui-j2-candidate.browser.cjs:45:1
+✖ 세션 비밀은 메모리로 전달하고 합성 자료와 안전한 메타데이터만 표시한다 (30468.718771ms)
+  locator.click: Timeout 30000ms exceeded.
+  Call log:
+  [2m  - waiting for getByRole('group', { name: '자료 범위와 미대응' }).locator('summary')[22m
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j2-candidate.browser.cjs:53:36) {
+    name: 'TimeoutError',
+    log: [ "  - waiting for getByRole('group', { name: '자료 범위와 미대응' }).locator('summary')" ]
+  }
+
+test at tests/ui-j2-candidate.browser.cjs:73:1
+✖ 필터 수정은 오래된 카드와 상세를 즉시 지우고 검색에 반영한다 (30040.388921ms)
+  locator.fill: Timeout 30000ms exceeded.
+  Call log:
+  [2m  - waiting for getByLabel('종교 · 교단 · 단체')[22m
+  [2m    - locator resolved to <input type="search" maxlength="200" name="community" placeholder="전통 또는 공동체"/>[22m
+  [2m    - fill("가상")[22m
+  [2m  - attempting fill action[22m
+  [2m    2 × waiting for element to be visible, enabled and editable[22m
+  [2m      - element is not visible[22m
+  [2m    - retrying fill action[22m
+  [2m    - waiting 20ms[22m
+  [2m    2 × waiting for element to be visible, enabled and editable[22m
+  [2m      - element is not visible[22m
+  [2m    - retrying fill action[22m
+  [2m      - waiting 100ms[22m
+  [2m    59 × waiting for element to be visible, enabled and editable[22m
+  [2m       - element is not visible[22m
+  [2m     - retrying fill action[22m
+  [2m       - waiting 500ms[22m
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j2-candidate.browser.cjs:74:41) {
+    name: 'TimeoutError',
+    log: [ "  - waiting for getByLabel('종교 · 교단 · 단체')", '    - locator resolved to <input type="search" maxlength="200" name="community" placeholder="전통 또는 공동체"/>', '    - fill("가상")', '  - attempting fill action', '    2 × waiting for element to be visible, enabled and editable', '      - element is not visible', '    - retrying fill action', '    - waiting 20ms', '    2 × waiting for element to be visible, enabled and editable', '      - element is not visible', '    - retrying fill action', '      - waiting 100ms', '    59 × waiting for element to be visible, enabled and editable', '       - element is not visible', '     - retrying fill action', '       - waiting 500ms' ]
+  }
+
+test at tests/ui-j2-candidate.browser.cjs:154:1
+✖ 외부 평가 대상·관계 방향·권리 원본과 후속 관찰을 분리한다 (116.207442ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(await detail.getByText('외부 비평',{exact:true}).isVisible())
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j2-candidate.browser.cjs:168:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/ui-j2-candidate.browser.cjs:180:1
+✖ 복수 판본의 권리 판단과 추가 관찰을 섞지 않는다 (119.072615ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 9
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j2-candidate.browser.cjs:193:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 9,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/ui-j2-candidate.browser.cjs:201:1
+✖ 제목이 가려진 후보는 안전한 임시 좌표로 구별하고 원본 ID는 표시하지 않는다 (113.143982ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(await page.getByRole('region',{name:'후보 상세'}).getByText('d8:claims:1',{exact:true}).isVisible())
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j2-candidate.browser.cjs:213:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/ui-j2-candidate.browser.cjs:215:1
+✖ 주장 상세는 안전한 좌표의 문헌 후보로 이동하고 판본과 위치를 구분한다 (120.662121ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(await detail.getByText('d8:editions:2',{exact:true}).isVisible())
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j2-candidate.browser.cjs:227:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/ui-j2-candidate.browser.cjs:232:1
+✖ 임의 URL이나 원본 ID는 문헌 좌표로 사용하지 않는다 (116.395504ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(await detail.getByText('연결된 문헌 후보 미확인').isVisible())
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j2-candidate.browser.cjs:241:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/ui-j2-candidate.browser.cjs:246:1
+✖ 실제 합성 테스트 서버의 인증·필터 응답으로 후보를 검색한다 (121.043858ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(await page.getByRole('region',{name:'후보 상세'}).getByText('개인 의견',{exact:true}).isVisible())
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j2-candidate.browser.cjs:252:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

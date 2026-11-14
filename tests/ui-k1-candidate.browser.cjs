@@ -1,5 +1,5 @@
 // Synthetic K-1 browser tests. Never load or print a research archive.
-const { test, before, after } = require('node:test');
+const { test, before, after, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
 const { spawn } = require('node:child_process');
@@ -36,6 +36,7 @@ before(async()=>{
  page=await browser.newPage();await page.goto(base,{waitUntil:'networkidle'});
 });
 after(async()=>{if(browser)await browser.close();if(server)server.kill('SIGTERM');});
+afterEach(async()=>{if(page && await page.locator('#research-drawer[open]').count()) await page.getByRole('button',{name:'상세 닫기'}).click();});
 
 test('D10은 선택 자료와 조건부 후보를 표시하되 행의 승인 위조를 무시한다',async()=>{
  await page.route('**/api/candidates**',route=>reply(route));
@@ -47,9 +48,11 @@ test('D10은 선택 자료와 조건부 후보를 표시하되 행의 승인 위
  assert.equal(await page.getByText(/SYNTHETIC-UNAPPROVED/).count(),0);
  await page.locator('.candidate').first().click();
  assert.equal(await page.getByText(/SYNTHETIC-UNAPPROVED/).count(),0);
- const detail=page.getByRole('region',{name:'후보 상세'});
+ await page.getByRole('region',{name:'후보 상세'}).getByRole('button',{name:'검증 정보 보기'}).click();
+ const detail=page.getByRole('dialog',{name:'검증 정보'});
  await detail.getByText('필드별 표시 적격성 보기',{exact:true}).click();
  assert.ok(await detail.getByText('source · bibliography: 미확인 · 표시 승인 아님',{exact:true}).isVisible());
+ await detail.getByRole('button',{name:'상세 닫기'}).click();
 });
 
 test('근거 없는 합계 1은 표시 승인으로 나타내지 않는다',async()=>{
@@ -64,10 +67,11 @@ test('근거 없는 합계 1은 표시 승인으로 나타내지 않는다',asyn
 test('D10에서 승인되지 않은 이름 검색을 명시적으로 보류한다',async()=>{
  let calls=0;await page.unroute('**/api/candidates**');
  await page.route('**/api/candidates**',route=>{calls++;return reply(route,payload([]));});
- await page.getByLabel('연구자 · 발화 주체').fill('SYNTHETIC-UNAPPROVED-RESEARCHER');
+ await page.getByLabel('문헌 작성자').fill('SYNTHETIC-UNAPPROVED-RESEARCHER');
  const before=calls;await page.getByRole('button',{name:'후보 검색'}).click();
  assert.ok(await page.getByText('검색 보류',{exact:true}).isVisible());assert.equal(calls,before);
- await page.getByLabel('연구자 · 발화 주체').fill('');
+ await page.getByLabel('문헌 작성자').fill('');
+ await page.locator('#advanced-filters > summary').click();
  await page.getByLabel('자료 단계').selectOption('d10');
  await page.getByRole('button',{name:'후보 검색'}).click();await page.getByText('0개 후보',{exact:true}).waitFor();
  assert.ok(await page.getByText(/표시 보류된 필드의 일치 여부는 확인할 수 없습니다/).isVisible());

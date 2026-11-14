@@ -81,6 +81,8 @@ jobs:
           node tests/ui-k13-local-candidate.browser.cjs
           # K-2 passage comparison uses synthetic records only.
           node tests/ui-k2-comparison.browser.cjs
+          # K-2.1 research layout and accessibility use synthetic records only.
+          node --test tests/ui-k21-research.browser.cjs
 
   postgres:
     name: PostgreSQL migrations and integration

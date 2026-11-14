@@ -432,6 +432,13 @@ def filter_records(dataset, params):
         if mode in RESEARCH_DATASETS and not _stage_allowed(str(original.get('stage') or '').lower(), mode):
             continue
         row = _safe_record(original, research=mode in RESEARCH_DATASETS, dataset=mode)
+        # The comparison view already uses this separately checked in-memory
+        # index.  Never trust a summary or status embedded in an archive row.
+        # Bibliographic search continues to operate on the existing safe fields.
+        if mode == 'D12' and row.get('record_kind') == 'claim':
+            summary = summary_for_record(dataset.get('_k2_summary_index'), mode, row.get('key'))
+            row['summary'] = summary if isinstance(summary, str) else None
+            row['summary_status'] = 'recorded_unverified' if row['summary'] is not None else 'pending_review'
         row['verified_metadata'] = metadata_for_record(metadata_index, mode, row.get('key'))
         if local_mode:
             # Only the sealed in-memory policy index can supply candidate
@@ -541,6 +548,7 @@ def filter_records(dataset, params):
         counts['display_records'] = sum(1 for row in dataset['records'] if _stage_allowed(str(row.get('stage') or '').lower(), mode))
     return {'dataset': dataset['dataset'],
             'metadata_projection': 'k1.3-local-candidate' if local_mode else 'k1.1-verified',
+            'summary_projection': 'k2-reviewed-summary' if mode == 'D12' else None,
             'metadata_coverage': metadata_coverage,
             'candidate_restriction_summary': local_summary,
             'counts': counts,

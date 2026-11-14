@@ -1,0 +1,52 @@
+✖ D10은 선택 자료와 조건부 후보를 표시하되 행의 승인 위조를 무시한다 (32817.62517ms)
+✔ 근거 없는 합계 1은 표시 승인으로 나타내지 않는다 (82.554515ms)
+✖ D10에서 승인되지 않은 이름 검색을 명시적으로 보류한다 (30069.565141ms)
+✔ D10 세션에 D9 응답이 섞이지 않고 503 오류 시 이전 카드가 사라진다 (266.89305ms)
+✔ 연구 자료의 위조 제목은 HTML로도 렌더링되지 않는다 (121.434952ms)
+✔ 합성 승인 예시의 제목은 실행 가능한 HTML이 아니라 텍스트다 (185.038646ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 4
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 64385.471302
+
+✖ failing tests:
+
+test at tests/ui-k1-candidate.browser.cjs:40:1
+✖ D10은 선택 자료와 조건부 후보를 표시하되 행의 승인 위조를 무시한다 (32817.62517ms)
+  locator.click: Timeout 30000ms exceeded.
+  Call log:
+  [2m  - waiting for getByRole('region', { name: '후보 상세' }).getByText('필드별 표시 적격성 보기', { exact: true })[22m
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-k1-candidate.browser.cjs:51:55) {
+    name: 'TimeoutError',
+    log: [ "  - waiting for getByRole('region', { name: '후보 상세' }).getByText('필드별 표시 적격성 보기', { exact: true })" ]
+  }
+
+test at tests/ui-k1-candidate.browser.cjs:64:1
+✖ D10에서 승인되지 않은 이름 검색을 명시적으로 보류한다 (30069.565141ms)
+  locator.selectOption: Timeout 30000ms exceeded.
+  Call log:
+  [2m  - waiting for getByLabel('자료 단계')[22m
+  [2m    - locator resolved to <select name="stage">…</select>[22m
+  [2m  - attempting select option action[22m
+  [2m    2 × waiting for element to be visible and enabled[22m
+  [2m      - element is not visible[22m
+  [2m    - retrying select option action[22m
+  [2m    - waiting 20ms[22m
+  [2m    2 × waiting for element to be visible and enabled[22m
+  [2m      - element is not visible[22m
+  [2m    - retrying select option action[22m
+  [2m      - waiting 100ms[22m
+  [2m    59 × waiting for element to be visible and enabled[22m
+  [2m       - element is not visible[22m
+  [2m     - retrying select option action[22m
+  [2m       - waiting 500ms[22m
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-k1-candidate.browser.cjs:71:33) {
+    name: 'TimeoutError',
+    log: [ "  - waiting for getByLabel('자료 단계')", '    - locator resolved to <select name="stage">…</select>', '  - attempting select option action', '    2 × waiting for element to be visible and enabled', '      - element is not visible', '    - retrying select option action', '    - waiting 20ms', '    2 × waiting for element to be visible and enabled', '      - element is not visible', '    - retrying select option action', '      - waiting 100ms', '    59 × waiting for element to be visible and enabled', '       - element is not visible', '     - retrying select option action', '       - waiting 500ms' ]
+  }

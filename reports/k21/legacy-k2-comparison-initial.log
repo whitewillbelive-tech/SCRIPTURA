@@ -1,0 +1,64 @@
+✖ 코퍼스·장절체계·주소를 선택해 두 해석을 나란히 본다 (3164.259044ms)
+✖ 비교 카드에서 연결된 문헌 상세로 이동할 수 있다 (30065.39327ms)
+✔ 자료 범위를 전체로 바꾸면 단계 필터 없이 본문을 조회한다 (97.894207ms)
+✔ 주장이 없는 본문도 보이고 선택 시 0건을 표시한다 (124.802981ms)
+✔ 불일치한 선택이나 다른 데이터셋의 응답을 표시하지 않는다 (129.184905ms)
+✔ 검토된 요지 표식과 상태가 모두 있는 경우만 텍스트로 표시한다 (93.556474ms)
+✖ 안전 투영된 원본 전통 라벨만 표시·필터하고 공식 귀속으로 단정하지 않는다 (191.922854ms)
+✔ 선택 변경과 지연 응답은 기존 비교 결과를 지운다 (161.125376ms)
+✔ 세션 닫기 후 비교 결과와 선택값을 지운다 (16.235655ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 6
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 35037.357184
+
+✖ failing tests:
+
+test at tests/ui-k2-comparison.browser.cjs:49:1
+✖ 코퍼스·장절체계·주소를 선택해 두 해석을 나란히 본다 (3164.259044ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok((await cards.nth(0).textContent()).includes('공동체 자기 설명'))
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-k2-comparison.browser.cjs:57:9)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/ui-k2-comparison.browser.cjs:63:1
+✖ 비교 카드에서 연결된 문헌 상세로 이동할 수 있다 (30065.39327ms)
+  locator.waitFor: Timeout 30000ms exceeded.
+  Call log:
+  [2m  - waiting for getByRole('region', { name: '후보 상세' }).getByText('합성 문헌 1', { exact: true }) to be visible[22m
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-k2-comparison.browser.cjs:68:82) {
+    name: 'TimeoutError',
+    log: [ "  - waiting for getByRole('region', { name: '후보 상세' }).getByText('합성 문헌 1', { exact: true }) to be visible" ]
+  }
+
+test at tests/ui-k2-comparison.browser.cjs:118:1
+✖ 안전 투영된 원본 전통 라벨만 표시·필터하고 공식 귀속으로 단정하지 않는다 (191.922854ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(card.includes(tradition))
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-k2-comparison.browser.cjs:137:9)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

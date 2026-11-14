@@ -1,0 +1,8 @@
+test_old_dataset_and_search_do_not_expose_summary (test_k21_api.CandidateSummaryTests.test_old_dataset_and_search_do_not_expose_summary) ... ok
+test_only_sealed_claim_summary_and_same_comparison_policy (test_k21_api.CandidateSummaryTests.test_only_sealed_claim_summary_and_same_comparison_policy) ... ok
+test_raw_and_forged_index_cannot_authorize (test_k21_api.CandidateSummaryTests.test_raw_and_forged_index_cannot_authorize) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+OK

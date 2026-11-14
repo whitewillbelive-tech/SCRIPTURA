@@ -1,6 +1,6 @@
 // Synthetic-only browser regression for the J-2 private local UI.
 // Starts the explicit test server; never opens a research archive.
-const { test, before, after } = require('node:test');
+const { test, before, after, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
 const { spawn } = require('node:child_process');
@@ -34,10 +34,13 @@ before(async () => {
   await page.goto(base, {waitUntil:'networkidle'});
 });
 after(async () => { if(browser) await browser.close(); if(server) server.kill('SIGTERM'); });
+afterEach(async()=>{if(page && await page.locator('#research-drawer[open]').count()) await page.getByRole('button',{name:'상세 닫기'}).click();});
 
 test('연구 후보 화면은 명시적 세션 인증 전 자료를 조회하지 않는다', async () => {
   assert.match(await page.getByRole('status').textContent(), /세션/);
-  assert.ok(await page.getByText(/공동체명·교단명·문헌명·연구자명·발화 주체는 개별 표시 자격 검토 전까지 가려져/).isVisible());
+  await page.locator('.research-help > summary').click();
+  assert.ok(await page.getByText(/표시 보류된 원문과 자유 텍스트는 가려집니다/).isVisible());
+  await page.locator('.research-help > summary').click();
   assert.equal(await page.locator('.candidate').count(),0);
   assert.equal(await page.evaluate(() => location.hash), '');
   assert.equal(await page.evaluate(() => localStorage.length + sessionStorage.length), 0);
@@ -49,6 +52,7 @@ test('세션 비밀은 메모리로 전달하고 합성 자료와 안전한 메�
   await page.getByRole('button',{name:'세션 열기'}).click();
   await page.getByText('합성 시험 자료 / 실제 연구 데이터 아님.').waitFor();
   assert.equal(sawAuth,true);
+  await page.locator('.research-metadata > summary').click();
   const mapping = page.getByRole('group',{name:'자료 범위와 미대응'});
   await mapping.locator('summary').click();
   assert.ok(await mapping.getByText('d8 · claims: 입력 17건 · 일부만 대응',{exact:true}).isVisible());
@@ -57,7 +61,8 @@ test('세션 비밀은 메모리로 전달하고 합성 자료와 안전한 메�
   assert.equal(await page.evaluate(() => localStorage.length + sessionStorage.length),0);
   assert.ok(!page.url().includes(secret));
   await page.getByRole('button',{name:/가상 문헌/}).click();
-  const detail = page.getByRole('region',{name:'후보 상세'});
+  await page.getByRole('region',{name:'후보 상세'}).getByRole('button',{name:'검증 정보 보기'}).click();
+  const detail = page.getByRole('dialog',{name:'검증 정보'});
   assert.ok(await detail.getByText('개인 의견',{exact:true}).isVisible());
   assert.ok(await detail.getByText('not_done',{exact:true}).count() === 0);
   assert.ok(await detail.getByText('독립 심사 미실시',{exact:true}).isVisible());
@@ -69,8 +74,10 @@ test('세션 비밀은 메모리로 전달하고 합성 자료와 안전한 메�
   assert.ok(await detail.getByText('synthetic_field',{exact:true}).isVisible());
   assert.equal(await page.getByText('SYNTHETIC_SECRET_SUMMARY_MUST_NOT_RENDER').count(),0);
   assert.equal(await page.locator('a[href*="example.invalid"]').count(),0);
+  await detail.getByRole('button',{name:'상세 닫기'}).click();
 });
 test('필터 수정은 오래된 카드와 상세를 즉시 지우고 검색에 반영한다', async () => {
+  await page.locator('#advanced-filters > summary').click();
   await page.getByLabel('종교 · 교단 · 단체').fill('가상');
   await page.getByLabel('자료 단계').selectOption('d8');
   await page.getByLabel('관계 · 반론 종류').fill('contrast');
@@ -164,7 +171,8 @@ test('외부 평가 대상·관계 방향·권리 원본과 후속 관찰을 분
   await page.getByRole('button',{name:'초기화'}).click();
   await page.getByRole('button',{name:/가상 문헌/}).waitFor();
   await page.getByRole('button',{name:/가상 문헌/}).click();
-  const detail = page.getByRole('region',{name:'후보 상세'});
+  await page.getByRole('region',{name:'후보 상세'}).getByRole('button',{name:'검증 정보 보기'}).click();
+  const detail = page.getByRole('dialog',{name:'검증 정보'});
   assert.ok(await detail.getByText('외부 비평',{exact:true}).isVisible());
   assert.ok(await detail.getByText('평가 대상 · 가상 대상',{exact:true}).isVisible());
   assert.ok(await detail.getByText(/연결 대상 → 이 후보 · contrast · pending/).isVisible());
@@ -175,7 +183,8 @@ test('외부 평가 대상·관계 방향·권리 원본과 후속 관찰을 분
   assert.ok(await detail.getByText(/unknown → conditional/).isVisible());
   assert.ok(await detail.getByText(/모든 이용은 허가하지 않습니다/).isVisible());
   await detail.getByRole('button',{name:'연결 대상 열기'}).click();
-  await detail.getByRole('heading',{name:'연결된 가상 문헌'}).waitFor();
+  await page.getByRole('dialog',{name:'연결 문헌'}).getByText('연결된 가상 문헌',{exact:true}).waitFor();
+  await page.getByRole('dialog').getByRole('button',{name:'상세 닫기'}).click();
 });
 test('복수 판본의 권리 판단과 추가 관찰을 섞지 않는다', async () => {
   await page.unroute('**/api/candidates**');
@@ -188,7 +197,8 @@ test('복수 판본의 권리 판단과 추가 관찰을 섞지 않는다', asyn
   await page.getByRole('button',{name:'초기화'}).click();
   await page.getByRole('button',{name:/가상 문헌/}).waitFor();
   await page.getByRole('button',{name:/가상 문헌/}).click();
-  const detail = page.getByRole('region',{name:'후보 상세'});
+  await page.getByRole('region',{name:'후보 상세'}).getByRole('button',{name:'검증 정보 보기'}).click();
+  const detail = page.getByRole('dialog',{name:'검증 정보'});
   const first = detail.getByRole('region',{name:'판본 1 권리'}), second = detail.getByRole('region',{name:'판본 2 권리'});
   assert.equal(await first.locator('dt').count(),9);
   assert.equal(await second.locator('dt').count(),9);
@@ -197,6 +207,7 @@ test('복수 판본의 권리 판단과 추가 관찰을 섞지 않는다', asyn
   assert.ok(await first.getByText(/unknown → conditional/).isVisible());
   assert.equal(await second.getByText(/unknown → conditional/).count(),0);
   assert.ok(await detail.getByText(/모든 이용은 허가하지 않습니다/).isVisible());
+  await detail.getByRole('button',{name:'상세 닫기'}).click();
 });
 test('제목이 가려진 후보는 안전한 임시 좌표로 구별하고 원본 ID는 표시하지 않는다', async () => {
   await page.unroute('**/api/candidates**');
@@ -210,7 +221,10 @@ test('제목이 가려진 후보는 안전한 임시 좌표로 구별하고 원�
   assert.equal(await page.getByText('SENSITIVE_ORIGINAL_ID').count(),0);
   assert.equal(await page.locator('[data-key="SENSITIVE_ORIGINAL_ID"]').count(),0);
   await candidates.first().click();
-  assert.ok(await page.getByRole('region',{name:'후보 상세'}).getByText('d8:claims:1',{exact:true}).isVisible());
+  await page.getByRole('region',{name:'후보 상세'}).getByRole('button',{name:'검증 정보 보기'}).click();
+  const detail = page.getByRole('dialog',{name:'검증 정보'});
+  assert.ok(await detail.getByText('d8:claims:1',{exact:true}).isVisible());
+  await detail.getByRole('button',{name:'상세 닫기'}).click();
 });
 test('주장 상세는 안전한 좌표의 문헌 후보로 이동하고 판본과 위치를 구분한다', async () => {
   await page.unroute('**/api/candidates**');
@@ -223,11 +237,13 @@ test('주장 상세는 안전한 좌표의 문헌 후보로 이동하고 판본�
   await page.getByRole('button',{name:'초기화'}).click();
   await page.getByRole('button',{name:/서지 제목 표시 보류/}).waitFor();
   await page.getByRole('button',{name:/서지 제목 표시 보류/}).click();
-  const detail = page.getByRole('region',{name:'후보 상세'});
+  await page.getByRole('region',{name:'후보 상세'}).getByRole('button',{name:'검증 정보 보기'}).click();
+  const detail = page.getByRole('dialog',{name:'검증 정보'});
   assert.ok(await detail.getByText('d8:editions:2',{exact:true}).isVisible());
   assert.ok(await detail.getByText('d8:locators:3',{exact:true}).isVisible());
   await detail.getByRole('button',{name:'연결된 문헌 후보 열기'}).click();
-  await detail.getByRole('heading',{name:'연결된 가상 문헌'}).waitFor();
+  await page.getByRole('dialog',{name:'연결 문헌'}).getByText('연결된 가상 문헌',{exact:true}).waitFor();
+  await page.getByRole('dialog').getByRole('button',{name:'상세 닫기'}).click();
 });
 test('임의 URL이나 원본 ID는 문헌 좌표로 사용하지 않는다', async () => {
   await page.unroute('**/api/candidates**');
@@ -236,12 +252,14 @@ test('임의 URL이나 원본 ID는 문헌 좌표로 사용하지 않는다', as
   await page.getByRole('button',{name:'초기화'}).click();
   await page.getByRole('button',{name:/가상 문헌/}).waitFor();
   await page.getByRole('button',{name:/가상 문헌/}).click();
-  const detail = page.getByRole('region',{name:'후보 상세'});
+  await page.getByRole('region',{name:'후보 상세'}).getByRole('button',{name:'검증 정보 보기'}).click();
+  const detail = page.getByRole('dialog',{name:'검증 정보'});
   assert.equal(await detail.getByRole('button',{name:'연결된 문헌 후보 열기'}).count(),0);
   assert.ok(await detail.getByText('연결된 문헌 후보 미확인').isVisible());
   assert.equal(await detail.getByText('RAW_EDITION_ID').count(),0);
   assert.equal(await detail.getByText('RAW_LOCATOR_ID').count(),0);
   assert.equal(await page.locator('a[href*="example.invalid"]').count(),0);
+  await detail.getByRole('button',{name:'상세 닫기'}).click();
 });
 test('실제 합성 테스트 서버의 인증·필터 응답으로 후보를 검색한다', async () => {
   await page.unroute('**/api/candidates**');
@@ -249,8 +267,11 @@ test('실제 합성 테스트 서버의 인증·필터 응답으로 후보를 �
   await page.getByRole('button',{name:'초기화'}).click(); await ok;
   await page.getByRole('button',{name:/가상 문헌 A/}).waitFor();
   await page.getByRole('button',{name:/가상 문헌 A/}).click();
-  assert.ok(await page.getByRole('region',{name:'후보 상세'}).getByText('개인 의견',{exact:true}).isVisible());
-  await page.getByLabel('연구자 · 발화 주체').fill('다른 연구자');
+  await page.getByRole('region',{name:'후보 상세'}).getByRole('button',{name:'검증 정보 보기'}).click();
+  const detail = page.getByRole('dialog',{name:'검증 정보'});
+  assert.ok(await detail.getByText('개인 의견',{exact:true}).isVisible());
+  await detail.getByRole('button',{name:'상세 닫기'}).click();
+  await page.getByLabel('문헌 작성자').fill('다른 연구자');
   const searched = page.waitForResponse(r => r.url().includes('/api/candidates') && new URL(r.url()).searchParams.get('researcher') === '다른 연구자');
   await page.getByRole('button',{name:'후보 검색'}).click(); await searched;
   await page.getByRole('button',{name:/가상 문헌 B/}).waitFor();

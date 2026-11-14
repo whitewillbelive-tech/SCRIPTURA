@@ -1,0 +1,91 @@
+✖ 원본 서지 후보는 상태·공식성·학술 상태와 분리된다 (2959.821966ms)
+✔ 표시 가능한 후보 제목과 저자는 서버의 검색으로 전달된다 (271.919675ms)
+✔ 제한·누락·알 수 없는 상태와 위조 원본 필드는 출력하지 않는다 (127.591948ms)
+✔ 응답 투영 표식 없이 위조된 후보 메타데이터는 숨긴다 (67.23493ms)
+✔ 후보 값의 HTML은 실행하지 않고 텍스트로 표시한다 (109.027319ms)
+✖ 공동체 표시 가능 값이 없으면 이름 검색을 보류한다 (30069.609414ms)
+✔ 503 또는 필터 변경 시 기존 후보 카드와 상세가 남지 않는다 (262.177591ms)
+✖ 명시된 공동체 자기 설명과 평가 대상 역할을 뒤섞지 않는다 (119.995411ms)
+✖ 공동체 역할이 없거나 허용되지 않으면 위조된 이름과 원본 역할을 가린다 (30128.884899ms)
+✔ 후보 필드의 수신기 길이 한도를 화면에도 동일하게 적용한다 (173.982907ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 6
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 65166.1235
+
+✖ failing tests:
+
+test at tests/ui-k13-local-candidate.browser.cjs:52:1
+✖ 원본 서지 후보는 상태·공식성·학술 상태와 분리된다 (2959.821966ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(card.includes(text))
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-k13-local-candidate.browser.cjs:57:119)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/ui-k13-local-candidate.browser.cjs:107:1
+✖ 공동체 표시 가능 값이 없으면 이름 검색을 보류한다 (30069.609414ms)
+  locator.fill: Timeout 30000ms exceeded.
+  Call log:
+  [2m  - waiting for getByLabel('종교 · 교단 · 단체')[22m
+  [2m    - locator resolved to <input type="search" maxlength="200" name="community" placeholder="전통 또는 공동체"/>[22m
+  [2m    - fill("합성 미확인 공동체")[22m
+  [2m  - attempting fill action[22m
+  [2m    2 × waiting for element to be visible, enabled and editable[22m
+  [2m      - element is not visible[22m
+  [2m    - retrying fill action[22m
+  [2m    - waiting 20ms[22m
+  [2m    2 × waiting for element to be visible, enabled and editable[22m
+  [2m      - element is not visible[22m
+  [2m    - retrying fill action[22m
+  [2m      - waiting 100ms[22m
+  [2m    60 × waiting for element to be visible, enabled and editable[22m
+  [2m       - element is not visible[22m
+  [2m     - retrying fill action[22m
+  [2m       - waiting 500ms[22m
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-k13-local-candidate.browser.cjs:111:40) {
+    name: 'TimeoutError',
+    log: [ "  - waiting for getByLabel('종교 · 교단 · 단체')", '    - locator resolved to <input type="search" maxlength="200" name="community" placeholder="전통 또는 공동체"/>', '    - fill("합성 미확인 공동체")', '  - attempting fill action', '    2 × waiting for element to be visible, enabled and editable', '      - element is not visible', '    - retrying fill action', '    - waiting 20ms', '    2 × waiting for element to be visible, enabled and editable', '      - element is not visible', '    - retrying fill action', '      - waiting 100ms', '    60 × waiting for element to be visible, enabled and editable', '       - element is not visible', '     - retrying fill action', '       - waiting 500ms' ]
+  }
+
+test at tests/ui-k13-local-candidate.browser.cjs:125:1
+✖ 명시된 공동체 자기 설명과 평가 대상 역할을 뒤섞지 않는다 (119.995411ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok((await detail.textContent()).includes('합성 공동체'))
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-k13-local-candidate.browser.cjs:131:9)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/ui-k13-local-candidate.browser.cjs:142:1
+✖ 공동체 역할이 없거나 허용되지 않으면 위조된 이름과 원본 역할을 가린다 (30128.884899ms)
+  locator.textContent: Timeout 30000ms exceeded.
+  Call log:
+  [2m  - waiting for getByRole('region', { name: '후보 상세' }).locator('.fact').filter({ has: getByText('공동체 참조의 역할', { exact: true }) }).locator('dd')[22m
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-k13-local-candidate.browser.cjs:150:116) {
+    name: 'TimeoutError',
+    log: [ "  - waiting for getByRole('region', { name: '후보 상세' }).locator('.fact').filter({ has: getByText('공동체 참조의 역할', { exact: true }) }).locator('dd')" ]
+  }

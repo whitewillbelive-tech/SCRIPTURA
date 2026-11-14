@@ -1,5 +1,5 @@
 // Synthetic-only J-3 browser regression; never opens a research archive.
-const { test, before, after } = require('node:test');
+const { test, before, after, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
 const { spawn } = require('node:child_process');
@@ -35,6 +35,7 @@ before(async()=>{
  page=await browser.newPage();await page.goto(base,{waitUntil:'networkidle'});
 });
 after(async()=>{if(browser)await browser.close();if(server)server.kill('SIGTERM');});
+afterEach(async()=>{if(page && await page.locator('#research-drawer[open]').count()) await page.getByRole('button',{name:'상세 닫기'}).click();});
 
 test('D9 후보 상태는 승인 0과 미승인 이름을 분리한다',async()=>{
  await page.route('**/api/candidates**',route=>reply(route));
@@ -46,7 +47,8 @@ test('D9 후보 상태는 승인 0과 미승인 이름을 분리한다',async()=
  assert.equal(await page.getByText('SYNTHETIC-UNAPPROVED-AUTHOR').count(),0);
  assert.equal(await page.getByText('SYNTHETIC-UNAPPROVED-GROUP').count(),0);
  const selected=page.locator('.candidate').first();await selected.click();
- const detail=page.getByRole('region',{name:'후보 상세'});
+ await page.getByRole('region',{name:'후보 상세'}).getByRole('button',{name:'검증 정보 보기'}).click();
+ const detail=page.getByRole('dialog',{name:'검증 정보'});
  assert.ok(await detail.getByText('d9:claims:1',{exact:true}).isVisible());
  assert.ok(await detail.getByText('d9:editions:1',{exact:true}).isVisible());
  assert.ok(await detail.getByText('d9:locators:1',{exact:true}).isVisible());
@@ -55,6 +57,7 @@ test('D9 후보 상태는 승인 0과 미승인 이름을 분리한다',async()=
   assert.equal(await detail.getByText('SYNTHETIC_PRIVATE_IDENTIFIER',{exact:true}).count(),0);
  assert.equal(await detail.getByText('SYNTHETIC-UNAPPROVED-TEXT').count(),0);
  assert.equal(await page.locator('a[href*="example.invalid"]').count(),0);
+ await detail.getByRole('button',{name:'상세 닫기'}).click();
 });
 
 test('근거 없는 승인 플래그는 표시 승인으로 나타내지 않는다',async()=>{
@@ -66,20 +69,22 @@ test('근거 없는 승인 플래그는 표시 승인으로 나타내지 않는�
  assert.ok(await page.getByText('표시 적격성 정보: 미확인',{exact:true}).isVisible());
  assert.equal(await page.getByText('SYNTHETIC-UNAPPROVED-TITLE').count(),0);
  await page.locator('.candidate').first().click();
- const detail=page.getByRole('region',{name:'후보 상세'});
+ await page.getByRole('region',{name:'후보 상세'}).getByRole('button',{name:'검증 정보 보기'}).click();
+ const detail=page.getByRole('dialog',{name:'검증 정보'});
  await detail.getByText('필드별 표시 적격성 보기',{exact:true}).click();
  assert.ok(await detail.getByText('source · bibliography: 미확인 · 표시 승인 아님',{exact:true}).isVisible());
+ await detail.getByRole('button',{name:'상세 닫기'}).click();
 });
 
 test('명시적 이름 검색 보류와 다른 조건의 0건을 구분한다',async()=>{
  let calls=0;await page.unroute('**/api/candidates**');
  await page.route('**/api/candidates**',route=>{calls++;return reply(route,payload([]));});
- await page.getByLabel('연구자 · 발화 주체').fill('SYNTHETIC-UNAPPROVED-AUTHOR');
+ await page.getByLabel('문헌 작성자').fill('SYNTHETIC-UNAPPROVED-AUTHOR');
  const before=calls;await page.getByRole('button',{name:'후보 검색'}).click();
  assert.ok(await page.getByText('검색 보류',{exact:true}).isVisible());
  assert.ok(await page.getByText(/보류는 일치하는 자료가 없다는 뜻이 아닙니다/).isVisible());
  assert.equal(calls,before);
- await page.getByLabel('연구자 · 발화 주체').fill('');await page.getByLabel('자료 단계').selectOption('d9');
+ await page.getByLabel('문헌 작성자').fill('');await page.locator('#advanced-filters > summary').click();await page.getByLabel('자료 단계').selectOption('d9');
  await page.getByRole('button',{name:'후보 검색'}).click();
  await page.getByText('0개 후보',{exact:true}).waitFor();
  assert.ok(await page.getByText(/표시 보류된 필드의 일치 여부는 확인할 수 없습니다/).isVisible());
@@ -115,7 +120,8 @@ test('D9 후속 관찰을 기존 D8의 원본 권리·검증 상태와 합치지
  await page.route('**/api/candidates**',route=>reply(route,payload([older])));
  await page.getByRole('button',{name:'초기화'}).click();await page.getByText('임시 참조 번호 · d8:claims:1',{exact:true}).waitFor();
  await page.locator('.candidate').first().click();
- const detail=page.getByRole('region',{name:'후보 상세'});
+ await page.getByRole('region',{name:'후보 상세'}).getByRole('button',{name:'검증 정보 보기'}).click();
+ const detail=page.getByRole('dialog',{name:'검증 정보'});
  assert.ok(await detail.getByText('D-9 후속 관찰 · 원본 상태 변경 없음',{exact:true}).isVisible());
  assert.ok(await detail.getByText(/관찰 · audit · pending · direct · 이 후보 → 연결 대상/).isVisible());
   assert.ok(await detail.getByText(/관찰 · relationship · source_checked · unknown · 연결 대상 → 이 후보 · 같은 공동체의 유사 해석/).isVisible());
@@ -125,6 +131,7 @@ test('D9 후속 관찰을 기존 D8의 원본 권리·검증 상태와 합치지
  const originalRights=detail.getByRole('region',{name:'연결된 판본 권리'});
  assert.equal(await originalRights.locator('.fact').filter({has:page.getByText('열람',{exact:true})}).locator('dd').textContent(),'unknown');
  assert.equal(await detail.getByText('SYNTHETIC-PRIVATE-NOTE').count(),0);
+ await detail.getByRole('button',{name:'상세 닫기'}).click();
 });
 
 test('D9의 503은 이전 카드·상세를 지우고 초기화로 복구한다',async()=>{
@@ -183,7 +190,8 @@ test('명시 승인된 표시 예시는 합성 모드에서만 표시한다',asy
  await page.route('**/api/candidates**',route=>reply(route,payload([synthetic],{dataset:'synthetic'})));
  await page.getByLabel('세션 비밀').fill(secret);await page.getByRole('button',{name:'세션 열기'}).click();
  await page.getByRole('button',{name:/가상 승인 예시/}).waitFor();await page.getByRole('button',{name:/가상 승인 예시/}).click();
- const detail=page.getByRole('region',{name:'후보 상세'});await detail.getByText('필드별 표시 적격성 보기',{exact:true}).click();
+ await page.getByRole('region',{name:'후보 상세'}).getByRole('button',{name:'검증 정보 보기'}).click();
+ const detail=page.getByRole('dialog',{name:'검증 정보'});await detail.getByText('필드별 표시 적격성 보기',{exact:true}).click();
  assert.ok(await detail.getByText('source · bibliography: candidate_visible_local · 합성 시험용 승인',{exact:true}).isVisible());
  assert.ok(await page.getByText('합성 시험 자료 / 실제 연구 데이터 아님.').isVisible());
 });

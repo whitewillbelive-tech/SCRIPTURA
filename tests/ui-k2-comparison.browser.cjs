@@ -54,9 +54,11 @@ test('코퍼스·장절체계·주소를 선택해 두 해석을 나란히 본�
  await page.getByText('선택한 본문의 연구 후보 2건',{exact:true}).waitFor();
  assert.equal(selectedQuery.get('stage'),'d12');assert.equal(selectedQuery.get('corpus'),selected.corpus);assert.equal(selectedQuery.get('scheme'),selected.scheme);assert.equal(selectedQuery.get('reference'),selected.reference);
  const cards=page.locator('.comparison-card');assert.equal(await cards.count(),2);
- assert.ok((await cards.nth(0).textContent()).includes('공동체 자기 설명'));
- assert.ok((await cards.nth(1).textContent()).includes('외부 비평'));
- for(const phrase of ['합성 문헌 1','합성 작성자 1','출처 확인','공식성','논증 검토','독립 학술 심사','표시 보류','별도 승인 필요']) assert.ok((await cards.nth(0).textContent()).includes(phrase));
+ for(const phrase of ['합성 문헌 1','합성 작성자 1','해석 주체 미확인','핵심 해석','논거 확인 대기','표시 보류']) assert.ok((await cards.nth(0).textContent()).includes(phrase));
+ await cards.nth(0).getByRole('button',{name:'검증 정보 보기'}).click();
+ for(const phrase of ['공동체 자기 설명','출처 확인','공식성','논증 검토','독립 학술 심사','별도 승인 필요']) assert.ok((await page.locator('#research-drawer').textContent()).includes(phrase));
+ await page.locator('#drawer-close').click();
+ await cards.nth(1).getByRole('button',{name:'검증 정보 보기'}).click();assert.ok((await page.locator('#research-drawer').textContent()).includes('외부 비평'));await page.locator('#drawer-close').click();
  assert.equal(await page.getByText('SYNTHETIC-PROTECTED-SUMMARY',{exact:true}).count(),0);
  assert.ok((await page.getByLabel('본문별 해석 비교').textContent()).includes('직접 반박의 근거가 아닙니다'));
 });
@@ -65,9 +67,8 @@ test('비교 카드에서 연결된 문헌 상세로 이동할 수 있다',async
  await page.unroute('**/api/candidates**');
  await page.route('**/api/candidates**',route=>reply(route,{...candidatePayload,records:[source]}));
  await page.locator('.comparison-card').first().getByRole('button',{name:'연결 문헌 보기'}).click();
- await page.getByRole('region',{name:'후보 상세'}).getByText('합성 문헌 1',{exact:true}).waitFor();
- await page.getByRole('button',{name:'본문 비교',exact:true}).click();
- await page.getByText(/본문 주소 3개/).waitFor();await choose();
+ await page.locator('#research-drawer').getByText('합성 문헌 1',{exact:true}).first().waitFor();
+ await page.locator('#drawer-close').click();
  await page.getByText('선택한 본문의 연구 후보 2건',{exact:true}).waitFor();
 });
 test('자료 범위를 전체로 바꾸면 단계 필터 없이 본문을 조회한다',async()=>{
@@ -133,8 +134,9 @@ test('안전 투영된 원본 전통 라벨만 표시·필터하고 공식 귀�
  await page.getByRole('button',{name:'해석 비교',exact:true}).click();
  await page.getByText('선택한 본문의 연구 후보 1건',{exact:true}).waitFor();
  assert.equal(chosen,tradition);
- const card=await page.locator('.comparison-card').first().textContent();
- assert.ok(card.includes(tradition));assert.ok(card.includes('귀속 및 공식성 미확인'));
+ await page.locator('.comparison-card').first().getByRole('button',{name:'검증 정보 보기'}).click();
+ const card=await page.locator('#research-drawer').textContent();
+ assert.ok(card.includes(tradition));assert.ok(card.includes('귀속 및 공식성 미확인'));await page.locator('#drawer-close').click();
  await page.unroute('**/api/comparison**');
  await page.route('**/api/comparison**',route=>reply(route,{dataset:'D12',metadata_projection:'k1.3-local-candidate',passages,selected,claims:projected}));
  await page.getByRole('button',{name:'해석 비교',exact:true}).click();

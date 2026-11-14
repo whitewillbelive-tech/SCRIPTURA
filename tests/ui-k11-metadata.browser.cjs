@@ -47,16 +47,18 @@ test('확인된 서지 필드와 미확정 공식성 및 학술 심사는 별도
  await page.route('**/api/candidates**',route=>reply(route));
  await page.getByLabel('세션 비밀').fill(secret);await page.getByRole('button',{name:'세션 열기'}).click();
  const candidate=page.locator('.candidate').first();await candidate.waitFor();
+ await page.locator('.research-metadata > summary').click();
  assert.ok(await page.getByText(/문헌명 3건 · 저자 2건 · 발행기관 1건 · 출판 연도 1건 · 공동체명 1건/).isVisible());
+ await page.locator('.research-metadata > summary').click();
  assert.ok((await candidate.textContent()).includes('합성 검증 문헌'));
- assert.ok((await candidate.textContent()).includes('출처 일부 서지 필드 확인'));
- assert.ok((await candidate.textContent()).includes('공식성 pending_authority'));
- assert.ok((await candidate.textContent()).includes('학술 심사 pending'));
  await candidate.click();const detail=page.getByRole('region',{name:'후보 상세'});
+ await detail.getByRole('button',{name:'검증 정보 보기'}).click();
+ const verification=page.locator('#research-drawer');
  for(const text of ['합성 검증 문헌','합성 저자','합성 발행기관','합성 공동체','2024','source_checked','pending_authority','pending']) {
-   assert.ok((await detail.textContent()).includes(text));
+   assert.ok((await verification.textContent()).includes(text));
  }
  assert.equal(await page.getByText(/SYNTHETIC-RAW/).count(),0);
+ await page.locator('#drawer-close').click();
 });
 
 test('주장 입력 확인과 문헌 출처 확인을 혼동하지 않는다',async()=>{
@@ -64,21 +66,24 @@ test('주장 입력 확인과 문헌 출처 확인을 혼동하지 않는다',as
  await page.route('**/api/candidates**',route=>reply(route,payload([row({verified_metadata:{},
    source_verification_status:'unconfirmed',verification_status:'source_checked'})])));
  await page.getByRole('button',{name:'초기화'}).click();const candidate=page.locator('.candidate').first();await candidate.waitFor();
- assert.ok((await candidate.textContent()).includes('출처 미확인'));await candidate.click();
- const detail=page.getByRole('region',{name:'후보 상세'});
+ await candidate.click();
+ await page.getByRole('region',{name:'후보 상세'}).getByRole('button',{name:'검증 정보 보기'}).click();
+ const detail=page.locator('#research-drawer');
  assert.equal(await detail.locator('.fact').filter({has:page.getByText('출처 확인 상태',{exact:true})}).locator('dd').textContent(),'미확인');
  assert.equal(await detail.locator('.fact').filter({has:page.getByText('입력 검증 상태',{exact:true})}).locator('dd').textContent(),'source_checked');
+ await page.locator('#drawer-close').click();
 });
 
 test('확인된 이름 검색을 전송하고 검색 범위 제한을 설명한다',async()=>{
  let seen='';await page.unroute('**/api/candidates**');
  await page.route('**/api/candidates**',route=>{seen=route.request().url();return reply(route,payload([]));});
- await page.getByLabel('연구자 · 발화 주체').fill('합성 저자');
+ await page.getByLabel('문헌 작성자').fill('합성 저자');
  await page.getByRole('button',{name:'후보 검색'}).click();
  await page.getByText('0개 후보',{exact:true}).waitFor();
  assert.equal(new URL(seen).searchParams.get('researcher'),'합성 저자');
  assert.ok(await page.getByText(/표시 보류된 필드의 일치 여부는 확인할 수 없습니다/).isVisible());
- await page.getByLabel('연구자 · 발화 주체').fill('');
+ await page.getByLabel('문헌 작성자').fill('');
+ await page.locator('#advanced-filters summary').click();
  await page.getByLabel('종교 · 교단 · 단체').fill('합성 공동체');
  await page.getByRole('button',{name:'후보 검색'}).click();
  await page.getByText('0개 후보',{exact:true}).waitFor();
@@ -105,7 +110,7 @@ test('검색 가능한 이름이 없으면 0건이 아니라 검색 보류로 �
  await page.route('**/api/candidates**',route=>{calls++;return reply(route,payload([],{
    metadata_coverage:{source_title:0,source_creator:0,source_publisher:0,source_year:0,community_name:0}}));});
  await page.getByRole('button',{name:'초기화'}).click();await page.getByText('0개 후보',{exact:true}).waitFor();
- const before=calls;await page.getByLabel('연구자 · 발화 주체').fill('합성 미확인 이름');
+ const before=calls;await page.getByLabel('문헌 작성자').fill('합성 미확인 이름');
  await page.getByRole('button',{name:'후보 검색'}).click();
  assert.ok(await page.getByText('검색 보류',{exact:true}).isVisible());assert.equal(calls,before);
  assert.ok(await page.getByText(/보류는 일치하는 자료가 없다는 뜻이 아닙니다/).isVisible());

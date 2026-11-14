@@ -69,11 +69,16 @@
   // Research fields remain closed until their individual use is checked by
   // the server. This extra UI boundary is not a replacement for that gate.
   // Synthetic tests remain labeled and never represent real approval.
-  const safeRow = (row, dataset, projection) => {
+  const safeRow = (row, dataset, projection, summaryProjection) => {
     if (!row || typeof row !== 'object') return null;
-    if (dataset === 'synthetic') return row;
+    if (dataset === 'synthetic') {
+      const synthetic = {...row, summary: null};
+      if (summaryProjection === 'k2-reviewed-summary' && row.summary_status === 'recorded_unverified' && typeof row.summary === 'string' && row.summary.trim() && row.summary.length <= 500 && !/[\x00-\x1f\x7f]/.test(row.summary)) synthetic.summary = row.summary;
+      return synthetic;
+    }
     const safe = {...row};
     for (const field of ['source_title','source_creator','source_publisher','source_doi','source_year','locator','researcher','speaker','tradition','community_reference','evaluated_subject','summary']) safe[field] = null;
+    if (summaryProjection === 'k2-reviewed-summary' && row.summary_status === 'recorded_unverified' && typeof row.summary === 'string' && row.summary.trim() && row.summary.length <= 500 && !/[\x00-\x1f\x7f]/.test(row.summary)) safe.summary = row.summary;
     // Only the authenticated API's explicit K-1.3 safe projection can carry
     // a private candidate value; a raw archive field or policy flag cannot.
     safe.candidate_field_states = null;
@@ -126,6 +131,7 @@
     return el;
   };
   const clear = () => {
+    closeDrawer();
     generation += 1;
     detailGeneration += 1;
     if (detailController) detailController.abort();
@@ -184,12 +190,70 @@
   // ID, name or free text must not become visible merely by looking like a key.
   const UNMAPPED_FIELDS = new Set(['source_title','source_creator','source_chain','title','creator','speaker','community_id','statement_ko','scope_note','note','url','doi','access_scope','document_type_scope','language','published_at','theological_primary_document','original_text_saved','claim_truth_status','independent_human_review','source_full_text','rights_scope','source_url','unreviewed_source_text','formal_adoption_evidence','position_scope','human_review','scholarly_reviewed','reference','reference_scheme','corpus','location','status','verification_status','authority_status','attribution_kind','passage_ids','source_locator_id','checked_at','unrecognized_field']);
   const safeEnum = (v, allowed) => typeof v === 'string' && allowed.has(v) ? v : '미확인';
-  const showDetail = selected => {
+  const drawer = document.getElementById('research-drawer');
+  const drawerTitle = document.getElementById('drawer-title');
+  const drawerContent = document.getElementById('drawer-content');
+  const drawerClose = document.getElementById('drawer-close');
+  let drawerOpener = null;
+  let drawerGeneration = 0;
+  const closeDrawer = () => {
+    drawerGeneration += 1;
+    if (drawer.open) drawer.close();
+  };
+  drawerClose.addEventListener('click', closeDrawer);
+  drawer.addEventListener('close', () => {
+    drawerGeneration += 1;
+    drawerContent.replaceChildren();
+    if (drawerOpener && drawerOpener.isConnected) drawerOpener.focus();
+    drawerOpener = null;
+  });
+  const openDrawer = (title, content, opener) => {
+    drawerTitle.textContent = title;
+    drawerContent.replaceChildren(content);
+    if (!drawer.open) {
+      drawerOpener = opener || document.activeElement;
+      drawer.showModal();
+    }
+    drawerClose.focus();
+  };
+  const evidencePanel = (selected, summary) => {
+    const section = node('div');
+    if (summary) section.append(node('h3', '핵심 해석 · 원본 기록'), node('p', summary));
+    section.append(node('h3', '연결 문헌'), node('p', value(selected.source_title, '문헌명 표시 보류')));
+    section.append(node('p', `문헌 작성자: ${value(selected.source_creator, '미확인')}`));
+    section.append(node('h3', '확인된 근거'));
+    // Evidence types and statuses are metadata, not the content of a proof.
+    // Do not turn them into an argument or generate a theological rationale.
+    section.append(node('p', '논거 확인 대기'));
+    const evidence = Array.isArray(selected.evidence) ? selected.evidence : [];
+    if (evidence.length) {
+      const list = node('ul');
+      for (const item of evidence) if (item && typeof item === 'object') list.append(node('li', `관련 근거 기록 · ${value(item.kind, '유형 미확인')} · ${value(item.status, '상태 미확인')}`));
+      section.append(list);
+    }
+    return section;
+  };
+  const appendPrimary = (container, selected, summary) => {
+    // There is no independently verified claim-to-speaker relation in this
+    // API. A confirmed community name alone cannot establish the speaker.
+    const role = null;
+    const actor = node('section', undefined, 'interpretation-actor');
+    actor.append(node('h4', '해석 주체'), node('p', value(role, '해석 주체 미확인')));
+    if (!role) actor.append(node('p', `문헌 작성자 · ${value(selected.source_creator, '미확인')}`, 'muted'));
+    const claim = node('section', undefined, 'interpretation-summary');
+    claim.append(node('h4', '핵심 해석'), node('p', value(summary, '해석 요지 표시 보류')));
+    const argument = node('section', undefined, 'interpretation-argument');
+    argument.append(node('h4', '핵심 논거'), node('p', '논거 확인 대기'));
+    const source = node('section', undefined, 'interpretation-source');
+    source.append(node('h4', '출처'), node('p', value(selected.source_title, '문헌명 표시 보류')));
+    container.append(actor, claim, argument, source);
+  };
+  const showDetail = (selected, destination = detail) => {
     detailGeneration += 1;
     if (detailController) detailController.abort();
     detailController = null;
     const ref = safeRef(selected.key);
-    results.querySelectorAll('button').forEach(el => el.setAttribute('aria-pressed', String(ref !== '미확인' && el.dataset.key === ref)));
+    if (destination === detail) results.querySelectorAll('button').forEach(el => el.setAttribute('aria-pressed', String(ref !== '미확인' && el.dataset.key === ref)));
     const body = node('div');
     body.append(node('p', '연구 후보 · 공식성 및 학술 검증 별도', 'tag'));
     body.append(node('h3', value(selected.source_title, '서지 제목 표시 보류')));
@@ -240,7 +304,7 @@
     if (selected.record_kind === 'claim') {
       if (safeCoordinate(selected.source_key, 'sources') !== '미확인') {
         const source = node('button', '연결된 문헌 후보 열기', 'target-button');
-        source.type = 'button'; source.addEventListener('click', () => openTarget(selected.source_key)); body.append(source);
+        source.type = 'button'; source.addEventListener('click', () => drawer.open ? openSourceDrawer(selected.source_key, source) : openTarget(selected.source_key)); body.append(source);
       } else body.append(node('p', '연결된 문헌 후보 미확인', 'muted'));
     }
     body.append(node('h4', '판본별 권리 기록'));
@@ -292,7 +356,7 @@
         const li = node('li', `관찰 · ${safeEnum(item.kind, OBSERVATION_KINDS)} · ${safeEnum(item.status, OBSERVATION_STATES)} · ${safeEnum(item.method, OBSERVATION_METHODS)} · ${direction} · ${relation} `);
         if (safeRef(item.target_key) !== '미확인') {
           const target = node('button', '후속 관찰 연결 대상 열기', 'target-button');
-          target.type = 'button'; target.addEventListener('click', () => openTarget(item.target_key)); li.append(target);
+          target.type = 'button'; target.addEventListener('click', () => drawer.open ? openSourceDrawer(item.target_key, target) : openTarget(item.target_key)); li.append(target);
         }
         list.append(li);
       }
@@ -314,7 +378,7 @@
         const li = node('li', `관계 · ${direction} · ${value(item.kind, '유형 미확인')} · ${value(item.status, '상태 미확인')} · ${value(item.assessment, '근거 검토 대기')} `);
         if (safeRef(item.target_key) !== '미확인') {
           const target = node('button', '연결 대상 열기', 'target-button');
-          target.type = 'button'; target.addEventListener('click', () => openTarget(item.target_key)); li.append(target);
+          target.type = 'button'; target.addEventListener('click', () => drawer.open ? openSourceDrawer(item.target_key, target) : openTarget(item.target_key)); li.append(target);
         } else li.append(node('span', '대상 미확인'));
         list.append(li);
       }
@@ -346,7 +410,46 @@
       }
       report.append(list); body.append(report);
     }
-    detail.replaceChildren(body);
+    const primary = node('div', undefined, 'research-detail');
+    primary.append(node('p', '연구 후보 · 원본 기록', 'tag'));
+    appendPrimary(primary, selected, selected.summary);
+    const actionsPanel = node('div', undefined, 'card-actions');
+    const evidenceButton = node('button', '근거·출처 보기', 'target-button');
+    evidenceButton.type = 'button';
+    evidenceButton.addEventListener('click', () => openDrawer('근거·출처', evidencePanel(selected, selected.summary), evidenceButton));
+    const verificationButton = node('button', '검증 정보 보기', 'target-button');
+    verificationButton.type = 'button';
+    verificationButton.addEventListener('click', () => openDrawer('검증 정보', body, verificationButton));
+    actionsPanel.append(evidenceButton, verificationButton);
+    if (selected.record_kind === 'claim' && safeCoordinate(selected.source_key, 'sources') !== '미확인') {
+      const sourceButton = node('button', '연결된 문헌 후보 열기', 'target-button');
+      sourceButton.type = 'button';
+      sourceButton.addEventListener('click', () => openTarget(selected.source_key));
+      actionsPanel.append(sourceButton);
+    }
+    primary.append(actionsPanel);
+    destination.replaceChildren(primary);
+  };
+  // The comparison remains in place while its linked source is read.
+  const openSourceDrawer = async (key, opener) => {
+    const current = ++drawerGeneration;
+    const holder = node('div');
+    holder.append(node('p', '연결 문헌을 불러오는 중입니다.'));
+    openDrawer('연결 문헌', holder, opener);
+    try {
+      const query = new URLSearchParams({key});
+      const response = await fetch(`/api/candidates?${query}`, {cache:'no-store', headers:{Authorization:`Bearer ${secret}`}});
+      if (!drawer.open || current !== drawerGeneration) return;
+      if (!response.ok) throw new Error('unavailable');
+      const data = await response.json();
+      if (!drawer.open || current !== drawerGeneration) return;
+      if (!data || data.dataset !== sessionDataset) throw new Error('unavailable');
+      const target = Array.isArray(data.records) ? safeRow(data.records.find(row => row && row.key === key), data.dataset, data.metadata_projection, data.summary_projection) : null;
+      if (!target) throw new Error('unavailable');
+      showDetail(target, holder);
+    } catch (_) {
+      if (drawer.open && current === drawerGeneration) holder.replaceChildren(node('p', '연결 문헌을 불러오지 못했습니다.', 'error'));
+    }
   };
   const openTarget = async key => {
     const local = rows.find(row => row && row.key === key);
@@ -364,7 +467,7 @@
       const data = await response.json();
       if (current !== detailGeneration) return;
       if (!data || data.dataset !== sessionDataset) throw new Error('dataset mismatch');
-      const target = Array.isArray(data.records) ? safeRow(data.records.find(row => row && row.key === key), data.dataset, data.metadata_projection) : null;
+      const target = Array.isArray(data.records) ? safeRow(data.records.find(row => row && row.key === key), data.dataset, data.metadata_projection, data.summary_projection) : null;
       if (!target) { detail.replaceChildren(node('p', '연결 대상의 표시 가능한 후보가 없습니다.', 'empty')); return; }
       showDetail(target);
     } catch (e) {
@@ -389,11 +492,9 @@
     mappingSummary.replaceChildren(list);
   };
   const render = data => {
-    // The legacy accessible label remains for earlier API versions only.
-    // In K-1.3 this filter matches recorded source creators, which can be an
-    // institution and must not be described as a claim's speaker.
-    creatorFilterLabel.textContent = data.metadata_projection === CANDIDATE_PROJECTION ? '문헌 작성자' : '연구자 · 발화 주체';
-    rows = Array.isArray(data.records) ? data.records.map(row => safeRow(row, data.dataset, data.metadata_projection)).filter(Boolean) : [];
+    // A document creator can be an institution and is not a claim's speaker.
+    creatorFilterLabel.textContent = '문헌 작성자';
+    rows = Array.isArray(data.records) ? data.records.map(row => safeRow(row, data.dataset, data.metadata_projection, data.summary_projection)).filter(Boolean) : [];
     renderMapping(data.unmapped_summary);
     const visibility = data.visibility_summary;
     const validCount = n => Number.isSafeInteger(n) && n >= 0 && n <= 100000;
@@ -449,13 +550,18 @@
       if (!row || typeof row !== 'object') continue;
       const button = node('button', undefined, 'candidate');
       button.type = 'button'; if (safeRef(row.key) !== '미확인') button.dataset.key = safeRef(row.key); button.setAttribute('aria-pressed', 'false');
-      button.append(node('span', readable(row.attribution), 'tag'));
-      button.append(node('strong', value(row.source_title, '서지 제목 표시 보류')));
-      if (row.candidate_field_states) button.append(node('small', `문헌 제목 · ${CANDIDATE_STATE_LABELS[row.candidate_field_states.source_title] || CANDIDATE_STATE_LABELS.missing_or_unmapped}`));
-      const bibliography = [row.source_creator,row.source_publisher,row.source_year,row.tradition].filter(v => (typeof v === 'string' && v.trim()) || typeof v === 'number');
-      if (bibliography.length) button.append(node('small', bibliography.join(' · ')));
-      button.append(node('small', `임시 참조 번호 · ${safeRef(row.key)}`));
-      button.append(node('small', [value(row.stage, '단계 미확인'), `출처 ${row.source_verification_status ? readable(row.source_verification_status) : '미확인'}`, `공식성 ${value(row.authority_status, '미확인')}`, `학술 심사 ${value(row.independent_review_status, '미확인')}`].join(' · ')));
+      if (row.record_kind === 'claim') {
+        const actor = null; // claim-to-speaker verification is not available
+        button.append(node('strong', value(actor, '해석 주체 미확인')));
+        if (!actor) button.append(node('small', `문헌 작성자 · ${value(row.source_creator, '미확인')}`));
+        button.append(node('span', value(row.summary, '해석 요지 표시 보류'), 'candidate-summary'));
+        button.append(node('small', `출처 · ${value(row.source_title, '서지 제목 표시 보류')}`));
+      } else {
+        button.append(node('strong', value(row.source_title, '서지 제목 표시 보류')));
+        button.append(node('small', `문헌 작성자 · ${value(row.source_creator, '미확인')}`));
+      }
+      if (row.candidate_field_states) button.append(node('small', CANDIDATE_STATE_LABELS[row.candidate_field_states.source_title] || CANDIDATE_STATE_LABELS.missing_or_unmapped));
+      button.append(node('small', `임시 참조 번호 · ${safeRef(row.key)}`, 'sr-only'));
       button.addEventListener('click', () => showDetail(row));
       results.append(button);
     }
@@ -520,6 +626,7 @@
   const comparisonReference = document.getElementById('comparison-reference');
   const comparisonTradition = document.getElementById('comparison-tradition');
   const resetComparison = () => {
+    closeDrawer();
     comparisonGeneration += 1;
     if (comparisonController) comparisonController.abort();
     comparisonController = null; comparisonPassages = [];
@@ -533,6 +640,7 @@
     for (const item of [...new Set(values)].sort()) select.add(new Option(item, item));
   };
   const invalidateComparison = () => {
+    closeDrawer();
     comparisonGeneration += 1;
     if (comparisonController) comparisonController.abort();
     comparisonController = null;
@@ -585,8 +693,7 @@
       comparisonStatus.textContent = cards.length ? `선택한 본문의 연구 후보 ${cards.length}건` : '선택한 본문에 표시할 연구 후보가 없습니다.';
       for (const {raw,row} of cards) {
         const card = node('article', undefined, 'comparison-card');
-        card.append(node('p', readable(row.attribution), 'tag'));
-        card.append(node('h3', value(row.source_title, '문헌명 표시 보류')));
+        card.append(node('p', '원본 기록 · 독립 확인 전', 'tag'));
         const facts = node('dl', undefined, 'facts');
         fact(facts, '문헌 작성자', row.source_creator);
         const candidateSummary = data.summary_projection === 'k2-reviewed-summary' && raw && raw.summary_status === 'recorded_unverified' && typeof raw.summary === 'string' && raw.summary.trim() && raw.summary.length <= 500 && !/[\x00-\x1f\x7f]/.test(raw.summary) ? raw.summary : null;
@@ -604,16 +711,34 @@
         fact(facts, '공동체 참조 역할', row.community_role === 'self' ? '자기 설명' : row.community_role === 'target' ? '외부 비평의 대상' : '미확인');
         fact(facts, '비공개 로컬 표시', row.candidate_field_states && CANDIDATE_STATE_LABELS[row.candidate_field_states.source_title]);
         fact(facts, '공개 · 재배포', '별도 승인 필요');
-        card.append(facts);
+        appendPrimary(card, row, candidateSummary);
+        const actionsPanel = node('div', undefined, 'card-actions');
+        const evidenceButton = node('button', '근거·출처 보기', 'target-button');
+        evidenceButton.type = 'button';
+        evidenceButton.addEventListener('click', () => openDrawer('근거·출처', evidencePanel(row, candidateSummary), evidenceButton));
+        const verificationButton = node('button', '검증 정보 보기', 'target-button');
+        verificationButton.type = 'button';
+        verificationButton.addEventListener('click', () => {
+          // Reuse the complete existing detail view so access observations,
+          // edition rights and technical references remain available.
+          const holder = node('div');
+          showDetail(row, holder);
+          const existing = [...holder.querySelectorAll('button')].find(button => button.textContent === '검증 정보 보기');
+          if (existing) {
+            drawerOpener = verificationButton;
+            existing.click();
+            drawerOpener = verificationButton;
+            drawerContent.append(facts);
+          }
+        });
+        actionsPanel.append(evidenceButton, verificationButton);
         if (safeCoordinate(row.source_key, 'sources') !== '미확인') {
           const source = node('button', '연결 문헌 보기', 'target-button');
           source.type = 'button';
-          source.addEventListener('click', () => {
-            document.getElementById('candidate-view').click();
-            openTarget(row.source_key);
-          });
-          card.append(source);
+          source.addEventListener('click', () => openSourceDrawer(row.source_key, source));
+          actionsPanel.append(source);
         }
+        card.append(actionsPanel);
         comparisonResults.append(card);
       }
     } catch (err) {
@@ -651,7 +776,7 @@
     resetComparison();
     offset = 0;
     sessionDataset = null;
-    creatorFilterLabel.textContent = '연구자 · 발화 주체';
+    creatorFilterLabel.textContent = '문헌 작성자';
     verifiedMetadataProjection = false;
     metadataNameCoverage = null;
     secret = secretInput.value;
@@ -659,7 +784,7 @@
     search();
   });
   document.getElementById('session-close').addEventListener('click', () => {
-    secret = ''; sessionDataset = null; verifiedMetadataProjection = false; metadataNameCoverage = null; creatorFilterLabel.textContent = '연구자 · 발화 주체'; secretInput.value = ''; clear(); resetComparison(); comparisonPanel.hidden = true; candidateLayout.hidden = false; document.getElementById('candidate-view').setAttribute('aria-pressed', 'true'); document.getElementById('comparison-view').setAttribute('aria-pressed', 'false'); connection.textContent = '세션이 닫혔습니다.';
+    secret = ''; sessionDataset = null; verifiedMetadataProjection = false; metadataNameCoverage = null; creatorFilterLabel.textContent = '문헌 작성자'; secretInput.value = ''; clear(); resetComparison(); comparisonPanel.hidden = true; candidateLayout.hidden = false; document.getElementById('candidate-view').setAttribute('aria-pressed', 'true'); document.getElementById('comparison-view').setAttribute('aria-pressed', 'false'); connection.textContent = '세션이 닫혔습니다.';
   });
   form.addEventListener('input', () => { offset = 0; clear(); connection.textContent = secret ? '조건이 변경됐습니다. 후보 검색을 눌러 주세요.' : '세션 비밀을 입력해 주세요.'; });
   form.addEventListener('change', () => { offset = 0; clear(); connection.textContent = secret ? '조건이 변경됐습니다. 후보 검색을 눌러 주세요.' : '세션 비밀을 입력해 주세요.'; });

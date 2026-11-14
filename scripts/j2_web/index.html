@@ -9,22 +9,21 @@
   <script src="/app.js" defer></script>
 </head>
 <body>
-  <header class="topbar"><div><span class="brand">SCRIPTURA</span><span class="division"> / 연구 후보 탐색</span></div><span class="private-badge">이 컴퓨터에서만 · 읽기 전용</span></header>
+  <header class="topbar"><div><span class="brand">SCRIPTURA</span><span class="division"> / 비공개 연구</span></div><nav class="view-switch" aria-label="탐색 화면 선택"><button id="candidate-view" type="button" aria-pressed="true">후보 탐색</button><button id="comparison-view" type="button" aria-pressed="false">본문 비교</button></nav><span class="private-badge">이 컴퓨터에서만 · 읽기 전용</span></header>
   <main>
-    <section class="intro">
-      <p class="eyebrow">PRIVATE RESEARCH PREVIEW</p>
-      <h1>출처와 해석을 <em>차근히 살펴보세요.</em></h1>
-      <p>이 화면은 로컬에서 선택한 자료의 연구 후보를 보여줍니다. 출처 확인, 공식 채택, 논증 평가, 독립 학술 심사와 이용권은 서로 다른 상태입니다.</p>
-      <p class="notice">학술적으로 확정되지 않은 자료입니다. 표시 권리나 출처가 불확실한 원문·자유 텍스트는 가립니다. 결과를 정본이나 공식 교리로 자동 승격하지 않습니다.</p>
-      <p class="notice">이용 제한이 없는 문헌명·저자·발행기관·연도와 역할이 확인된 공동체명은 비공개 로컬 연구 후보로 표시하고 검색할 수 있습니다. 원본 기록은 독립 출처 확인과 다르며, 공개·재배포는 별도 검토가 필요합니다. 제한·미확인 필드는 검색되지 않습니다.</p>
-      <p class="subtle">이전 단계에서는 공동체명·교단명·문헌명·연구자명·발화 주체는 개별 표시 자격 검토 전까지 가려져 있었습니다. 현재는 위의 비공개 로컬 후보 정책을 적용합니다.</p>
-    </section>
+    <details class="research-help">
+      <summary>연구 후보 안내</summary>
+      <p>이 화면은 선택한 로컬 자료의 연구 후보를 보여줍니다. 원본 기록, 출처 확인, 공식 채택, 학술 심사와 이용권은 서로 다른 상태입니다.</p>
+      <p>표시 보류된 원문과 자유 텍스트는 가려집니다. 로컬 후보 표시가 공개·재배포를 허용하거나 정본·공식 교리로 승격하는 것은 아닙니다.</p>
+      <p>문헌 작성자는 개인 또는 기관일 수 있으며, 해석의 발화 주체나 공동체 대표라는 뜻은 아닙니다.</p>
+    </details>
     <section class="session panel" aria-label="비공개 세션">
       <form id="session-form" autocomplete="off"><label>세션 비밀 <input id="session-secret" type="password" autocomplete="off" minlength="20" required placeholder="터미널에서 지정한 세션 비밀"></label><button class="primary" type="submit">세션 열기</button><button id="session-close" type="button">세션 닫기</button></form>
       <p class="subtle">로컬 터미널에서 지정한 세션 비밀을 입력하세요. 브라우저 저장소에는 보관하지 않습니다.</p>
     </section>
     <div id="connection" role="status" class="connection">세션을 열면 선택한 자료를 불러옵니다.</div>
     <p id="visibility-status" class="subtle" aria-live="polite">표시 적격성 정보: 미확인</p>
+    <details class="research-metadata"><summary>자료 범위와 표시 조건</summary>
     <p id="metadata-coverage" class="subtle" aria-live="polite">서지 검색 범위: 미확인</p>
     <details id="candidate-limits" class="panel mapping" hidden><summary>로컬 후보의 필드별 제한 사유 보기</summary><div id="candidate-limits-content"></div></details>
     <details class="panel mapping" aria-label="자료 범위와 미대응">
@@ -32,7 +31,7 @@
       <p class="subtle">입력 건수와 화면에 일부만 대응했거나 아직 대응하지 않은 유형입니다. 이는 이용권 승인이나 정본 수가 아닙니다.</p>
       <div id="mapping-summary"><p class="empty">미확인</p></div>
     </details>
-    <nav class="view-switch" aria-label="탐색 화면 선택"><button id="candidate-view" type="button" aria-pressed="true">후보 탐색</button><button id="comparison-view" type="button" aria-pressed="false">본문 비교</button></nav>
+    </details>
     <section id="comparison-panel" class="panel comparison" aria-label="본문별 해석 비교" hidden>
       <div class="section-heading"><div><p class="eyebrow">PASSAGE / COMPARE</p><h2>본문별 해석 비교</h2></div></div>
       <p class="subtle">같은 코퍼스와 장절 체계의 정확히 같은 주소에 연결된 연구 후보를 나란히 봅니다. 서로 다른 해석이 있다는 사실은 직접 반박의 근거가 아닙니다.</p>
@@ -43,15 +42,14 @@
     </section>
     <section id="candidate-layout" class="layout">
       <aside aria-label="검색 조건" class="panel filters">
-        <div class="section-heading"><div><p class="eyebrow">01 / SEARCH</p><h2>검색 조건</h2></div><span>선택 사항</span></div>
+        <h2 class="sr-only">검색 조건</h2>
         <form id="filters" autocomplete="off">
+          <div class="core-search"><label>통합 검색 <input name="q" type="search" maxlength="200" placeholder="문헌명 · 작성자 · 본문"></label><label>본문 주소 <input name="reference" type="search" maxlength="100" placeholder="책 · 장 · 절"></label><label><span id="creator-filter-label">연구자 · 발화 주체</span> <input name="researcher" type="search" maxlength="200" placeholder="문헌 작성자"></label><div class="actions"><button class="primary" type="submit">후보 검색</button><button type="reset">초기화</button></div></div>
+          <details id="advanced-filters" class="advanced-filters"><summary>고급 검색 조건</summary><div class="advanced-grid">
           <div class="pair"><label>자료 단계 <select name="stage"><option value="">전체</option><option value="base">D-4 기준</option><option value="d5">D-5</option><option value="d6">D-6</option><option value="d7">D-7</option><option value="d8">D-8</option><option value="d9">D-9</option><option value="d10">D-10</option><option value="d11">D-11</option><option value="d12">D-12</option></select></label><label>결과 유형 <select name="record_kind"><option value="">전체</option><option value="claim">해석 주장</option><option value="source">문헌</option></select></label></div>
-          <label>통합 검색 <input name="q" type="search" maxlength="200" placeholder="표시가 허용된 메타데이터"></label>
           <label>종교 · 교단 · 단체 <input name="community" type="search" maxlength="200" placeholder="전통 또는 공동체"></label>
-          <label><span id="creator-filter-label">연구자 · 발화 주체</span> <input name="researcher" type="search" maxlength="200" placeholder="표시 가능한 문헌 작성자 검색"></label>
           <p class="subtle">이 필터는 기록된 문헌 작성자만 검색합니다. 작성자는 개인 또는 기관일 수 있으며, 해석의 발화 주체나 공동체 대표라는 뜻은 아닙니다. 별도 연구자와 발화 주체 이름은 아직 검색에 포함되지 않습니다.</p>
           <div class="pair"><label>본문 코퍼스 <input name="corpus" type="search" maxlength="100" placeholder="코퍼스"></label><label>장절 체계 <input name="scheme" type="search" maxlength="100" placeholder="체계"></label></div>
-          <label>본문 주소 <input name="reference" type="search" maxlength="100" placeholder="책 · 장 · 절"></label>
           <label>문헌 종류 <input name="source_kind" type="search" maxlength="100" placeholder="원본 문헌 유형 코드 (정확히 입력)"></label>
           <label>확인 경로 <input name="access_path" type="search" maxlength="100" placeholder="직접 · 번역 · 전언 등"></label>
           <div class="pair"><label>귀속 <select name="attribution"><option value="">전체</option><option value="community_self_explanation">공동체 자기 설명</option><option value="individual_opinion">개인 의견</option><option value="academic_interpretation">학술 해석</option><option value="external_critique">외부 비평</option><option value="unconfirmed_authority">원본 공식 교리 귀속 · 미확인</option></select></label><label>공식성 상태 <input name="authority_status" type="search" maxlength="100" placeholder="상태"></label></div>
@@ -60,7 +58,7 @@
           <div class="pair"><label>관계 · 반론 종류 <input name="relation_kind" type="search" maxlength="100" placeholder="기록된 관계"></label><label>관계 검증 상태 <input name="relation_status" type="search" maxlength="100" placeholder="상태"></label></div>
           <div class="pair"><label>권리 행위 <select name="rights_action"><option value="">전체</option><option value="browse">열람</option><option value="collect_metadata">메타데이터 수집</option><option value="store_raw">원문 저장</option><option value="store_excerpt">발췌 저장</option><option value="index_fulltext">전문 색인</option><option value="embed">임베딩</option><option value="send_to_model">모델 전송</option><option value="redistribute">재배포</option><option value="public_link">공개 링크</option></select></label><label>권리 결정 · 추가 관찰 <select name="rights_decision"><option value="">전체</option><option value="unknown">미상</option><option value="conditional">조건부</option><option value="allowed">허용 기록</option><option value="prohibited">금지</option></select></label></div>
           <label>기준일 <input name="as_of" type="date"></label>
-          <div class="actions"><button class="primary" type="submit">후보 검색</button><button type="reset">초기화</button></div>
+          </div></details>
         </form>
       </aside>
       <div class="content">
@@ -78,6 +76,7 @@
         </section>
       </div>
     </section>
+    <dialog id="research-drawer" aria-labelledby="drawer-title"><div class="drawer-heading"><h2 id="drawer-title">상세 정보</h2><button id="drawer-close" type="button" aria-label="상세 닫기">닫기</button></div><div id="drawer-content"></div></dialog>
     <footer>비공개 연구 후보 · 원문 표시와 정본 승격은 별도 검토가 필요합니다.</footer>
   </main>
 </body>

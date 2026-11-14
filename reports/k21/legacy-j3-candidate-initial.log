@@ -1,0 +1,100 @@
+✖ D9 후보 상태는 승인 0과 미승인 이름을 분리한다 (3325.42987ms)
+✖ 근거 없는 승인 플래그는 표시 승인으로 나타내지 않는다 (30111.015007ms)
+✖ 명시적 이름 검색 보류와 다른 조건의 0건을 구분한다 (30193.261665ms)
+✔ 다른 데이터셋 응답은 목록이나 상세에 혼합하지 않는다 (237.606031ms)
+✖ D9 후속 관찰을 기존 D8의 원본 권리·검증 상태와 합치지 않는다 (102.806387ms)
+✔ D9의 503은 이전 카드·상세를 지우고 초기화로 복구한다 (260.005687ms)
+✔ 늦은 D9 응답이 최신 D9 검색을 덮지 않는다 (181.993018ms)
+✔ 세션 종료 후 새 D8 세션을 열 수 있고 이전 D9 결과는 없다 (209.949152ms)
+✖ 명시 승인된 표시 예시는 합성 모드에서만 표시한다 (30288.861526ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 4
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 95964.883579
+
+✖ failing tests:
+
+test at tests/ui-j3-candidate.browser.cjs:39:1
+✖ D9 후보 상태는 승인 0과 미승인 이름을 분리한다 (3325.42987ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(await detail.getByText('d9:claims:1',{exact:true}).isVisible())
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:50:9)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/ui-j3-candidate.browser.cjs:60:1
+✖ 근거 없는 승인 플래그는 표시 승인으로 나타내지 않는다 (30111.015007ms)
+  locator.click: Timeout 30000ms exceeded.
+  Call log:
+  [2m  - waiting for getByRole('region', { name: '후보 상세' }).getByText('필드별 표시 적격성 보기', { exact: true })[22m
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:70:55) {
+    name: 'TimeoutError',
+    log: [ "  - waiting for getByRole('region', { name: '후보 상세' }).getByText('필드별 표시 적격성 보기', { exact: true })" ]
+  }
+
+test at tests/ui-j3-candidate.browser.cjs:74:1
+✖ 명시적 이름 검색 보류와 다른 조건의 0건을 구분한다 (30193.261665ms)
+  locator.selectOption: Timeout 30000ms exceeded.
+  Call log:
+  [2m  - waiting for getByLabel('자료 단계')[22m
+  [2m    - locator resolved to <select name="stage">…</select>[22m
+  [2m  - attempting select option action[22m
+  [2m    2 × waiting for element to be visible and enabled[22m
+  [2m      - element is not visible[22m
+  [2m    - retrying select option action[22m
+  [2m    - waiting 20ms[22m
+  [2m    2 × waiting for element to be visible and enabled[22m
+  [2m      - element is not visible[22m
+  [2m    - retrying select option action[22m
+  [2m      - waiting 100ms[22m
+  [2m    60 × waiting for element to be visible and enabled[22m
+  [2m       - element is not visible[22m
+  [2m     - retrying select option action[22m
+  [2m       - waiting 500ms[22m
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:82:79) {
+    name: 'TimeoutError',
+    log: [ "  - waiting for getByLabel('자료 단계')", '    - locator resolved to <select name="stage">…</select>', '  - attempting select option action', '    2 × waiting for element to be visible and enabled', '      - element is not visible', '    - retrying select option action', '    - waiting 20ms', '    2 × waiting for element to be visible and enabled', '      - element is not visible', '    - retrying select option action', '      - waiting 100ms', '    60 × waiting for element to be visible and enabled', '       - element is not visible', '     - retrying select option action', '       - waiting 500ms' ]
+  }
+
+test at tests/ui-j3-candidate.browser.cjs:109:1
+✖ D9 후속 관찰을 기존 D8의 원본 권리·검증 상태와 합치지 않는다 (102.806387ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(await detail.getByText('D-9 후속 관찰 · 원본 상태 변경 없음',{exact:true}).isVisible())
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:119:9)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/ui-j3-candidate.browser.cjs:179:1
+✖ 명시 승인된 표시 예시는 합성 모드에서만 표시한다 (30288.861526ms)
+  locator.click: Timeout 30000ms exceeded.
+  Call log:
+  [2m  - waiting for getByRole('region', { name: '후보 상세' }).getByText('필드별 표시 적격성 보기', { exact: true })[22m
+  
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-j3-candidate.browser.cjs:186:108) {
+    name: 'TimeoutError',
+    log: [ "  - waiting for getByRole('region', { name: '후보 상세' }).getByText('필드별 표시 적격성 보기', { exact: true })" ]
+  }

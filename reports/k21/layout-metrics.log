@@ -1,0 +1,6 @@
+K-2.1 synthetic-only layout comparison, ten candidate rows; Chromium headless.
+Each run uses the same synthetic 10-card fixture; no research archive was used.
+old 1366x768: document_height=2729 results_panel_height=1712 detail_panel_height=1712
+old 1920x1080: document_height=2729 results_panel_height=1712 detail_panel_height=1712
+new 1366x768: document_height=768 results_panel_height=304 detail_panel_height=304
+new 1920x1080: document_height=1080 results_panel_height=616 detail_panel_height=616

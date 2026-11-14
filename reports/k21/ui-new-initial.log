@@ -1,0 +1,30 @@
+✔ 고급 검색은 접혀 있으며 키보드로 열고 닫는다 (1430.603302ms)
+✖ 데스크톱은 목록과 상세가 가로 배치되고 문서 스크롤이 제한된다 (18.574289ms)
+✔ 좁은 화면과 200% 확대에서도 가로 잘림 없이 세로로 전환한다 (60.480146ms)
+✔ 비교 카드의 정보 순서는 주체·해석·논거·출처이며 검증정보는 기본 접힘 (188.515175ms)
+✔ 검증 drawer는 키보드로 닫고 열었던 버튼에 포커스를 돌린다 (55.765449ms)
+✔ 2열 비교 배치, 모바일 단일열 및 XSS 방어 (58.797273ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2406.289345
+
+✖ failing tests:
+
+test at tests/ui-k21-research.browser.cjs:22:1
+✖ 데스크톱은 목록과 상세가 가로 배치되고 문서 스크롤이 제한된다 (18.574289ms)
+  AssertionError [ERR_ASSERTION]: {"size":{"width":1366,"height":768},"document":1009,"viewport":768,"ax":34.140625,"bx":482.734375,"aw":437.40625,"bw":849.125}
+      at TestContext.<anonymous> (/workspace/scriptura/tests/ui-k21-research.browser.cjs:22:522)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
