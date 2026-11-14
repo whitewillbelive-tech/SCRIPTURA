@@ -527,6 +527,6 @@ test_zip_excessive_compression_ratio_is_rejected (test_s1b2_validator.SyntheticV
 test_zip_slip_entry_is_rejected (test_s1b2_validator.SyntheticValidationTests.test_zip_slip_entry_is_rejected) ... ok
 
 ----------------------------------------------------------------------
-Ran 519 tests in 6.557s
+Ran 519 tests in 6.484s
 
 OK

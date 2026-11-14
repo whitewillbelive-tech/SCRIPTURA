@@ -15,6 +15,6 @@ test_symlink_and_excessive_compression_rejected (test_k37_recovery_security.Reco
 test_zip_slip_and_duplicate_names_rejected (test_k37_recovery_security.RecoverySecurityTests.test_zip_slip_and_duplicate_names_rejected) ... ok
 
 ----------------------------------------------------------------------
-Ran 15 tests in 0.021s
+Ran 15 tests in 0.026s
 
 OK

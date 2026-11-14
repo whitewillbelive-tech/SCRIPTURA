@@ -1,0 +1,15 @@
+K2 disclosure exact-match scan (aggregate only)
+archives 14
+jsonl_files 310
+jsonl_rows 28062
+csv_files 1
+snapshots 13
+id_new_match_snapshots 0
+url_new_match_snapshots 0
+selected_text_new_match_snapshots 0
+personal_name_new_match_snapshots 0
+raw_hash_new_match_snapshots 0
+sensitive_file_candidates 0
+non_utf8 0
+limits: selected literal fields only; no excerpts, transformations, OCR or semantics; generic field exceptions as specified
+RESULT PASS

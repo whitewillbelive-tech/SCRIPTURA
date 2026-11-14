@@ -86,9 +86,12 @@ def secure_zip(blob):
     require(0 < len(infos) <= 150 and len({i.filename for i in infos}) == len(infos))
     require(sum(i.file_size for i in infos) <= MAX_UNCOMPRESSED)
     for i in infos:
-        n = i.filename
-        require(not n.startswith('/') and '\\' not in n and not re.match(r'^[A-Za-z]:', n)
-                and not any(part in ('.', '..') for part in n.split('/')))
+        # ZipInfo normalizes platform separators on Windows. Validate the raw
+        # archive name too, before that normalization can hide a backslash.
+        for n in (i.orig_filename, i.filename):
+            require(not any(ord(ch) < 32 or ord(ch) == 127 for ch in n)
+                    and not n.startswith('/') and '\\' not in n and not re.match(r'^[A-Za-z]:', n)
+                    and not any(part in ('.', '..') for part in n.split('/')))
         if i.is_dir():
             continue
         require(not i.flag_bits & 1 and not stat.S_ISLNK(i.external_attr >> 16)

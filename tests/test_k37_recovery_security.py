@@ -110,10 +110,22 @@ class RecoverySecurityTests(unittest.TestCase):
                 compat.validate_checksums(z, [hashlib.sha256(b'synthetic').hexdigest() + '  ../synthetic'], expected_count=1)
 
     def test_zip_slip_and_duplicate_names_rejected(self):
-        for rows in ([('../synthetic', b'x')], [('x', b'a'), ('x', b'b')], [('a\\b', b'x')]):
+        for rows in ([('../synthetic', b'x')], [('x', b'a'), ('x', b'b')]):
             with self.subTest(kind=len(rows)):
                 with self.assertRaises(compat.AuditError):
                     compat.secure_zip(archive(rows))
+        # writestr normalizes backslashes on Windows. Construct the malformed
+        # local and central directory names at the byte level on every OS.
+        blob = archive([('a/b', b'x')])
+        self.assertEqual(blob.count(b'a/b'), 2)
+        malformed = blob.replace(b'a/b', b'a\\b')
+        for separator in ('/', '\\'):
+            with self.subTest(separator=separator), patch.object(zipfile.os, 'sep', separator):
+                with self.assertRaises(compat.AuditError):
+                    compat.secure_zip(malformed)
+        # NUL is also normalized by ZipInfo, so validate the raw member name.
+        with self.assertRaises(compat.AuditError):
+            compat.secure_zip(blob.replace(b'a/b', b'a\x00b'))
 
     def test_symlink_and_excessive_compression_rejected(self):
         out = io.BytesIO()
