@@ -115,8 +115,51 @@ jobs:
         run: python -m unittest discover -s tests -p test_k7_comparison_scaling.py -v
       - name: Verify D12 withheld audit
         run: python -m unittest discover -s tests -p test_k37_d12_withheld_audit.py -v
-      - name: Verify Work receipt security
-        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -v
+      - name: Windows test_private_carriers_do_not_bulk_render_or_json_encode
+        if: ${{ !cancelled() }}
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -k test_private_carriers_do_not_bulk_render_or_json_encode -v
+      - name: Windows test_loader_returns_opaque_rows_for_synthetic_sentinel
+        if: ${{ !cancelled() }}
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -k test_loader_returns_opaque_rows_for_synthetic_sentinel -v
+      - name: Windows test_45_unique_digests_and_required_coverage
+        if: ${{ !cancelled() }}
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -k test_45_unique_digests_and_required_coverage -v
+      - name: Windows test_checksum_mismatch_and_path_escape_rejected
+        if: ${{ !cancelled() }}
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -k test_checksum_mismatch_and_path_escape_rejected -v
+      - name: Windows test_zip_slip_and_duplicate_names_rejected
+        if: ${{ !cancelled() }}
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -k test_zip_slip_and_duplicate_names_rejected -v
+      - name: Windows test_symlink_and_excessive_compression_rejected
+        if: ${{ !cancelled() }}
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -k test_symlink_and_excessive_compression_rejected -v
+      - name: Windows test_remote_paths_and_missing_file_are_not_read
+        if: ${{ !cancelled() }}
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -k test_remote_paths_and_missing_file_are_not_read -v
+      - name: Windows test_changed_file_identity_is_rejected
+        if: ${{ !cancelled() }}
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -k test_changed_file_identity_is_rejected -v
+      - name: Windows test_cross_table_collision_quarantines_both_and_dependants
+        if: ${{ !cancelled() }}
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -k test_cross_table_collision_quarantines_both_and_dependants -v
+      - name: Windows test_cross_source_conflict_quarantines_dependants_only
+        if: ${{ !cancelled() }}
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -k test_cross_source_conflict_quarantines_dependants_only -v
+      - name: Windows test_conflicting_baseline_id_does_not_silently_select_old_record
+        if: ${{ !cancelled() }}
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -k test_conflicting_baseline_id_does_not_silently_select_old_record -v
+      - name: Windows test_malformed_unhashable_reference_is_quarantined
+        if: ${{ !cancelled() }}
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -k test_malformed_unhashable_reference_is_quarantined -v
+      - name: Windows test_audit_entrypoint_uses_manifest_and_quarantine
+        if: ${{ !cancelled() }}
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -k test_audit_entrypoint_uses_manifest_and_quarantine -v
+      - name: Windows test_entrypoint_rejects_wrong_baseline_even_with_correct_zip_anchors
+        if: ${{ !cancelled() }}
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -k test_entrypoint_rejects_wrong_baseline_even_with_correct_zip_anchors -v
+      - name: Windows test_entrypoint_rejects_unchecksummed_extra_record
+        if: ${{ !cancelled() }}
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -k test_entrypoint_rejects_unchecksummed_extra_record -v
 
   postgres:
     name: PostgreSQL migrations and integration
