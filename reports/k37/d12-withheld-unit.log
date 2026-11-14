@@ -1,0 +1,13 @@
+test_cli_accepts_windows_drive_path_and_rejects_unc (test_k37_d12_withheld_audit.WithheldAuditTests.test_cli_accepts_windows_drive_path_and_rejects_unc) ... ok
+test_cli_errors_never_echo_paths_or_exception (test_k37_d12_withheld_audit.WithheldAuditTests.test_cli_errors_never_echo_paths_or_exception) ... ok
+test_cli_produces_only_fixed_aggregate (test_k37_d12_withheld_audit.WithheldAuditTests.test_cli_produces_only_fixed_aggregate) ... ok
+test_displayed_status_comes_only_from_existing_sealed_gate (test_k37_d12_withheld_audit.WithheldAuditTests.test_displayed_status_comes_only_from_existing_sealed_gate) ... ok
+test_invalid_and_duplicate_do_not_leak_values (test_k37_d12_withheld_audit.WithheldAuditTests.test_invalid_and_duplicate_do_not_leak_values) ... ok
+test_missing_projection_is_separately_counted (test_k37_d12_withheld_audit.WithheldAuditTests.test_missing_projection_is_separately_counted) ... ok
+test_overlapping_reasons_and_per_card_explanation (test_k37_d12_withheld_audit.WithheldAuditTests.test_overlapping_reasons_and_per_card_explanation) ... ok
+test_untrusted_keys_are_not_accepted (test_k37_d12_withheld_audit.WithheldAuditTests.test_untrusted_keys_are_not_accepted) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.003s
+
+OK

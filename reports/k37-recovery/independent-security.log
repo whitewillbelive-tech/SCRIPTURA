@@ -1,0 +1,20 @@
+test_45_unique_digests_and_required_coverage (test_k37_recovery_security.RecoverySecurityTests.test_45_unique_digests_and_required_coverage) ... ok
+test_audit_entrypoint_uses_manifest_and_quarantine (test_k37_recovery_security.RecoverySecurityTests.test_audit_entrypoint_uses_manifest_and_quarantine) ... ok
+test_changed_file_identity_is_rejected (test_k37_recovery_security.RecoverySecurityTests.test_changed_file_identity_is_rejected) ... ok
+test_checksum_mismatch_and_path_escape_rejected (test_k37_recovery_security.RecoverySecurityTests.test_checksum_mismatch_and_path_escape_rejected) ... ok
+test_conflicting_baseline_id_does_not_silently_select_old_record (test_k37_recovery_security.RecoverySecurityTests.test_conflicting_baseline_id_does_not_silently_select_old_record) ... ok
+test_cross_source_conflict_quarantines_dependants_only (test_k37_recovery_security.RecoverySecurityTests.test_cross_source_conflict_quarantines_dependants_only) ... ok
+test_cross_table_collision_quarantines_both_and_dependants (test_k37_recovery_security.RecoverySecurityTests.test_cross_table_collision_quarantines_both_and_dependants) ... ok
+test_entrypoint_rejects_unchecksummed_extra_record (test_k37_recovery_security.RecoverySecurityTests.test_entrypoint_rejects_unchecksummed_extra_record) ... ok
+test_entrypoint_rejects_wrong_baseline_even_with_correct_zip_anchors (test_k37_recovery_security.RecoverySecurityTests.test_entrypoint_rejects_wrong_baseline_even_with_correct_zip_anchors) ... ok
+test_loader_returns_opaque_rows_for_synthetic_sentinel (test_k37_recovery_security.RecoverySecurityTests.test_loader_returns_opaque_rows_for_synthetic_sentinel) ... ok
+test_malformed_unhashable_reference_is_quarantined (test_k37_recovery_security.RecoverySecurityTests.test_malformed_unhashable_reference_is_quarantined) ... ok
+test_private_carriers_do_not_bulk_render_or_json_encode (test_k37_recovery_security.RecoverySecurityTests.test_private_carriers_do_not_bulk_render_or_json_encode) ... ok
+test_remote_paths_and_missing_file_are_not_read (test_k37_recovery_security.RecoverySecurityTests.test_remote_paths_and_missing_file_are_not_read) ... ok
+test_symlink_and_excessive_compression_rejected (test_k37_recovery_security.RecoverySecurityTests.test_symlink_and_excessive_compression_rejected) ... ok
+test_zip_slip_and_duplicate_names_rejected (test_k37_recovery_security.RecoverySecurityTests.test_zip_slip_and_duplicate_names_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.021s
+
+OK

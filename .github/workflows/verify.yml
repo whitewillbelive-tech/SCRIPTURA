@@ -109,7 +109,9 @@ jobs:
             'test_k13_candidate_api.py',
             'test_k2_comparison_api.py',
             'test_k21_api.py',
-            'test_k7_comparison_scaling.py'
+            'test_k7_comparison_scaling.py',
+            'test_k37_d12_withheld_audit.py',
+            'test_k37_recovery_security.py'
           )
           foreach ($pattern in $patterns) {
             python -m unittest discover -s tests -p $pattern -v
