@@ -99,24 +99,24 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify local launcher, ZIP safety and comparison policies
-        shell: pwsh
-        run: |
-          $patterns = @(
-            'test_j3_windows_launcher.py',
-            'test_s1b2_validator.py',
-            'test_k13_local_candidate.py',
-            'test_k13_candidate_api.py',
-            'test_k2_comparison_api.py',
-            'test_k21_api.py',
-            'test_k7_comparison_scaling.py',
-            'test_k37_d12_withheld_audit.py',
-            'test_k37_recovery_security.py'
-          )
-          foreach ($pattern in $patterns) {
-            python -m unittest discover -s tests -p $pattern -v
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          }
+      - name: Verify Windows launcher
+        run: python -m unittest discover -s tests -p test_j3_windows_launcher.py -v
+      - name: Verify staging ZIP validation
+        run: python -m unittest discover -s tests -p test_s1b2_validator.py -v
+      - name: Verify local candidate policy
+        run: python -m unittest discover -s tests -p test_k13_local_candidate.py -v
+      - name: Verify local candidate API
+        run: python -m unittest discover -s tests -p test_k13_candidate_api.py -v
+      - name: Verify passage comparison API
+        run: python -m unittest discover -s tests -p test_k2_comparison_api.py -v
+      - name: Verify research UI API
+        run: python -m unittest discover -s tests -p test_k21_api.py -v
+      - name: Verify comparison scaling
+        run: python -m unittest discover -s tests -p test_k7_comparison_scaling.py -v
+      - name: Verify D12 withheld audit
+        run: python -m unittest discover -s tests -p test_k37_d12_withheld_audit.py -v
+      - name: Verify Work receipt security
+        run: python -m unittest discover -s tests -p test_k37_recovery_security.py -v
 
   postgres:
     name: PostgreSQL migrations and integration
