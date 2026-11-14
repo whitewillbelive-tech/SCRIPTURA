@@ -43,6 +43,8 @@ jobs:
         run: |
           python3 scripts/benchmark_i1.py --records 10000
           python3 scripts/benchmark_i1.py --records 100000
+      - name: Benchmark synthetic passage comparison at scale
+        run: python3 scripts/benchmark_k7_comparison.py --records 100000
       - name: Test demo API and audit
         run: npm test
       - name: Build
@@ -83,6 +85,36 @@ jobs:
           node tests/ui-k2-comparison.browser.cjs
           # K-2.1 research layout and accessibility use synthetic records only.
           node --test tests/ui-k21-research.browser.cjs
+          # K-6 comparison selection and research status use synthetic records only.
+          node --test tests/ui-k6-selection.browser.cjs
+
+  windows-synthetic:
+    name: Windows synthetic launcher and security
+    runs-on: windows-2022
+    timeout-minutes: 15
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify local launcher, ZIP safety and comparison policies
+        shell: pwsh
+        run: |
+          $patterns = @(
+            'test_j3_windows_launcher.py',
+            'test_s1b2_validator.py',
+            'test_k13_local_candidate.py',
+            'test_k13_candidate_api.py',
+            'test_k2_comparison_api.py',
+            'test_k21_api.py',
+            'test_k7_comparison_scaling.py'
+          )
+          foreach ($pattern in $patterns) {
+            python -m unittest discover -s tests -p $pattern -v
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
 
   postgres:
     name: PostgreSQL migrations and integration

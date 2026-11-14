@@ -395,15 +395,19 @@ def attach_local_public_snapshot(dataset, snapshot_id, path, *, today=None):
         raise ValueError('public_snapshot_untrusted') from None
 
 
-def filter_records(dataset, params):
+def filter_records(dataset, params, *, _internal_all=False):
     """Search the pre-redacted projection only; unknown temporal scope stays pending."""
     if not isinstance(dataset, dict) or dataset.get('dataset') not in ALLOWED_DATASETS or not isinstance(dataset.get('records'), list):
         raise ValueError('invalid dataset')
-    allowed = set(FILTERS) | {'q', 'as_of', 'offset', 'key', 'evidence_kind', 'evidence_status', 'relation_kind', 'relation_status', 'relation_direction', 'rights_action', 'rights_decision'}
+    allowed = set(FILTERS) | {'q', 'as_of', 'offset', 'key', 'source_key', 'evidence_kind', 'evidence_status', 'relation_kind', 'relation_status', 'relation_direction', 'rights_action', 'rights_decision'}
     if set(params) - allowed or any(len(v) != 1 for v in params.values()):
         raise ValueError('invalid query')
     q = {k: v[0].strip() for k, v in params.items()}
     if any(len(value) > MAX_QUERY_LENGTH for value in q.values()):
+        raise ValueError('invalid query')
+    source_key = q.get('source_key', '')
+    mode = dataset.get('dataset')
+    if source_key and not re.fullmatch(_stage_pattern(mode, research=mode in RESEARCH_DATASETS) + r':sources:[1-9][0-9]*', source_key):
         raise ValueError('invalid query')
     if q.get('rights_action') and q['rights_action'] not in RIGHTS_ACTIONS or q.get('rights_decision') and q['rights_decision'] not in RIGHTS_DECISIONS:
         raise ValueError('invalid query')
@@ -418,7 +422,6 @@ def filter_records(dataset, params):
         raise ValueError('invalid query') from None
     search = q.get('q', '').casefold()
     found = []
-    mode = dataset.get('dataset')
     # This object can only be supplied by trusted in-process verification code;
     # JSON records and recorded status flags are never treated as grants.
     metadata_index = dataset.get('_verified_metadata_index')
@@ -485,6 +488,10 @@ def filter_records(dataset, params):
             if field in metadata_coverage:
                 metadata_coverage[field] += 1
         if q.get('key') and row.get('key') != q['key']:
+            continue
+        # Exact match only after the normal safety projection; raw source IDs
+        # and malformed or cross-version coordinates never enter the filter.
+        if source_key and row.get('source_key') != source_key:
             continue
         if search and not (any(search in _text(row.get(key)) for key in SEARCH_FIELDS) or any(search in _text(value) for value in available.values()) or any(search in _text(p.get(field)) for p in row.get('passages', []) for field in ('corpus', 'scheme', 'reference'))):
             continue
@@ -557,7 +564,8 @@ def filter_records(dataset, params):
             'visibility_summary': _safe_visibility(dataset.get('visibility_summary'), dataset=mode),
             'd10_receipt': _safe_d10_receipt(dataset.get('d10_receipt'), dataset=mode),
             'unmapped_summary': _safe_unmapped(dataset.get('unmapped_summary'), dataset=mode),
-            'total': len(found), 'offset': offset, 'page_size': PAGE_SIZE, 'records': found[offset:offset + PAGE_SIZE]}
+            'total': len(found), 'offset': offset, 'page_size': PAGE_SIZE,
+            'records': found if _internal_all else found[offset:offset + PAGE_SIZE]}
 
 
 def compare_passages(dataset, params):
@@ -582,17 +590,12 @@ def compare_passages(dataset, params):
     lookup = {'record_kind': ['claim']}
     if stage:
         lookup['stage'] = [stage]
-    rows = []
-    offset = 0
-    while True:
-        result = filter_records(dataset, {**lookup, 'offset': [str(offset)]})
-        batch = result['records']
-        rows.extend(batch)
-        offset += len(batch)
-        if not batch or offset >= result['total']:
-            break
-        if offset > 100000:
-            raise ValueError('invalid query')
+    # This internal-only path projects each input record once. Repeatedly
+    # requesting pages here rescans the complete dataset for every page,
+    # making large passage comparisons quadratic in the number of records.
+    # HTTP candidate requests still receive ordinary bounded pagination.
+    result = filter_records(dataset, lookup, _internal_all=True)
+    rows = result['records']
     groups = {}
     traditions = {}
     for row in rows:

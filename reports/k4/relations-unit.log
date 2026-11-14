@@ -1,0 +1,21 @@
+test_affiliation_date_order_and_locator (test_k4_relations.RelationTests.test_affiliation_date_order_and_locator) ... ok
+test_critique_subject_does_not_become_speaker (test_k4_relations.RelationTests.test_critique_subject_does_not_become_speaker) ... ok
+test_disagreeing_community_targets_are_pending (test_k4_relations.RelationTests.test_disagreeing_community_targets_are_pending) ... ok
+test_errors_and_repr_never_print_sensitive_identifiers (test_k4_relations.RelationTests.test_errors_and_repr_never_print_sensitive_identifiers) ... ok
+test_explicit_speaker_is_recorded_with_citation_not_verified (test_k4_relations.RelationTests.test_explicit_speaker_is_recorded_with_citation_not_verified) ... ok
+test_malformed_kind_and_role_are_unmapped_not_crash (test_k4_relations.RelationTests.test_malformed_kind_and_role_are_unmapped_not_crash) ... ok
+test_mismatched_role_does_not_become_self_explanation (test_k4_relations.RelationTests.test_mismatched_role_does_not_become_self_explanation) ... ok
+test_missing_or_conflicting_citation_blocks_relationship (test_k4_relations.RelationTests.test_missing_or_conflicting_citation_blocks_relationship) ... ok
+test_official_source_claim_never_automatically_promotes (test_k4_relations.RelationTests.test_official_source_claim_never_automatically_promotes) ... ok
+test_partial_dates_preserve_precision_and_reject_impossible_order (test_k4_relations.RelationTests.test_partial_dates_preserve_precision_and_reject_impossible_order) ... ok
+test_returned_affiliation_cannot_mutate_index (test_k4_relations.RelationTests.test_returned_affiliation_cannot_mutate_index) ... ok
+test_same_target_cannot_be_reinterpreted_as_reported_self (test_k4_relations.RelationTests.test_same_target_cannot_be_reinterpreted_as_reported_self) ... ok
+test_self_explanation_is_recorded_not_official_or_peer_reviewed (test_k4_relations.RelationTests.test_self_explanation_is_recorded_not_official_or_peer_reviewed) ... ok
+test_source_reference_alone_cannot_infer_affiliation (test_k4_relations.RelationTests.test_source_reference_alone_cannot_infer_affiliation) ... ok
+test_unknown_status_is_not_untrusted_text (test_k4_relations.RelationTests.test_unknown_status_is_not_untrusted_text) ... ok
+test_writer_is_not_claim_speaker (test_k4_relations.RelationTests.test_writer_is_not_claim_speaker) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.002s
+
+OK

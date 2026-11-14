@@ -13,6 +13,7 @@
   const prev = document.getElementById('prev-page');
   const next = document.getElementById('next-page');
   const pageStatus = document.getElementById('page-status');
+  const pageSort = document.getElementById('page-sort');
   const mappingSummary = document.getElementById('mapping-summary');
   const visibilityStatus = document.getElementById('visibility-status');
   const metadataCoverage = document.getElementById('metadata-coverage');
@@ -427,8 +428,63 @@
       sourceButton.addEventListener('click', () => openTarget(selected.source_key));
       actionsPanel.append(sourceButton);
     }
+    if (selected.record_kind === 'source' && safeCoordinate(selected.key, 'sources') !== '미확인') {
+      const relatedButton = node('button', '이 문헌의 관련 해석 보기', 'target-button');
+      relatedButton.type = 'button';
+      relatedButton.addEventListener('click', () => openRelatedClaims(selected.key, relatedButton));
+      actionsPanel.append(relatedButton);
+    }
     primary.append(actionsPanel);
     destination.replaceChildren(primary);
+  };
+  // Reverse navigation uses only an opaque coordinate and the server's safe
+  // projection. It stays in the drawer so the original search position and
+  // filters are not lost. Exact source identity is checked again on receipt.
+  const openRelatedClaims = async (key, opener, offset = 0) => {
+    if (safeCoordinate(key, 'sources') === '미확인') return;
+    const current = ++drawerGeneration;
+    const holder = node('div');
+    holder.append(node('p', '관련 해석을 불러오는 중입니다.'));
+    openDrawer('이 문헌의 관련 해석', holder, opener);
+    try {
+      const query = new URLSearchParams({source_key:key, record_kind:'claim', offset:String(offset)});
+      const response = await fetch(`/api/candidates?${query}`, {cache:'no-store',headers:{Authorization:`Bearer ${secret}`}});
+      if (!drawer.open || current !== drawerGeneration) return;
+      if (!response.ok) throw new Error('unavailable');
+      const data = await response.json();
+      if (!drawer.open || current !== drawerGeneration) return;
+      if (!data || data.dataset !== sessionDataset || !Array.isArray(data.records)) throw new Error('unavailable');
+      const linked = data.records.map(row => safeRow(row, data.dataset, data.metadata_projection, data.summary_projection))
+        .filter(row => row && row.record_kind === 'claim' && row.source_key === key);
+      const total = Number.isSafeInteger(data.total) && data.total >= 0 ? data.total : linked.length;
+      const pageSize = Number.isSafeInteger(data.page_size) && data.page_size > 0 ? data.page_size : 100;
+      holder.replaceChildren(node('p', `관련 해석 ${total}건 · 출처 연결 기준`, 'subtle'));
+      if (!linked.length) holder.append(node('p', '연결된 해석 또는 표시 가능한 본문이 없습니다.', 'empty'));
+      const list = node('ul');
+      for (const row of linked) {
+        const item = node('li');
+        const passage = Array.isArray(row.passages) ? row.passages.find(p => p && ['corpus','scheme','reference'].every(k => typeof p[k] === 'string' && p[k].trim())) : null;
+        item.append(node('p', passage ? `${passage.corpus} · ${passage.scheme} · ${passage.reference}` : '본문 연결 미확인'));
+        const inspect = node('button', '해석 상세 보기', 'target-button'); inspect.type = 'button';
+        inspect.addEventListener('click', () => showDetail(row, holder)); item.append(inspect);
+        if (passage) {
+          const compare = node('button', '이 본문 비교하기', 'target-button'); compare.type = 'button';
+          compare.addEventListener('click', () => openComparisonAt(passage)); item.append(compare);
+        }
+        list.append(item);
+      }
+      if (linked.length) holder.append(list);
+      if (offset > 0 || offset + pageSize < total) {
+        const nav = node('nav'); nav.setAttribute('aria-label', '관련 해석 페이지');
+        const previous = node('button', '이전'); previous.type = 'button'; previous.disabled = offset <= 0;
+        previous.addEventListener('click', () => openRelatedClaims(key, opener, Math.max(0, offset - pageSize)));
+        const nextPage = node('button', '다음'); nextPage.type = 'button'; nextPage.disabled = offset + pageSize >= total;
+        nextPage.addEventListener('click', () => openRelatedClaims(key, opener, offset + pageSize));
+        nav.append(previous, nextPage); holder.append(nav);
+      }
+    } catch (_) {
+      if (drawer.open && current === drawerGeneration) holder.replaceChildren(node('p', '관련 해석을 불러오지 못했습니다.', 'error'));
+    }
   };
   // The comparison remains in place while its linked source is read.
   const openSourceDrawer = async (key, opener) => {
@@ -491,6 +547,38 @@
     const list = node('ul'); for (const entry of entries) list.append(node('li', entry));
     mappingSummary.replaceChildren(list);
   };
+  const renderCards = () => {
+    const selectedKey = results.querySelector('.candidate[aria-pressed="true"]')?.dataset.key;
+    results.replaceChildren();
+    const ordered = [...rows];
+    const field = pageSort.value === 'title' ? 'source_title' : pageSort.value === 'creator' ? 'source_creator' : null;
+    if (field) ordered.sort((a, b) => {
+      const left = typeof a[field] === 'string' ? a[field].trim() : '';
+      const right = typeof b[field] === 'string' ? b[field].trim() : '';
+      if (!left || !right) return left ? -1 : right ? 1 : 0;
+      return left.localeCompare(right, 'ko', {sensitivity:'base', numeric:true});
+    });
+    for (const row of ordered) {
+      if (!row || typeof row !== 'object') continue;
+      const button = node('button', undefined, 'candidate');
+      button.type = 'button'; if (safeRef(row.key) !== '미확인') button.dataset.key = safeRef(row.key); button.setAttribute('aria-pressed', String(Boolean(selectedKey && selectedKey === button.dataset.key)));
+      if (row.record_kind === 'claim') {
+        const actor = null; // claim-to-speaker verification is not available
+        button.append(node('strong', value(actor, '해석 주체 미확인')));
+        if (!actor) button.append(node('small', `문헌 작성자 · ${value(row.source_creator, '미확인')}`));
+        button.append(node('span', value(row.summary, '해석 요지 표시 보류'), 'candidate-summary'));
+        button.append(node('small', `출처 · ${value(row.source_title, '서지 제목 표시 보류')}`));
+      } else {
+        button.append(node('strong', value(row.source_title, '서지 제목 표시 보류')));
+        button.append(node('small', `문헌 작성자 · ${value(row.source_creator, '미확인')}`));
+      }
+      if (row.candidate_field_states) button.append(node('small', CANDIDATE_STATE_LABELS[row.candidate_field_states.source_title] || CANDIDATE_STATE_LABELS.missing_or_unmapped));
+      button.append(node('small', `임시 참조 번호 · ${safeRef(row.key)}`, 'sr-only'));
+      button.addEventListener('click', () => showDetail(row));
+      results.append(button);
+    }
+  };
+  pageSort.addEventListener('change', renderCards);
   const render = data => {
     // A document creator can be an institution and is not a claim's speaker.
     creatorFilterLabel.textContent = '문헌 작성자';
@@ -546,25 +634,7 @@
     pageStatus.textContent = total ? `${offset + 1}–${offset + rows.length} / ${total}` : '';
     connection.textContent = data.dataset === 'synthetic' ? '합성 시험 자료 / 실제 연구 데이터 아님.' : `${data.dataset === 'D12' ? 'D-12' : data.dataset === 'D10' ? 'D-10' : data.dataset === 'D9' ? 'D-9' : 'D-8'} 연구 후보 · 선택한 로컬 자료에서 조회했습니다. 모든 결과는 연구 후보입니다.`;
     empty.hidden = rows.length > 0;
-    for (const row of rows) {
-      if (!row || typeof row !== 'object') continue;
-      const button = node('button', undefined, 'candidate');
-      button.type = 'button'; if (safeRef(row.key) !== '미확인') button.dataset.key = safeRef(row.key); button.setAttribute('aria-pressed', 'false');
-      if (row.record_kind === 'claim') {
-        const actor = null; // claim-to-speaker verification is not available
-        button.append(node('strong', value(actor, '해석 주체 미확인')));
-        if (!actor) button.append(node('small', `문헌 작성자 · ${value(row.source_creator, '미확인')}`));
-        button.append(node('span', value(row.summary, '해석 요지 표시 보류'), 'candidate-summary'));
-        button.append(node('small', `출처 · ${value(row.source_title, '서지 제목 표시 보류')}`));
-      } else {
-        button.append(node('strong', value(row.source_title, '서지 제목 표시 보류')));
-        button.append(node('small', `문헌 작성자 · ${value(row.source_creator, '미확인')}`));
-      }
-      if (row.candidate_field_states) button.append(node('small', CANDIDATE_STATE_LABELS[row.candidate_field_states.source_title] || CANDIDATE_STATE_LABELS.missing_or_unmapped));
-      button.append(node('small', `임시 참조 번호 · ${safeRef(row.key)}`, 'sr-only'));
-      button.addEventListener('click', () => showDetail(row));
-      results.append(button);
-    }
+    renderCards();
 
   };
   const search = async () => {
@@ -625,12 +695,44 @@
   const comparisonScheme = document.getElementById('comparison-scheme');
   const comparisonReference = document.getElementById('comparison-reference');
   const comparisonTradition = document.getElementById('comparison-tradition');
+  const selectionTools = document.getElementById('comparison-selection');
+  const selectionStatus = document.getElementById('comparison-selection-status');
+  const selectedOnly = document.getElementById('comparison-selected-only');
+  const clearSelectionButton = document.getElementById('comparison-clear-selection');
+  let selectedClaims = new Set();
+  let selectionCards = [];
+  let selectionOnly = false;
+  const refreshSelection = () => {
+    const size = selectedClaims.size;
+    selectionStatus.textContent = `비교할 해석 ${size}개 선택 · 2~3개 선택`;
+    selectedOnly.disabled = size < 2;
+    clearSelectionButton.disabled = size === 0;
+    selectedOnly.setAttribute('aria-pressed', String(selectionOnly));
+    selectedOnly.textContent = selectionOnly ? '전체 해석 보기' : '선택한 해석만 보기';
+    for (const item of selectionCards) {
+      item.checkbox.checked = selectedClaims.has(item.key);
+      item.checkbox.disabled = !item.checkbox.checked && size >= 3;
+      item.card.hidden = selectionOnly && !item.checkbox.checked;
+    }
+  };
+  const clearComparisonSelection = () => {
+    selectedClaims = new Set(); selectionCards = []; selectionOnly = false;
+    selectionTools.hidden = true; refreshSelection();
+  };
+  selectedOnly.addEventListener('click', () => {
+    if (selectedClaims.size < 2) return;
+    selectionOnly = !selectionOnly; refreshSelection();
+  });
+  clearSelectionButton.addEventListener('click', () => {
+    selectedClaims.clear(); selectionOnly = false; refreshSelection();
+  });
   const resetComparison = () => {
     closeDrawer();
     comparisonGeneration += 1;
     if (comparisonController) comparisonController.abort();
     comparisonController = null; comparisonPassages = [];
     comparisonResults.replaceChildren();
+    clearComparisonSelection();
     for (const select of [comparisonCorpus, comparisonScheme, comparisonReference]) select.replaceChildren(new Option('선택', ''));
     comparisonTradition.replaceChildren(new Option('전체', ''));
     comparisonStatus.textContent = '세션을 열고 본문 비교를 선택하세요.';
@@ -645,6 +747,7 @@
     if (comparisonController) comparisonController.abort();
     comparisonController = null;
     comparisonResults.replaceChildren();
+    clearComparisonSelection();
     comparisonStatus.textContent = '본문을 선택하고 해석 비교를 눌러 주세요.';
   };
   const refreshSchemes = () => {
@@ -664,6 +767,7 @@
     if (comparisonController) comparisonController.abort();
     comparisonController = new AbortController();
     comparisonResults.replaceChildren();
+    clearComparisonSelection();
     if (!secret || !sessionDataset) { comparisonStatus.textContent = '먼저 비공개 세션을 열어 주세요.'; return; }
     comparisonStatus.textContent = '본문 후보를 불러오는 중입니다.';
     try {
@@ -685,14 +789,33 @@
           const labels = data.traditions.filter(t => t && typeof t.value === 'string' && t.value.trim() && t.value.length <= 200 && !/[\x00-\x1f\x7f]/.test(t.value) && Number.isSafeInteger(t.claim_count) && t.claim_count > 0).map(t => t.value);
           for (const label of [...new Set(labels)].sort()) comparisonTradition.add(new Option(label, label));
         }
-        comparisonStatus.textContent = comparisonPassages.length ? `본문 주소 ${comparisonPassages.length}개 · 코퍼스와 장절 체계를 선택하세요.` : '비교할 본문 후보가 없습니다.';
+        const multiple = comparisonPassages.filter(p => p.claim_count >= 2).length;
+        const links = comparisonPassages.reduce((sum, p) => sum + p.claim_count, 0);
+        comparisonStatus.textContent = comparisonPassages.length
+          ? `본문 주소 ${comparisonPassages.length}개 · 복수 해석 주소 ${multiple}개 · 본문 연결 ${Number.isSafeInteger(links) ? links : '미확인'}건 · 코퍼스와 장절 체계를 선택하세요.`
+          : '비교할 본문 후보가 없습니다.';
         return;
       }
       if (!data.selected || ['corpus','scheme','reference'].some(k => data.selected[k] !== query[k])) throw new Error('unexpected');
       const cards = data.claims.map(raw => ({raw, row:safeRow(raw, data.dataset, data.metadata_projection)})).filter(item => item.row && item.row.record_kind === 'claim');
       comparisonStatus.textContent = cards.length ? `선택한 본문의 연구 후보 ${cards.length}건` : '선택한 본문에 표시할 연구 후보가 없습니다.';
+      selectionTools.hidden = cards.length < 2;
       for (const {raw,row} of cards) {
         const card = node('article', undefined, 'comparison-card');
+        const selectionKey = safeRef(row.key);
+        if (cards.length >= 2 && selectionKey !== '미확인') {
+          const choice = node('label', undefined, 'comparison-choice');
+          const checkbox = document.createElement('input'); checkbox.type = 'checkbox';
+          choice.append(checkbox, node('span', '이 해석을 비교 대상으로 선택'));
+          checkbox.addEventListener('change', () => {
+            if (checkbox.checked && selectedClaims.size < 3) selectedClaims.add(selectionKey);
+            else selectedClaims.delete(selectionKey);
+            if (selectedClaims.size < 2) selectionOnly = false;
+            refreshSelection();
+          });
+          selectionCards.push({key:selectionKey, card, checkbox});
+          card.append(choice);
+        }
         card.append(node('p', '원본 기록 · 독립 확인 전', 'tag'));
         const facts = node('dl', undefined, 'facts');
         fact(facts, '문헌 작성자', row.source_creator);
@@ -741,17 +864,41 @@
         card.append(actionsPanel);
         comparisonResults.append(card);
       }
+      refreshSelection();
     } catch (err) {
       if (current !== comparisonGeneration || err.name === 'AbortError') return;
       comparisonStatus.textContent = '본문 비교를 불러오지 못했습니다. 로컬 서버와 자료를 확인해 주세요.';
     }
   };
-  document.getElementById('comparison-view').addEventListener('click', () => {
+  const openComparisonAt = async passage => {
+    // Do not infer equivalence between corpora or numbering systems: select
+    // only the exact triple returned by the authenticated candidate API.
+    if (!passage || !['corpus','scheme','reference'].every(k => typeof passage[k] === 'string' && passage[k].trim())) return;
+    closeDrawer();
     candidateLayout.hidden = true; comparisonPanel.hidden = false;
     document.getElementById('candidate-view').setAttribute('aria-pressed', 'false');
     document.getElementById('comparison-view').setAttribute('aria-pressed', 'true');
-    comparisonStage.value = sessionDataset === 'D12' ? 'd12' : '';
-    fetchComparison();
+    comparisonStage.value = '';
+    await fetchComparison();
+    if (!comparisonPassages.some(p => p.corpus === passage.corpus && p.scheme === passage.scheme && p.reference === passage.reference)) {
+      comparisonStatus.textContent = '같은 코퍼스와 장절 체계의 본문을 확인할 수 없습니다.';
+      return;
+    }
+    comparisonCorpus.value = passage.corpus; refreshSchemes();
+    comparisonScheme.value = passage.scheme; refreshReferences();
+    comparisonReference.value = passage.reference;
+    await fetchComparison({corpus:passage.corpus, scheme:passage.scheme, reference:passage.reference});
+    comparisonCorpus.focus();
+  };
+  document.getElementById('comparison-view').addEventListener('click', () => {
+    const returning = comparisonPanel.hidden;
+    candidateLayout.hidden = true; comparisonPanel.hidden = false;
+    document.getElementById('candidate-view').setAttribute('aria-pressed', 'false');
+    document.getElementById('comparison-view').setAttribute('aria-pressed', 'true');
+    if (!returning || !comparisonPassages.length) {
+      comparisonStage.value = sessionDataset === 'D12' ? 'd12' : '';
+      fetchComparison();
+    }
   });
   document.getElementById('candidate-view').addEventListener('click', () => {
     comparisonGeneration += 1; if (comparisonController) comparisonController.abort();

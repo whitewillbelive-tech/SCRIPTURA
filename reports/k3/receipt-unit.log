@@ -1,0 +1,21 @@
+test_authenticated_increment_and_future_version (test_k3_receipt.GenericReceiptTests.test_authenticated_increment_and_future_version) ... ok
+test_baseline_cross_row_semantics_are_explicitly_pending (test_k3_receipt.GenericReceiptTests.test_baseline_cross_row_semantics_are_explicitly_pending) ... ok
+test_bibliographic_duplicate_candidates_are_not_id_conflicts_or_merges (test_k3_receipt.GenericReceiptTests.test_bibliographic_duplicate_candidates_are_not_id_conflicts_or_merges) ... ok
+test_caller_provided_independent_trust_anchors_required (test_k3_receipt.GenericReceiptTests.test_caller_provided_independent_trust_anchors_required) ... ok
+test_collision_with_baseline_never_deletes_baseline (test_k3_receipt.GenericReceiptTests.test_collision_with_baseline_never_deletes_baseline) ... ok
+test_duplicate_new_ids_quarantines_dependents_and_keeps_baseline (test_k3_receipt.GenericReceiptTests.test_duplicate_new_ids_quarantines_dependents_and_keeps_baseline) ... ok
+test_evidence_may_cite_different_valid_source (test_k3_receipt.GenericReceiptTests.test_evidence_may_cite_different_valid_source) ... ok
+test_large_increment_accepts_unique_rows_without_quadratic_scan (test_k3_receipt.GenericReceiptTests.test_large_increment_accepts_unique_rows_without_quadratic_scan) ... ok
+test_limits_and_opaque_repr_and_defensive_copy (test_k3_receipt.GenericReceiptTests.test_limits_and_opaque_repr_and_defensive_copy) ... ok
+test_malformed_version_schema_and_zip_rejected_without_data (test_k3_receipt.GenericReceiptTests.test_malformed_version_schema_and_zip_rejected_without_data) ... ok
+test_relation_endpoint_dialects_and_ambiguous_mapping (test_k3_receipt.GenericReceiptTests.test_relation_endpoint_dialects_and_ambiguous_mapping) ... ok
+test_semantic_edition_source_mismatch_quarantined (test_k3_receipt.GenericReceiptTests.test_semantic_edition_source_mismatch_quarantined) ... ok
+test_traversal_and_unlisted_members_rejected (test_k3_receipt.GenericReceiptTests.test_traversal_and_unlisted_members_rejected) ... ok
+test_unknown_corpus_and_malformed_rights_quarantined_separately (test_k3_receipt.GenericReceiptTests.test_unknown_corpus_and_malformed_rights_quarantined_separately) ... ok
+test_unknown_reference_and_wrong_type_are_quarantined (test_k3_receipt.GenericReceiptTests.test_unknown_reference_and_wrong_type_are_quarantined) ... ok
+test_version_progression_against_independent_trusted_baseline (test_k3_receipt.GenericReceiptTests.test_version_progression_against_independent_trusted_baseline) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 1.737s
+
+OK

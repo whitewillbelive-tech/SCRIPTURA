@@ -1,0 +1,15 @@
+✖ tests/ui-k6-selection.browser.cjs (15493.461711ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15500.614506
+
+✖ failing tests:
+
+test at tests/ui-k6-selection.browser.cjs:1:1
+✖ tests/ui-k6-selection.browser.cjs (15493.461711ms)
+  'test failed'

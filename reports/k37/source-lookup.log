@@ -1,0 +1,8 @@
+test_exact_source_lookup_uses_only_safe_projection (test_k37_source_lookup.SourceLookupTests.test_exact_source_lookup_uses_only_safe_projection) ... ok
+test_invalid_or_cross_version_coordinates_are_rejected (test_k37_source_lookup.SourceLookupTests.test_invalid_or_cross_version_coordinates_are_rejected) ... ok
+test_no_prefix_matches (test_k37_source_lookup.SourceLookupTests.test_no_prefix_matches) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+OK

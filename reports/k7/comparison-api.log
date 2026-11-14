@@ -1,0 +1,12 @@
+test_comparison_reads_all_pages_and_deduplicates_addresses (test_k2_comparison_api.ComparisonApiTests.test_comparison_reads_all_pages_and_deduplicates_addresses) ... ok
+test_exact_address_group_never_infers_rebuttal (test_k2_comparison_api.ComparisonApiTests.test_exact_address_group_never_infers_rebuttal) ... ok
+test_exact_reference_and_stage_scope (test_k2_comparison_api.ComparisonApiTests.test_exact_reference_and_stage_scope) ... ok
+test_forged_input_summary_cannot_authorize_display (test_k2_comparison_api.ComparisonApiTests.test_forged_input_summary_cannot_authorize_display) ... ok
+test_loopback_authentication_and_no_store (test_k2_comparison_api.ComparisonApiTests.test_loopback_authentication_and_no_store) ... ok
+test_tradition_filter_only_uses_local_sealed_label (test_k2_comparison_api.ComparisonApiTests.test_tradition_filter_only_uses_local_sealed_label) ... ok
+test_unlinked_passage_is_visible_but_has_no_invented_claim (test_k2_comparison_api.ComparisonApiTests.test_unlinked_passage_is_visible_but_has_no_invented_claim) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.510s
+
+OK

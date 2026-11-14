@@ -1,0 +1,18 @@
+test_duplicate_review_and_field_restrictions_fail_closed (test_k5_comparison.ComparisonEvidenceTests.test_duplicate_review_and_field_restrictions_fail_closed) ... ok
+test_evidence_from_distinct_source_is_bound_and_permissions_separate (test_k5_comparison.ComparisonEvidenceTests.test_evidence_from_distinct_source_is_bound_and_permissions_separate) ... ok
+test_exact_address_never_crosses_corpus_or_scheme (test_k5_comparison.ComparisonEvidenceTests.test_exact_address_never_crosses_corpus_or_scheme) ... ok
+test_false_or_mismatched_scope_does_not_grant (test_k5_comparison.ComparisonEvidenceTests.test_false_or_mismatched_scope_does_not_grant) ... ok
+test_fields_are_independent_and_never_automatically_academic (test_k5_comparison.ComparisonEvidenceTests.test_fields_are_independent_and_never_automatically_academic) ... ok
+test_independent_verifier_is_required_and_exact_true (test_k5_comparison.ComparisonEvidenceTests.test_independent_verifier_is_required_and_exact_true) ... ok
+test_k3_relation_schema_aliases_and_conflicting_references (test_k5_comparison.ComparisonEvidenceTests.test_k3_relation_schema_aliases_and_conflicting_references) ... ok
+test_malformed_reference_and_relation_are_safe (test_k5_comparison.ComparisonEvidenceTests.test_malformed_reference_and_relation_are_safe) ... ok
+test_mismatched_chain_or_duplicate_evidence_is_rejected (test_k5_comparison.ComparisonEvidenceTests.test_mismatched_chain_or_duplicate_evidence_is_rejected) ... ok
+test_relationships_never_inferred_or_accepted_without_evidence (test_k5_comparison.ComparisonEvidenceTests.test_relationships_never_inferred_or_accepted_without_evidence) ... ok
+test_relevant_rights_block_while_other_action_does_not (test_k5_comparison.ComparisonEvidenceTests.test_relevant_rights_block_while_other_action_does_not) ... ok
+test_sensitive_text_and_objects_are_not_published (test_k5_comparison.ComparisonEvidenceTests.test_sensitive_text_and_objects_are_not_published) ... ok
+test_verifier_exception_and_stdout_stderr_are_suppressed (test_k5_comparison.ComparisonEvidenceTests.test_verifier_exception_and_stdout_stderr_are_suppressed) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.002s
+
+OK

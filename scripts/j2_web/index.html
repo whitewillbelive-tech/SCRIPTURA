@@ -38,6 +38,11 @@
       <form id="comparison-form" autocomplete="off"><div class="comparison-filters"><label>자료 범위 <select id="comparison-stage" aria-label="자료 범위"><option value="d12">D-12 후보</option><option value="">모든 자료 단계</option></select></label><label>코퍼스 <select id="comparison-corpus" required><option value="">선택</option></select></label><label>장절 체계 <select id="comparison-scheme" required><option value="">선택</option></select></label><label>본문 주소 <select id="comparison-reference" required><option value="">선택</option></select></label><label>원본 전통 라벨 <select id="comparison-tradition" aria-label="원본 전통 라벨"><option value="">전체</option></select></label><button class="primary" type="submit">해석 비교</button></div></form>
       <p class="subtle">전통 라벨은 원본의 기록이며 발화 주체, 공동체의 공식 채택이나 소속을 확인한 뜻은 아닙니다. 표시 보류된 라벨은 검색되지 않습니다.</p>
       <p id="comparison-status" role="status" aria-live="polite" class="subtle">세션을 열고 본문 비교를 선택하세요.</p>
+      <div id="comparison-selection" class="comparison-selection" hidden aria-label="비교할 해석 선택">
+        <span id="comparison-selection-status" role="status" aria-live="polite">비교할 해석 0개 선택 · 2~3개 선택</span>
+        <button id="comparison-selected-only" type="button" aria-pressed="false" disabled>선택한 해석만 보기</button>
+        <button id="comparison-clear-selection" type="button" disabled>선택 지우기</button>
+      </div>
       <div id="comparison-results" class="comparison-grid" aria-label="본문 비교 결과"></div>
     </section>
     <section id="candidate-layout" class="layout">
@@ -65,6 +70,7 @@
         <section aria-label="검색 결과" class="panel results">
           <div class="section-heading"><div><p class="eyebrow">02 / CANDIDATES</p><h2>연구 후보</h2></div><span id="result-count" aria-live="polite">—</span></div>
           <p class="subtle">후보를 선택하면 출처와 확인 범위를 함께 볼 수 있습니다.</p>
+          <label class="page-sort">현재 페이지 정렬 <select id="page-sort"><option value="original">기본 순서</option><option value="title">표시된 문헌명 순</option><option value="creator">표시된 작성자 순</option></select></label>
           <p id="error" class="error" role="alert" hidden></p>
           <div id="results" class="cards"></div>
           <nav class="pagination" aria-label="결과 페이지"><button id="prev-page" type="button" disabled>이전</button><span id="page-status"></span><button id="next-page" type="button" disabled>다음</button></nav>
