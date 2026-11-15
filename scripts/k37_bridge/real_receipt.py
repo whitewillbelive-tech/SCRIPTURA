@@ -160,7 +160,10 @@ def load_d16_archive(base_path, delta_path):
             layers, result['records'], result.get('_k2_summary_index'), result.get('_k2_tradition_index'))
         result['_local_candidate_index'] = prepare_local_candidate_index(result, layers)
         from k37_bridge.real_content import build_content_index
-        result['_d16_content_index'] = build_content_index(layers, additions, result['_local_candidate_index'])
+        # Keep the older D12 sealed summary index intact, while allowing the
+        # newer D16 *private-only* mode to inspect separately labelled,
+        # unreviewed D12 notes. This does not modify D12 or its K2 behavior.
+        result['_d16_content_index'] = build_content_index(layers, result['records'], result['_local_candidate_index'])
         result['counts'] = dict(old.get('counts', {}))
         result['counts']['by_stage'] = dict(result['counts'].get('by_stage', {}))
         for stage in ('d13', 'd14'):

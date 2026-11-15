@@ -167,7 +167,7 @@ def build_content_index(layers, additions, candidate_index):
             value=row.get(field)
             if _flags(row) and isinstance(value,str) and value.strip():protected.append(value.strip().casefold())
     claims={}
-    for stage in ('d13','d14'):
+    for stage in ('d12','d13','d14'):
         tables=layers.get(stage,{})
         for entry in tables.get('claims',[]) if isinstance(tables,dict) else ():
             if isinstance(entry,dict) and type(entry.get('line')) is int and isinstance(entry.get('value'),dict):

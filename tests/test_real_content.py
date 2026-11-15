@@ -67,6 +67,23 @@ class PrivateContentTests(unittest.TestCase):
             self.assertEqual(got['reasoning'],'SYNTHETIC REASONING')
             self.assertEqual(got['reasoning_status'],'local_input_candidate')
 
+    def test_d12_unattested_notes_are_visible_only_as_private_input_candidates(self):
+        layers,records,dataset=fixture()
+        layers['d12'] = layers.pop('d13')
+        records[0]['key'] = 'd12:claims:1'
+        records[0]['stage'] = 'd12'
+        records[0]['source_key'] = 'd12:sources:1'
+        records[0]['edition_key'] = 'd12:editions:1'
+        row = layers['d12']['claims'][0]['value']
+        row.pop('verification_method');row.pop('original_text_stored')
+        candidate=prepare_local_candidate_index(dataset,layers)
+        result=content_for_record(build_content_index(layers,records,candidate),'D16','d12:claims:1')
+        self.assertEqual(result['summary_status'],'local_input_candidate')
+        self.assertEqual(result['reasoning_status'],'local_input_candidate')
+        row['statement_original_quote'] = 'SYNTHETIC QUOTATION'
+        result=content_for_record(build_content_index(layers,records,candidate),'D16','d12:claims:1')
+        self.assertIsNone(result['summary'])
+
     def test_unattested_research_reasoning_remains_unreviewed(self):
         layers,records,dataset=fixture()
         row=layers['d13']['claims'][0]['value']
