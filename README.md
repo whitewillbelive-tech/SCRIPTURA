@@ -137,3 +137,9 @@ Windows에서는 `START_SCRIPTURA.cmd`로 로컬 파일 선택기를 열고 고�
 ## K-3~K-7 비공개 입력 통합
 
 이후 전달된 비공개 브리지 입력과 실제 수신·비교·안전 검증 범위는 [통합 보고서](docs/K37_PRIVATE_INTEGRATION_REPORT.md), 사용자 PC에서의 최종 수용 절차는 [Windows 안내](K37_PRIVATE_WINDOWS_KO.md)를 참조한다. 입력 파일은 저장소나 CI에 포함하지 않는다.
+
+## Latest private research browser acceptance — 2026-11-16
+
+The user confirmed the current K-3–K-7 private-local Windows viewer's five core interpretation/search/transition checks **5/5 PASS**. The D-13/D-14 interpretation and reasoning text is now visible as distinctly marked **unverified private research input notes**. Code baseline: `codex/scriptura-k37-private-candidate-fix` @ `be6c4163ea7c71926b476f7e77a6c04230f7b969`. GitHub Actions: [5/5 jobs PASS](https://github.com/whitewillbelive-tech/SCRIPTURA/actions/runs/43745598748).
+
+See [the latest Windows acceptance result](docs/K37_WINDOWS_ACCEPTED_20261116.md). The separate, ongoing human scholarship, primary-source fidelity and rights verification is **not** a functional blocker for this private-local research pilot. Earlier reports with PENDING status describe their own historical test scope and must not override this latest user acceptance.
