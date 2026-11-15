@@ -1,0 +1,3 @@
+Synthetic Chromium repeated regression after response-listener race fix
+Runs: 3
+Per run: 5 PASS / 0 FAIL / 0 SKIP

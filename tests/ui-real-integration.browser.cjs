@@ -37,6 +37,10 @@ test('1280×720에서 비교 결과와 상세 버튼을 마우스로 접근한�
   await p.locator('#comparison-corpus').selectOption(selected.corpus);await p.locator('#comparison-scheme').selectOption(selected.scheme);await p.locator('#comparison-reference').selectOption(selected.reference);
   await p.getByRole('button',{name:'해석 비교',exact:true}).click();await p.locator('.comparison-card').nth(1).waitFor();
   assert.ok(await p.locator('#comparison-results').evaluate(e=>e.clientHeight>=100));
+  await p.getByLabel('이 해석을 비교 대상으로 선택').nth(0).check({timeout:5000});
+  await p.getByLabel('이 해석을 비교 대상으로 선택').nth(1).check({timeout:5000});
+  await p.getByRole('button',{name:'선택한 해석만 보기'}).click({timeout:5000});
+  assert.equal(await p.locator('.comparison-card:visible').count(),2);
   await p.locator('.comparison-card').first().getByRole('button',{name:'검증 정보 보기'}).click({timeout:5000});
   assert.equal(await p.locator('#research-drawer').evaluate(e=>e.open),true);
  } finally {await p.close()}
@@ -68,7 +72,7 @@ test('봉인된 전통 라벨만 공동체 필터 검색을 허용한다',async(
  await page.route('**/api/candidates**',r=>{requests++;return reply(r,{dataset:'D16',metadata_projection:'k1.3-local-candidate',tradition_projection:marker?'k2-reviewed-tradition':null,metadata_coverage:{community_name:0,source_creator:1,tradition:1},records:[row],total:1,page_size:100});});
  await page.reload();await page.getByLabel('세션 비밀').fill(secret);await page.getByRole('button',{name:'세션 열기'}).click();await page.locator('.candidate').first().waitFor();
  await page.locator('#advanced-filters summary').click();await page.locator('input[name="community"]').fill('SYNTHETIC-TRADITION');
- const before=requests;await page.getByRole('button',{name:'후보 검색'}).click();await page.waitForResponse(r=>r.url().includes('community=SYNTHETIC-TRADITION'));assert.equal(requests,before+1);
+ const before=requests;await Promise.all([page.waitForResponse(r=>r.url().includes('community=SYNTHETIC-TRADITION')),page.getByRole('button',{name:'후보 검색'}).click()]);assert.equal(requests,before+1);
  marker=false;await page.reload();await page.getByLabel('세션 비밀').fill(secret);await page.getByRole('button',{name:'세션 열기'}).click();await page.locator('.candidate').first().waitFor();
  await page.locator('#advanced-filters summary').click();await page.locator('input[name="community"]').fill('SYNTHETIC-TRADITION');const blocked=requests;
  await page.getByRole('button',{name:'후보 검색'}).click();await page.getByText('검색 보류',{exact:true}).waitFor();assert.equal(requests,blocked);

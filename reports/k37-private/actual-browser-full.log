@@ -14,7 +14,8 @@ Speaker and source author distinct test samples: 2
 1366x768 keyboard, focus restoration and zoom: PASS
 1366x768 K6 selection, persistence and reverse source navigation: PASS
 1280x720 tradition-filter verification button with mouse after CSS correction: PASS
-1280x720 K6 full regression: PENDING, further diagnostic in progress
+1280x720 K6 selection, persistence and reverse source navigation: PASS
+1280x720 keyboard focus, drawer and mouse interactions: PASS
 Unauthorized API request denied: PASS
 Authenticated response cache no-store: PASS
 Content security policy present: PASS
