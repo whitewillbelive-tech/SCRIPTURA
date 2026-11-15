@@ -1,0 +1,15 @@
+test_exact_source_chain_and_sealed_index_are_required (test_real_content.PrivateContentTests.test_exact_source_chain_and_sealed_index_are_required) ... ok
+test_field_privacy_and_conditional_rights_are_not_overridden (test_real_content.PrivateContentTests.test_field_privacy_and_conditional_rights_are_not_overridden) ... ok
+test_known_private_agent_never_appears_as_recorded_speaker (test_real_content.PrivateContentTests.test_known_private_agent_never_appears_as_recorded_speaker) ... ok
+test_locator_specific_rights_cannot_be_skipped (test_real_content.PrivateContentTests.test_locator_specific_rights_cannot_be_skipped) ... ok
+test_missing_evidence_does_not_hide_unverified_tradition (test_real_content.PrivateContentTests.test_missing_evidence_does_not_hide_unverified_tradition) ... ok
+test_missing_method_or_original_storage_does_not_approve (test_real_content.PrivateContentTests.test_missing_method_or_original_storage_does_not_approve) ... ok
+test_opaque_baseline_mapping_is_supported (test_real_content.PrivateContentTests.test_opaque_baseline_mapping_is_supported) ... ok
+test_reasoning_requires_own_independent_attestation (test_real_content.PrivateContentTests.test_reasoning_requires_own_independent_attestation) ... ok
+test_recorded_speaker_does_not_become_verified_subject_and_can_be_restricted (test_real_content.PrivateContentTests.test_recorded_speaker_does_not_become_verified_subject_and_can_be_restricted) ... ok
+test_statement_and_tradition_are_separate_from_reasoning_and_subject (test_real_content.PrivateContentTests.test_statement_and_tradition_are_separate_from_reasoning_and_subject) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.003s
+
+OK

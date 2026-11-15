@@ -1,0 +1,28 @@
+SCRIPTURA K37 private actual-data acceptance
+Environment: Linux Chromium (not Windows)
+D12 title search: PASS
+D12 author search: PASS
+D12 multiple-claim comparison: PASS
+D13 title search: PASS
+D13 author search: PASS
+D13 multiple-claim comparison: PASS
+D14 title search: PASS
+D14 author search: PASS
+D14 multiple-claim comparison: PASS
+Search and comparison checks: 9 PASS, 0 FAIL
+D13 and D14 tradition filters: 2 API result checks and 2 UI dropdown selections PASS
+Full UI submission of tradition filters: NOT_RUN
+Total candidate records: 909
+Preserved baseline candidate records: 621
+Comparison groups in API: 80
+Comparison partitions in API: 81
+Single-corpus group selected in UI: 1 PASS, 4 cards
+Cross-corpus group UI selections: 2 partitions PASS, 1 card each
+All 80 groups individually selected in UI: NOT_RUN
+Unauthenticated API request denied: PASS
+Authenticated API cache-control no-store: PASS
+Authenticated session termination: NOT_RUN
+External browser requests: 0
+Both input archives unchanged: PASS
+Unapproved new claim summaries and reasoning: held pending
+Windows hardware acceptance: NOT_RUN

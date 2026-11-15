@@ -161,7 +161,7 @@ def validate_checksums(z, lines, *, expected_count=EXPECTED_CHECKSUMS, required=
     return len(seen)
 
 
-def reference_assessment(prior, new):
+def reference_assessment(prior, new, *, quarantine_positions=None):
     """Classify invalid increments by fixed labels; never return identifiers.
 
     This detects graph errors without changing prior rows. It does not certify
@@ -169,14 +169,21 @@ def reference_assessment(prior, new):
     """
     prior_index = {}
     global_prior = set()
+    prior_tables = {}
     for table, stages in prior.items():
         prior_index[table] = {}
         for rows in stages.values():
             for row in rows:
                 ident = row.get('id') if isinstance(row, dict) else None
                 if isinstance(ident, str) and ident:
-                    require(ident not in global_prior)
+                    if ident in global_prior:
+                        # Nested Work stages repeat identical historical rows.
+                        # Conflicting values or a cross-table ID remain errors.
+                        require(prior_tables.get(ident) == table and
+                                prior_index[table].get(ident) == row)
+                        continue
                     global_prior.add(ident)
+                    prior_tables[ident] = table
                     prior_index[table][ident] = row
     indexes = {table: dict(prior_index.get(table, {})) for table in TABLES}
     rejected = {table: set() for table in TABLES}
@@ -239,6 +246,11 @@ def reference_assessment(prior, new):
                 if indexes[table].get(ident) is row:
                     del indexes[table][ident]
                 reasons['reference_missing' if missing else 'source_chain_conflict'] += 1
+    if quarantine_positions is not None:
+        # Internal use only: caller uses positional masks in memory and never
+        # emits identifiers or record contents to diagnostics.
+        quarantine_positions.update({table: frozenset(positions)
+                                     for table, positions in rejected.items()})
     return {'accepted': sum(len(rows) - len(rejected[t]) for t, rows in new.items()),
             'quarantined': sum(map(len, rejected.values())),
             'id_collision': reasons['id_collision'], 'invalid_id': reasons['invalid_id'],

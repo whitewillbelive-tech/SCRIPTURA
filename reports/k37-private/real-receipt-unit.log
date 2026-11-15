@@ -1,0 +1,10 @@
+test_identical_baseline_records_are_deduplicated_without_mutation (test_real_receipt.RealReceiptBaselineTests.test_identical_baseline_records_are_deduplicated_without_mutation) ... ok
+test_pathlike_inputs_are_passed_as_strings_and_fail_closed (test_real_receipt.RealReceiptBaselineTests.test_pathlike_inputs_are_passed_as_strings_and_fail_closed) ... ok
+test_quarantines_bad_increment_and_dependants_only (test_real_receipt.RealReceiptBaselineTests.test_quarantines_bad_increment_and_dependants_only) ... ok
+test_same_id_different_content_remains_a_conflict (test_real_receipt.RealReceiptBaselineTests.test_same_id_different_content_remains_a_conflict) ... ok
+test_same_id_in_different_tables_remains_a_conflict (test_real_receipt.RealReceiptBaselineTests.test_same_id_in_different_tables_remains_a_conflict) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.001s
+
+OK

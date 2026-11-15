@@ -19,6 +19,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from k2_bridge.receipt import load_k2_archive as load_versioned_archive, safe_k2_passage, summary_for_record, get_k2_passages, tradition_for_record
+from k37_bridge.d16_groups import get_d16_sets, safe_d16_passage
+from k37_bridge.real_content import content_for_record
 from k11_bridge.metadata import FIELDS as VERIFIED_METADATA_FIELDS, PrivateMetadataCandidates, metadata_for_record
 from k13_bridge.local_candidate import LocalCandidateIndex, candidate_metadata_for_record, candidate_restriction_summary
 from k12_bridge.snapshot import load_authenticated_snapshot
@@ -33,17 +35,18 @@ PAGE_SIZE = 100
 RIGHTS_ACTIONS = frozenset(('browse', 'collect_metadata', 'store_raw', 'store_excerpt', 'index_fulltext', 'embed', 'send_to_model', 'redistribute', 'public_link'))
 RIGHTS_DECISIONS = frozenset(('unknown', 'conditional', 'allowed', 'prohibited', 'not_recorded', 'conflicting', 'unmapped'))
 SAFE_RECORD_FIELDS = frozenset(('key', 'stage', 'record_kind', 'category', 'attribution', 'original_attribution', 'authority_status', 'input_authority_status', 'verification_status', 'quotation_status', 'argument_status', 'reported_independent_review_status', 'independent_review_status', 'audit_observation_key', 'rights_status', 'tradition', 'community_reference', 'community_role', 'evaluated_subject', 'researcher', 'speaker', 'speaker_type', 'passage_corpus', 'passage_scheme', 'passage_reference', 'source_title', 'source_creator', 'source_kind', 'source_doi', 'source_year', 'access_path', 'locator', 'unmapped', 'checked_at', 'as_of', 'valid_from', 'valid_until', 'display_status'))
-SAFE_STAGES = frozenset(('base', 'd5', 'd6', 'd7', 'd8', 'd9', 'd10', 'd11', 'd12'))
-RESEARCH_DATASETS = frozenset(('D8', 'D9', 'D10', 'D12'))
+SAFE_STAGES = frozenset(('base', 'd5', 'd6', 'd7', 'd8', 'd9', 'd10', 'd11', 'd12', 'd13', 'd14', 'd15', 'd16'))
+RESEARCH_DATASETS = frozenset(('D8', 'D9', 'D10', 'D12', 'D16'))
 ALLOWED_DATASETS = RESEARCH_DATASETS | {'synthetic'}
 
 
 def _stage_pattern(dataset, *, research=True):
     """Exact version boundary; unknown research versions never become synthetic."""
     if not research:
-        return r'(?:base|d[5-9]|d1[012]|synthetic)'
+        return r'(?:base|d[5-9]|d1[0-6]|synthetic)'
     return {'D8': r'(?:base|d[5-8])', 'D9': r'(?:base|d[5-9])',
-            'D10': r'(?:base|d[5-9]|d10)', 'D12': r'(?:base|d[5-9]|d1[012])'}.get(dataset, r'(?!)')
+            'D10': r'(?:base|d[5-9]|d10)', 'D12': r'(?:base|d[5-9]|d1[012])',
+            'D16': r'(?:base|d[5-9]|d1[0-6])'}.get(dataset, r'(?!)')
 
 
 def _stage_allowed(stage, dataset):
@@ -71,7 +74,7 @@ def _safe_visibility(value, *, dataset=None):
     # candidate-visible fields. Input counters never authorize display.
     if dataset == 'D9' and result and (result.get('metadata_candidate') != 9 or result.get('candidate_visible_local') != 0):
         return {'status': 'pending_inconsistent'}
-    if dataset in ('D10', 'D12') and result:
+    if dataset in ('D10', 'D12', 'D16') and result:
         # The source ledger calls one row candidate_visible_local, but the
         # contract says this is conditional, not an operational approval.
         # Do not let a supplied counter authorize a real field.
@@ -91,7 +94,7 @@ def _safe_counts(value, *, dataset):
     count = value.get('display_records')
     if isinstance(count, int) and not isinstance(count, bool) and 0 <= count <= 100000:
         result['display_records'] = count
-    for stage in ('d8', 'd9', 'd10', 'd11', 'd12'):
+    for stage in ('d8', 'd9', 'd10', 'd11', 'd12', 'd13', 'd14', 'd15', 'd16'):
         if not _stage_allowed(stage, dataset):
             continue
         tables = value.get(stage)
@@ -131,7 +134,7 @@ def _safe_unmapped(value, *, dataset=None):
 
 def _safe_d10_receipt(value, *, dataset):
     """D10 quarantine is reported only as bounded fixed-name counts."""
-    if dataset not in ('D10', 'D12') or not isinstance(value, dict):
+    if dataset not in ('D10', 'D12', 'D16') or not isinstance(value, dict):
         return {}
     result = {}
     for key in ('source_count', 'quarantined_source_count', 'conditional_candidate_count', 'effective_visible_fields'):
@@ -200,7 +203,7 @@ def _safe_eligibility(value, *, research):
 
 def _safe_d9_observations(row, *, dataset):
     """Only fixed observations, with no text, ID, URL, or automatic grant."""
-    if dataset not in ('D9', 'D10', 'D12', 'synthetic'):
+    if dataset not in ('D9', 'D10', 'D12', 'D16', 'synthetic'):
         return [], []
     observed, rights = [], []
     for item in row.get('d9_observations', []) if isinstance(row.get('d9_observations'), list) else []:
@@ -316,8 +319,13 @@ def _safe_record(row, *, research=False, dataset=None):
         safe_passages = []
         reverse_schemes = {value: key for key, value in candidate._SCHEMES.items()}
         for passage in result.get('passages', []):
-            if dataset == 'D12' and stage == 'd12':
+            if dataset in ('D12', 'D16') and stage == 'd12':
                 checked = safe_k2_passage(passage)
+                if checked:
+                    safe_passages.append({key: checked[key] for key in ('corpus', 'scheme', 'reference')})
+                continue
+            if dataset == 'D16' and stage in ('d13', 'd14'):
+                checked = safe_d16_passage(passage)
                 if checked:
                     safe_passages.append({key: checked[key] for key in ('corpus', 'scheme', 'reference')})
                 continue
@@ -429,19 +437,40 @@ def filter_records(dataset, params, *, _internal_all=False):
     local_mode = mode in RESEARCH_DATASETS and type(local_index) is LocalCandidateIndex
     local_summary = candidate_restriction_summary(local_index, mode) if local_mode else {}
     metadata_coverage = {field: 0 for field in sorted(VERIFIED_METADATA_FIELDS)}
+    if mode == 'D16':
+        metadata_coverage['tradition'] = 0
     for original in dataset['records']:
         # D8 mode must not include newer D9 records, even if the dataset is
         # accidentally assembled from mixed snapshots.
         if mode in RESEARCH_DATASETS and not _stage_allowed(str(original.get('stage') or '').lower(), mode):
             continue
         row = _safe_record(original, research=mode in RESEARCH_DATASETS, dataset=mode)
+        content = content_for_record(dataset.get('_d16_content_index'), mode, row.get('key')) if mode == 'D16' else {}
         # The comparison view already uses this separately checked in-memory
         # index.  Never trust a summary or status embedded in an archive row.
         # Bibliographic search continues to operate on the existing safe fields.
-        if mode == 'D12' and row.get('record_kind') == 'claim':
-            summary = summary_for_record(dataset.get('_k2_summary_index'), mode, row.get('key'))
+        if mode in ('D12', 'D16') and row.get('record_kind') == 'claim':
+            # The K2 index is scoped to the frozen D12 baseline, even when it
+            # is embedded in a newer validated research receipt.
+            summary = summary_for_record(dataset.get('_k2_summary_index'), 'D12', row.get('key'))
+            if mode == 'D16' and content.get('summary_status') == 'recorded_unverified':
+                summary = content.get('summary')
             row['summary'] = summary if isinstance(summary, str) else None
             row['summary_status'] = 'recorded_unverified' if row['summary'] is not None else 'pending_review'
+        if mode == 'D16':
+            for field in ('reasoning', 'subject', 'reported_speaker'):
+                valid = 'source_confirmed' if field == 'subject' else 'recorded_unverified'
+                value = content.get(field)
+                row[field] = value if content.get(field + '_status') == valid and isinstance(value, str) else None
+                row[field + '_status'] = valid if row[field] is not None else 'pending'
+            label = content.get('tradition')
+            if content.get('tradition_status') != 'recorded_unverified' or not isinstance(label, str):
+                label = tradition_for_record(dataset.get('_k2_tradition_index'), 'D12', row.get('key'))
+            else:
+                label = label if isinstance(label, str) else None
+            row['tradition_candidate'] = {'value': label, 'status': 'recorded_unverified'} if isinstance(label, str) else {'value': None, 'status': 'missing_or_unmapped'}
+            if isinstance(label, str):
+                metadata_coverage['tradition'] += 1
         row['verified_metadata'] = metadata_for_record(metadata_index, mode, row.get('key'))
         if local_mode:
             # Only the sealed in-memory policy index can supply candidate
@@ -493,10 +522,10 @@ def filter_records(dataset, params, *, _internal_all=False):
         # and malformed or cross-version coordinates never enter the filter.
         if source_key and row.get('source_key') != source_key:
             continue
-        if search and not (any(search in _text(row.get(key)) for key in SEARCH_FIELDS) or any(search in _text(value) for value in available.values()) or any(search in _text(p.get(field)) for p in row.get('passages', []) for field in ('corpus', 'scheme', 'reference'))):
+        if search and not (any(search in _text(row.get(key)) for key in SEARCH_FIELDS) or any(search in _text(value) for value in available.values()) or search in _text(row.get('tradition_candidate', {}).get('value')) or any(search in _text(p.get(field)) for p in row.get('passages', []) for field in ('corpus', 'scheme', 'reference'))):
             continue
         community = q.get('community', '').casefold()
-        if community and not (any(community in _text(row.get(key)) for key in ('tradition', 'community_reference', 'evaluated_subject')) or community in _text(available.get('community_name'))):
+        if community and not (any(community in _text(row.get(key)) for key in ('tradition', 'community_reference', 'evaluated_subject')) or community in _text(available.get('community_name')) or community in _text(row.get('tradition_candidate', {}).get('value'))):
             continue
         researcher = q.get('researcher', '').casefold()
         if researcher and not (any(researcher in _text(row.get(key)) for key in ('researcher', 'speaker', 'source_creator')) or researcher in _text(available.get('source_creator'))):
@@ -555,7 +584,11 @@ def filter_records(dataset, params, *, _internal_all=False):
         counts['display_records'] = sum(1 for row in dataset['records'] if _stage_allowed(str(row.get('stage') or '').lower(), mode))
     return {'dataset': dataset['dataset'],
             'metadata_projection': 'k1.3-local-candidate' if local_mode else 'k1.1-verified',
-            'summary_projection': 'k2-reviewed-summary' if mode == 'D12' else None,
+            'summary_projection': 'k2-reviewed-summary' if mode in ('D12', 'D16') else None,
+            'tradition_projection': 'k2-reviewed-tradition' if mode == 'D16' else None,
+            'reasoning_projection': 'k37-reviewed-reasoning' if mode == 'D16' else None,
+            'subject_projection': 'k37-reviewed-subject' if mode == 'D16' else None,
+            'reported_speaker_projection': 'k37-recorded-speaker' if mode == 'D16' else None,
             'metadata_coverage': metadata_coverage,
             'candidate_restriction_summary': local_summary,
             'counts': counts,
@@ -574,7 +607,7 @@ def compare_passages(dataset, params):
     Sharing an address alone never creates a rebuttal, official position, or
     independent academic finding. No unapproved claim text enters this result.
     """
-    if not isinstance(params, dict) or set(params) - {'corpus', 'scheme', 'reference', 'stage', 'tradition'}:
+    if not isinstance(params, dict) or set(params) - {'corpus', 'scheme', 'reference', 'stage', 'tradition', 'comparison_set'}:
         raise ValueError('invalid query')
     if any(not isinstance(v, list) or len(v) != 1 or not isinstance(v[0], str) for v in params.values()):
         raise ValueError('invalid query')
@@ -586,6 +619,10 @@ def compare_passages(dataset, params):
         raise ValueError('invalid query')
     stage = query.get('stage', '')
     if stage and not _stage_allowed(stage, dataset.get('dataset')):
+        raise ValueError('invalid query')
+    requested_set = query.get('comparison_set', '')
+    if requested_set and (dataset.get('dataset') != 'D16' or
+                          not re.fullmatch(r'd16:comparison_sets:[1-9][0-9]*', requested_set)):
         raise ValueError('invalid query')
     lookup = {'record_kind': ['claim']}
     if stage:
@@ -599,7 +636,9 @@ def compare_passages(dataset, params):
     groups = {}
     traditions = {}
     for row in rows:
-        value = tradition_for_record(dataset.get('_k2_tradition_index'), dataset.get('dataset'), row.get('key'))
+        value = tradition_for_record(dataset.get('_k2_tradition_index'), 'D12' if dataset.get('dataset') == 'D16' else dataset.get('dataset'), row.get('key'))
+        if dataset.get('dataset') == 'D16' and row.get('tradition_candidate', {}).get('status') == 'recorded_unverified':
+            value = row['tradition_candidate'].get('value')
         row = dict(row)
         row['tradition_candidate'] = {'value': value, 'status': 'recorded_unverified'} if isinstance(value, str) else {'value': None, 'status': 'missing_or_unmapped'}
         if isinstance(value, str):
@@ -615,23 +654,58 @@ def compare_passages(dataset, params):
                 continue
             seen.add(key)
             groups.setdefault(key, []).append(row)
-    if dataset.get('dataset') == 'D12' and stage in ('', 'd12'):
-        for passage in get_k2_passages(dataset):
+    if dataset.get('dataset') in ('D12', 'D16') and stage in ('', 'd12'):
+        # K2's accessor intentionally requires the D12 label; retain the
+        # sealed baseline when presented as part of D16.
+        baseline_dataset = dict(dataset, dataset='D12')
+        for passage in get_k2_passages(baseline_dataset):
             key = tuple(passage.get(k) for k in ('corpus', 'scheme', 'reference'))
             if all(isinstance(v, str) and v for v in key):
                 groups.setdefault(key, [])
+    safe_sets = []
+    if dataset.get('dataset') == 'D16':
+        for item in get_d16_sets(dataset):
+            if not isinstance(item, dict):
+                continue
+            group_key = item.get('key')
+            triple = tuple(item.get(k) for k in ('corpus', 'scheme', 'reference'))
+            keys = item.get('claim_keys')
+            if (not isinstance(group_key, str) or not re.fullmatch(r'd16:comparison_sets:[1-9][0-9]*', group_key)
+                    or not all(isinstance(v, str) and v for v in triple)
+                    or not isinstance(keys, (tuple, list))
+                    or any(not isinstance(k, str) or not re.fullmatch(_stage_pattern('D16') + r':claims:[1-9][0-9]*', k) for k in keys)):
+                continue
+            eligible = {r.get('key') for r in groups.get(triple, [])}
+            members = set(keys) & eligible
+            if members:
+                safe_sets.append((group_key, triple, members, item.get('status')))
+    if requested_set and not any(key == requested_set for key, _, _, _ in safe_sets):
+        raise ValueError('invalid query')
     options = [{'corpus': key[0], 'scheme': key[1], 'reference': key[2],
                 'claim_count': len(claims)} for key, claims in sorted(groups.items())]
     selected = tuple(selected_terms) if all(selected_terms) else None
+    selected_members = None
+    if requested_set and selected:
+        selected_members = set().union(*(members for key, triple, members, _ in safe_sets
+                                         if key == requested_set and triple == selected))
     claims = []
     for row in groups.get(selected, []) if selected else []:
-        summary = summary_for_record(dataset.get('_k2_summary_index'), dataset.get('dataset'), row.get('key'))
+        if selected_members is not None and row.get('key') not in selected_members:
+            continue
+        summary = row.get('summary') if dataset.get('dataset') == 'D16' else summary_for_record(dataset.get('_k2_summary_index'), dataset.get('dataset'), row.get('key'))
         claims.append(dict(row, summary=summary, summary_status='recorded_unverified' if summary is not None else 'pending_review'))
     return {'dataset': dataset['dataset'], 'metadata_projection': result['metadata_projection'],
             'summary_projection': 'k2-reviewed-summary',
+            'reasoning_projection': result.get('reasoning_projection'),
+            'subject_projection': result.get('subject_projection'),
+            'reported_speaker_projection': result.get('reported_speaker_projection'),
             'tradition_projection': 'k2-reviewed-tradition',
             'traditions': [{'value': value, 'claim_count': count} for value, count in sorted(traditions.items())],
             'passages': options, 'selected': dict(zip(('corpus', 'scheme', 'reference'), selected)) if selected in groups else None,
+            'comparison_sets': [{'key': key, 'corpus': triple[0], 'scheme': triple[1], 'reference': triple[2],
+                                 'claim_count': len(members),
+                                 'status': status if status in ('recorded_unverified', 'pending') else 'pending'}
+                                for key, triple, members, status in safe_sets],
             'claims': claims}
 
 
@@ -740,7 +814,7 @@ class Handler(BaseHTTPRequestHandler):
                     return self._respond(401, '세션 인증이 필요합니다.')
                 if len(url.query) > 4096:
                     return self._respond(400, '잘못된 요청입니다.')
-                params = urllib.parse.parse_qs(url.query, keep_blank_values=True, max_num_fields=5, encoding='utf-8', errors='strict')
+                params = urllib.parse.parse_qs(url.query, keep_blank_values=True, max_num_fields=6, encoding='utf-8', errors='strict')
                 value = compare_passages(self.server.dataset, params)
                 return self._respond(200, json.dumps(value, ensure_ascii=False, separators=(',', ':')), 'application/json; charset=utf-8')
             return self._respond(404, '요청을 찾을 수 없습니다.')
@@ -757,19 +831,24 @@ class Handler(BaseHTTPRequestHandler):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description='로컬 연구 후보 탐색기 (루프백 전용)')
-    parser.add_argument('--archive', required=True, help='고정 D-8, D-9 또는 D-10 ZIP 파일')
+    parser.add_argument('--archive', required=True, help='로컬 연구 ZIP 파일')
+    parser.add_argument('--increment', help='별도로 제공된 D-14~D-16 증분 ZIP 파일')
     parser.add_argument('--public-snapshot', help='검토된 고정 공개 서지 스냅샷의 로컬 파일')
     parser.add_argument('--public-snapshot-id', help='코드에 등록된 스냅샷 정책 이름')
     args = parser.parse_args(argv)
     try:
         archive = local_archive_path(args.archive)
-        dataset = load_versioned_archive(archive)
+        if args.increment:
+            from k37_bridge.real_receipt import load_d16_archive
+            dataset = load_d16_archive(archive, local_archive_path(args.increment))
+        else:
+            dataset = load_versioned_archive(archive)
         if bool(args.public_snapshot) != bool(args.public_snapshot_id):
             raise ValueError('public_snapshot_untrusted')
         if args.public_snapshot:
             dataset = attach_local_public_snapshot(dataset, args.public_snapshot_id, args.public_snapshot)
     except Exception:
-        print('고정 D-8/D-9/D-10 자료를 확인할 수 없습니다. 경로와 무결성을 확인하세요.', file=sys.stderr)
+        print('연구 자료를 확인할 수 없습니다. 경로와 무결성을 확인하세요.', file=sys.stderr)
         return 1
     try:
         if not sys.stdin.isatty():

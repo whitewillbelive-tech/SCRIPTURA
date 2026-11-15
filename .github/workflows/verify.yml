@@ -87,6 +87,8 @@ jobs:
           node --test tests/ui-k21-research.browser.cjs
           # K-6 comparison selection and research status use synthetic records only.
           node --test tests/ui-k6-selection.browser.cjs
+          # Private integration behavior uses synthetic records in CI only.
+          node --test tests/ui-real-integration.browser.cjs
 
   windows-synthetic:
     name: Windows synthetic launcher and security
@@ -117,6 +119,16 @@ jobs:
         run: python -m unittest discover -s tests -p test_k37_d12_withheld_audit.py -v
       - name: Verify Work receipt security
         run: python -m unittest discover -s tests -p test_k37_recovery_security.py -v
+      - name: Verify two-archive Windows launcher
+        run: python -m unittest discover -s tests -p test_real_windows_launcher.py -v
+      - name: Verify private receipt and comparison contracts
+        shell: pwsh
+        run: |
+          $patterns = @('test_real_receipt.py', 'test_d16_groups.py', 'test_real_content.py', 'test_review_checks.py', 'test_k37_d16_api.py')
+          foreach ($pattern in $patterns) {
+            python -m unittest discover -s tests -p $pattern -v
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
 
   postgres:
     name: PostgreSQL migrations and integration

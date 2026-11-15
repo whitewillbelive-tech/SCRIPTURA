@@ -1,0 +1,17 @@
+SCRIPTURA K37 staged-index disclosure scan
+Scope: 32 staged added or modified files, evaluated from the index.
+Private input fields were collected from recursively nested JSON and JSONL in both input archives in memory. Values were compared as exact UTF-8 byte substrings. ID, URL and selected name fields shorter than 12 characters and selected text shorter than 32 characters were not included. No private values were logged.
+staged_files 32
+ids_checked 13559 ids_matches 0
+urls_checked 625 urls_matches 0
+names_checked 892 names_matches 0
+text_checked 550 text_matches 0
+hashes_checked 167 hashes_matches 2
+hashes_already_in_baseline 2
+hashes_new 0
+staged_zip_files 0
+staged_credential_file_names 0
+full_input_zip_byte_matches 0
+The 2 matching hash values already existed in the base commit; 0 were newly introduced.
+Credential check covers filenames and extensions only; it is not a content-based secret scan. Exact byte matching does not detect transformed, escaped, shortened or uncollected data. Deleted files are not counted. This scan cannot prove the absence of every disclosure.
+Post-scan report edit: 1 modified worktree file compared against the same private-input field sets; ID, URL, selected name, selected text and hash exact matches: 0 each. At that recheck the staged index had 0 changes. The original 32-file index scan above was performed before the commit.

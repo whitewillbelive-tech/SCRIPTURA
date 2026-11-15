@@ -10,7 +10,7 @@ from __future__ import annotations
 import sys
 
 
-def _choose_archive():
+def _choose_archive(*, increment=False):
     # Import lazily so that command-line and non-Windows use do not require Tk.
     import tkinter as tk
     from tkinter import filedialog
@@ -21,14 +21,26 @@ def _choose_archive():
         window.attributes('-topmost', True)
         return filedialog.askopenfilename(
             parent=window,
-            title='SCRIPTURA D-8, D-9, D-10 또는 D-12 연구 ZIP 선택',
+            title=('SCRIPTURA D-14~D-16 증분 ZIP 선택' if increment else
+                   'SCRIPTURA 기준 연구 ZIP 선택 (D-8, D-9, D-10, D-12 또는 D-13)'),
             filetypes=(('ZIP archive', '*.zip'),),
         )
     finally:
         window.destroy()
 
 
-def main(*, platform=None, chooser=None, runner=None, version=None, is_tty=None):
+def _is_d13_archive(path):
+    """Recognize the pinned D13 bytes without printing a path or a digest."""
+    import hashlib
+    import hmac
+    from k37_work_archive_compat import D13_SHA, read_local_unchanged
+    try:
+        return hmac.compare_digest(hashlib.sha256(read_local_unchanged(path)).hexdigest(), D13_SHA)
+    except Exception:
+        return False
+
+
+def main(*, platform=None, chooser=None, increment_chooser=None, is_d13=None, runner=None, version=None, is_tty=None):
     """Launch interactively. Injectable boundaries are used by synthetic tests."""
     platform = sys.platform if platform is None else platform
     version = sys.version_info if version is None else version
@@ -57,8 +69,18 @@ def main(*, platform=None, chooser=None, runner=None, version=None, is_tty=None)
     try:
         if runner is None:
             from j2_private_preview import main as runner
-        # No subprocess: the chosen path and later secret are not added to argv.
-        return runner(['--archive', selected])
+        args = ['--archive', selected]
+        if (is_d13 or _is_d13_archive)(selected):
+            increment = (increment_chooser or (lambda: _choose_archive(increment=True)))()
+            if not increment:
+                print('증분 자료 선택을 취소했습니다.')
+                return 0
+            if not isinstance(increment, str):
+                print('선택한 증분 자료를 확인할 수 없습니다.', file=sys.stderr)
+                return 1
+            args.extend(['--increment', increment])
+        # No subprocess: chosen paths and the later secret are not added to argv.
+        return runner(args)
     except Exception:
         # A loader or interpreter failure must not expose a selected path.
         print('로컬 탐색기를 시작하지 못했습니다. 설치 상태를 확인하세요.', file=sys.stderr)

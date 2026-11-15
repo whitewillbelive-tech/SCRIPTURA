@@ -1,0 +1,13 @@
+test_cross_table_collision_and_changed_history_stay_ambiguous (test_review_checks.ReviewChecksTests.test_cross_table_collision_and_changed_history_stay_ambiguous) ... ok
+test_identical_historical_rows_are_deduplicated (test_review_checks.ReviewChecksTests.test_identical_historical_rows_are_deduplicated) ... ok
+test_malformed_input_has_fixed_exception (test_review_checks.ReviewChecksTests.test_malformed_input_has_fixed_exception) ... ok
+test_missing_and_wrong_table_are_pending (test_review_checks.ReviewChecksTests.test_missing_and_wrong_table_are_pending) ... ok
+test_missing_optional_is_not_same_as_missing_required (test_review_checks.ReviewChecksTests.test_missing_optional_is_not_same_as_missing_required) ... ok
+test_relation_evidence_must_match_recorded_endpoints (test_review_checks.ReviewChecksTests.test_relation_evidence_must_match_recorded_endpoints) ... ok
+test_source_conflict_is_not_silently_accepted (test_review_checks.ReviewChecksTests.test_source_conflict_is_not_silently_accepted) ... ok
+test_valid_review_references_do_not_imply_verification (test_review_checks.ReviewChecksTests.test_valid_review_references_do_not_imply_verification) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.001s
+
+OK

@@ -31,6 +31,7 @@
   let comparisonController = null;
   let comparisonGeneration = 0;
   let comparisonPassages = [];
+  let comparisonSets = [];
   // The selected archive is fixed for one authenticated session. A response
   // that changes dataset must never replace results from the selected archive.
   let sessionDataset = null;
@@ -65,21 +66,27 @@
     return fallback;
   };
   // Only generated layer/table/row coordinates are displayed; never raw source IDs.
-  const safeRef = key => typeof key === 'string' && /^(base|d[5-9]|d1[012]):(claims|sources):[1-9][0-9]{0,6}$/.test(key) ? key : '미확인';
-  const safeCoordinate = (key, table) => typeof key === 'string' && new RegExp(`^(base|d[5-9]|d1[012]):${table}:[1-9][0-9]{0,6}$`).test(key) ? key : '미확인';
+  const safeRef = key => typeof key === 'string' && /^(base|d[5-9]|d1[0-6]):(claims|sources):[1-9][0-9]{0,6}$/.test(key) ? key : '미확인';
+  const safeCoordinate = (key, table) => typeof key === 'string' && new RegExp(`^(base|d[5-9]|d1[0-6]):${table}:[1-9][0-9]{0,6}$`).test(key) ? key : '미확인';
   // Research fields remain closed until their individual use is checked by
   // the server. This extra UI boundary is not a replacement for that gate.
   // Synthetic tests remain labeled and never represent real approval.
-  const safeRow = (row, dataset, projection, summaryProjection) => {
+  const safeRow = (row, dataset, projection, summaryProjection, reasoningProjection, subjectProjection, reportedSpeakerProjection) => {
     if (!row || typeof row !== 'object') return null;
     if (dataset === 'synthetic') {
-      const synthetic = {...row, summary: null};
+      const synthetic = {...row, summary: null, reasoning: null, subject: null, reported_speaker: null};
       if (summaryProjection === 'k2-reviewed-summary' && row.summary_status === 'recorded_unverified' && typeof row.summary === 'string' && row.summary.trim() && row.summary.length <= 500 && !/[\x00-\x1f\x7f]/.test(row.summary)) synthetic.summary = row.summary;
+      if (reasoningProjection === 'k37-reviewed-reasoning' && row.reasoning_status === 'recorded_unverified' && typeof row.reasoning === 'string' && row.reasoning.trim() && row.reasoning.length <= 1000 && !/[\x00-\x1f\x7f]/.test(row.reasoning)) synthetic.reasoning = row.reasoning;
+      if (subjectProjection === 'k37-reviewed-subject' && row.subject_status === 'source_confirmed' && typeof row.subject === 'string' && row.subject.trim() && row.subject.length <= 512 && !/[\x00-\x1f\x7f]/.test(row.subject)) synthetic.subject = row.subject;
+      if (reportedSpeakerProjection === 'k37-recorded-speaker' && row.reported_speaker_status === 'recorded_unverified' && typeof row.reported_speaker === 'string' && row.reported_speaker.trim() && row.reported_speaker.length <= 512 && !/[\x00-\x1f\x7f]/.test(row.reported_speaker)) synthetic.reported_speaker = row.reported_speaker;
       return synthetic;
     }
     const safe = {...row};
-    for (const field of ['source_title','source_creator','source_publisher','source_doi','source_year','locator','researcher','speaker','tradition','community_reference','evaluated_subject','summary']) safe[field] = null;
+    for (const field of ['source_title','source_creator','source_publisher','source_doi','source_year','locator','researcher','speaker','tradition','community_reference','evaluated_subject','summary','reasoning','subject','reported_speaker']) safe[field] = null;
     if (summaryProjection === 'k2-reviewed-summary' && row.summary_status === 'recorded_unverified' && typeof row.summary === 'string' && row.summary.trim() && row.summary.length <= 500 && !/[\x00-\x1f\x7f]/.test(row.summary)) safe.summary = row.summary;
+    if (reasoningProjection === 'k37-reviewed-reasoning' && row.reasoning_status === 'recorded_unverified' && typeof row.reasoning === 'string' && row.reasoning.trim() && row.reasoning.length <= 1000 && !/[\x00-\x1f\x7f]/.test(row.reasoning)) safe.reasoning = row.reasoning;
+    if (subjectProjection === 'k37-reviewed-subject' && row.subject_status === 'source_confirmed' && typeof row.subject === 'string' && row.subject.trim() && row.subject.length <= 512 && !/[\x00-\x1f\x7f]/.test(row.subject)) safe.subject = row.subject;
+    if (reportedSpeakerProjection === 'k37-recorded-speaker' && row.reported_speaker_status === 'recorded_unverified' && typeof row.reported_speaker === 'string' && row.reported_speaker.trim() && row.reported_speaker.length <= 512 && !/[\x00-\x1f\x7f]/.test(row.reported_speaker)) safe.reported_speaker = row.reported_speaker;
     // Only the authenticated API's explicit K-1.3 safe projection can carry
     // a private candidate value; a raw archive field or policy flag cannot.
     safe.candidate_field_states = null;
@@ -222,10 +229,11 @@
     if (summary) section.append(node('h3', '핵심 해석 · 원본 기록'), node('p', summary));
     section.append(node('h3', '연결 문헌'), node('p', value(selected.source_title, '문헌명 표시 보류')));
     section.append(node('p', `문헌 작성자: ${value(selected.source_creator, '미확인')}`));
-    section.append(node('h3', '확인된 근거'));
+    section.append(node('h3', selected.reasoning ? '기록된 논거 및 근거' : '확인된 근거'));
     // Evidence types and statuses are metadata, not the content of a proof.
     // Do not turn them into an argument or generate a theological rationale.
-    section.append(node('p', '논거 확인 대기'));
+    section.append(node('p', value(selected.reasoning, '논거 확인 대기')));
+    if (selected.reasoning) section.append(node('p', '원본 연구 기록 · 독립 확인 전', 'muted'));
     const evidence = Array.isArray(selected.evidence) ? selected.evidence : [];
     if (evidence.length) {
       const list = node('ul');
@@ -237,14 +245,16 @@
   const appendPrimary = (container, selected, summary) => {
     // There is no independently verified claim-to-speaker relation in this
     // API. A confirmed community name alone cannot establish the speaker.
-    const role = null;
+    const role = selected.subject || null;
     const actor = node('section', undefined, 'interpretation-actor');
     actor.append(node('h4', '해석 주체'), node('p', value(role, '해석 주체 미확인')));
+    if (selected.reported_speaker) actor.append(node('p', `원본 발화자 표기 · 귀속 미확인: ${selected.reported_speaker}`, 'muted'));
     if (!role) actor.append(node('p', `문헌 작성자 · ${value(selected.source_creator, '미확인')}`, 'muted'));
     const claim = node('section', undefined, 'interpretation-summary');
     claim.append(node('h4', '핵심 해석'), node('p', value(summary, '해석 요지 표시 보류')));
     const argument = node('section', undefined, 'interpretation-argument');
-    argument.append(node('h4', '핵심 논거'), node('p', '논거 확인 대기'));
+    argument.append(node('h4', '핵심 논거'), node('p', value(selected.reasoning, '논거 확인 대기')));
+    if (selected.reasoning) argument.append(node('p', '원본 연구 기록 · 독립 확인 전', 'muted'));
     const source = node('section', undefined, 'interpretation-source');
     source.append(node('h4', '출처'), node('p', value(selected.source_title, '문헌명 표시 보류')));
     container.append(actor, claim, argument, source);
@@ -348,7 +358,7 @@
     }
     const later = Array.isArray(selected.d9_observations) ? selected.d9_observations : [];
     const laterRights = Array.isArray(selected.d9_rights_observations) ? selected.d9_rights_observations : [];
-    if ((sessionDataset === 'D9' || sessionDataset === 'D10' || sessionDataset === 'D12') && (later.length || laterRights.length)) {
+    if ((sessionDataset === 'D9' || sessionDataset === 'D10' || sessionDataset === 'D12' || sessionDataset === 'D16') && (later.length || laterRights.length)) {
       body.append(node('h4', 'D-9 후속 관찰 · 원본 상태 변경 없음'));
       const list = node('ul');
       for (const item of later) if (item && typeof item === 'object') {
@@ -454,7 +464,7 @@
       const data = await response.json();
       if (!drawer.open || current !== drawerGeneration) return;
       if (!data || data.dataset !== sessionDataset || !Array.isArray(data.records)) throw new Error('unavailable');
-      const linked = data.records.map(row => safeRow(row, data.dataset, data.metadata_projection, data.summary_projection))
+      const linked = data.records.map(row => safeRow(row, data.dataset, data.metadata_projection, data.summary_projection, data.reasoning_projection, data.subject_projection, data.reported_speaker_projection))
         .filter(row => row && row.record_kind === 'claim' && row.source_key === key);
       const total = Number.isSafeInteger(data.total) && data.total >= 0 ? data.total : linked.length;
       const pageSize = Number.isSafeInteger(data.page_size) && data.page_size > 0 ? data.page_size : 100;
@@ -500,7 +510,7 @@
       const data = await response.json();
       if (!drawer.open || current !== drawerGeneration) return;
       if (!data || data.dataset !== sessionDataset) throw new Error('unavailable');
-      const target = Array.isArray(data.records) ? safeRow(data.records.find(row => row && row.key === key), data.dataset, data.metadata_projection, data.summary_projection) : null;
+      const target = Array.isArray(data.records) ? safeRow(data.records.find(row => row && row.key === key), data.dataset, data.metadata_projection, data.summary_projection, data.reasoning_projection, data.subject_projection, data.reported_speaker_projection) : null;
       if (!target) throw new Error('unavailable');
       showDetail(target, holder);
     } catch (_) {
@@ -523,7 +533,7 @@
       const data = await response.json();
       if (current !== detailGeneration) return;
       if (!data || data.dataset !== sessionDataset) throw new Error('dataset mismatch');
-      const target = Array.isArray(data.records) ? safeRow(data.records.find(row => row && row.key === key), data.dataset, data.metadata_projection, data.summary_projection) : null;
+      const target = Array.isArray(data.records) ? safeRow(data.records.find(row => row && row.key === key), data.dataset, data.metadata_projection, data.summary_projection, data.reasoning_projection, data.subject_projection, data.reported_speaker_projection) : null;
       if (!target) { detail.replaceChildren(node('p', '연결 대상의 표시 가능한 후보가 없습니다.', 'empty')); return; }
       showDetail(target);
     } catch (e) {
@@ -563,8 +573,9 @@
       const button = node('button', undefined, 'candidate');
       button.type = 'button'; if (safeRef(row.key) !== '미확인') button.dataset.key = safeRef(row.key); button.setAttribute('aria-pressed', String(Boolean(selectedKey && selectedKey === button.dataset.key)));
       if (row.record_kind === 'claim') {
-        const actor = null; // claim-to-speaker verification is not available
+        const actor = row.subject || null; // only the sealed, source-confirmed projection
         button.append(node('strong', value(actor, '해석 주체 미확인')));
+        if (row.reported_speaker) button.append(node('small', `원본 발화자 표기 · 귀속 미확인: ${row.reported_speaker}`));
         if (!actor) button.append(node('small', `문헌 작성자 · ${value(row.source_creator, '미확인')}`));
         button.append(node('span', value(row.summary, '해석 요지 표시 보류'), 'candidate-summary'));
         button.append(node('small', `출처 · ${value(row.source_title, '서지 제목 표시 보류')}`));
@@ -582,7 +593,7 @@
   const render = data => {
     // A document creator can be an institution and is not a claim's speaker.
     creatorFilterLabel.textContent = '문헌 작성자';
-    rows = Array.isArray(data.records) ? data.records.map(row => safeRow(row, data.dataset, data.metadata_projection, data.summary_projection)).filter(Boolean) : [];
+    rows = Array.isArray(data.records) ? data.records.map(row => safeRow(row, data.dataset, data.metadata_projection, data.summary_projection, data.reasoning_projection, data.subject_projection, data.reported_speaker_projection)).filter(Boolean) : [];
     renderMapping(data.unmapped_summary);
     const visibility = data.visibility_summary;
     const validCount = n => Number.isSafeInteger(n) && n >= 0 && n <= 100000;
@@ -632,7 +643,7 @@
     pageSize = Number.isSafeInteger(data.page_size) && data.page_size > 0 ? data.page_size : 100;
     prev.disabled = offset <= 0; next.disabled = offset + rows.length >= total || rows.length === 0;
     pageStatus.textContent = total ? `${offset + 1}–${offset + rows.length} / ${total}` : '';
-    connection.textContent = data.dataset === 'synthetic' ? '합성 시험 자료 / 실제 연구 데이터 아님.' : `${data.dataset === 'D12' ? 'D-12' : data.dataset === 'D10' ? 'D-10' : data.dataset === 'D9' ? 'D-9' : 'D-8'} 연구 후보 · 선택한 로컬 자료에서 조회했습니다. 모든 결과는 연구 후보입니다.`;
+    connection.textContent = data.dataset === 'synthetic' ? '합성 시험 자료 / 실제 연구 데이터 아님.' : `${data.dataset === 'D16' ? 'D-16' : data.dataset === 'D12' ? 'D-12' : data.dataset === 'D10' ? 'D-10' : data.dataset === 'D9' ? 'D-9' : 'D-8'} 연구 후보 · 선택한 로컬 자료에서 조회했습니다. 모든 결과는 연구 후보입니다.`;
     empty.hidden = rows.length > 0;
     renderCards();
 
@@ -647,7 +658,7 @@
     const nameSearchBlocked = () => {
       if (!query.get('community') && !query.get('researcher')) return false;
       if (!verifiedMetadataProjection || !metadataNameCoverage) return true;
-      return Boolean((query.get('community') && metadataNameCoverage.community_name === 0) ||
+      return Boolean((query.get('community') && metadataNameCoverage.community_name === 0 && metadataNameCoverage.tradition === 0) ||
         (query.get('researcher') && metadataNameCoverage.source_creator === 0));
     };
     const showNameSearchBlocked = () => {
@@ -669,14 +680,22 @@
       if (!response.ok) throw new Error('unavailable');
       const data = await response.json();
       if (current !== generation) return;
-      if (!data || !Array.isArray(data.records) || !['D8','D9','D10','D12','synthetic'].includes(data.dataset)) throw new Error('unexpected');
+      if (!data || !Array.isArray(data.records) || !['D8','D9','D10','D12','D16','synthetic'].includes(data.dataset)) throw new Error('unexpected');
       if (sessionDataset && sessionDataset !== data.dataset) throw new Error('dataset mismatch');
       sessionDataset = data.dataset;
+      for (const select of [form.elements.stage, comparisonStage]) {
+        for (const option of select.options) {
+          if (option.value === 'd13' || option.value === 'd14') option.hidden = sessionDataset !== 'D16';
+        }
+      }
       verifiedMetadataProjection = isMetadataProjection(data.metadata_projection);
       const nameCoverage = data.metadata_coverage;
       metadataNameCoverage = verifiedMetadataProjection && nameCoverage && typeof nameCoverage === 'object' &&
         Number.isSafeInteger(nameCoverage.community_name) && nameCoverage.community_name >= 0 && nameCoverage.community_name <= 100000 &&
-        Number.isSafeInteger(nameCoverage.source_creator) && nameCoverage.source_creator >= 0 && nameCoverage.source_creator <= 100000 ? nameCoverage : null;
+        Number.isSafeInteger(nameCoverage.source_creator) && nameCoverage.source_creator >= 0 && nameCoverage.source_creator <= 100000 ? {
+          community_name: nameCoverage.community_name, source_creator: nameCoverage.source_creator,
+          tradition: data.tradition_projection === 'k2-reviewed-tradition' && Number.isSafeInteger(nameCoverage.tradition) && nameCoverage.tradition >= 0 && nameCoverage.tradition <= 100000 ? nameCoverage.tradition : 0
+        } : null;
       if (sessionDataset !== 'synthetic' && nameSearchBlocked()) { showNameSearchBlocked(); return; }
       empty.textContent = '표시 가능한 필드에서 조건에 맞는 후보가 없습니다. 표시 보류된 필드의 일치 여부는 확인할 수 없습니다.';
       render(data);
@@ -695,6 +714,8 @@
   const comparisonScheme = document.getElementById('comparison-scheme');
   const comparisonReference = document.getElementById('comparison-reference');
   const comparisonTradition = document.getElementById('comparison-tradition');
+  const comparisonSet = document.getElementById('comparison-set');
+  const comparisonSetWrap = document.getElementById('comparison-set-wrap');
   const selectionTools = document.getElementById('comparison-selection');
   const selectionStatus = document.getElementById('comparison-selection-status');
   const selectedOnly = document.getElementById('comparison-selected-only');
@@ -730,11 +751,12 @@
     closeDrawer();
     comparisonGeneration += 1;
     if (comparisonController) comparisonController.abort();
-    comparisonController = null; comparisonPassages = [];
+    comparisonController = null; comparisonPassages = []; comparisonSets = [];
     comparisonResults.replaceChildren();
     clearComparisonSelection();
     for (const select of [comparisonCorpus, comparisonScheme, comparisonReference]) select.replaceChildren(new Option('선택', ''));
     comparisonTradition.replaceChildren(new Option('전체', ''));
+    comparisonSet.replaceChildren(new Option('선택한 본문의 전체 후보', '')); comparisonSetWrap.hidden = true;
     comparisonStatus.textContent = '세션을 열고 본문 비교를 선택하세요.';
   };
   const fillOptions = (select, values) => {
@@ -752,12 +774,14 @@
   };
   const refreshSchemes = () => {
     invalidateComparison();
+    comparisonSet.replaceChildren(new Option('선택한 본문의 전체 후보', '')); comparisonSetWrap.hidden = true;
     fillOptions(comparisonScheme, comparisonPassages.filter(p => p.corpus === comparisonCorpus.value).map(p => p.scheme));
     fillOptions(comparisonReference, []);
     comparisonResults.replaceChildren();
   };
   const refreshReferences = () => {
     invalidateComparison();
+    comparisonSet.replaceChildren(new Option('선택한 본문의 전체 후보', '')); comparisonSetWrap.hidden = true;
     fillOptions(comparisonReference, comparisonPassages.filter(p => p.corpus === comparisonCorpus.value && p.scheme === comparisonScheme.value).map(p => p.reference));
     comparisonResults.replaceChildren();
   };
@@ -772,7 +796,7 @@
     comparisonStatus.textContent = '본문 후보를 불러오는 중입니다.';
     try {
       const params = new URLSearchParams();
-      if (comparisonStage.value === 'd12') params.set('stage', 'd12');
+      if (['d12','d13','d14'].includes(comparisonStage.value)) params.set('stage', comparisonStage.value);
       if (query) for (const [key,item] of Object.entries(query)) params.set(key,item);
       const response = await fetch(`/api/comparison${params.size ? `?${params}` : ''}`, {cache:'no-store',headers:{Authorization:`Bearer ${secret}`},signal:comparisonController.signal});
       if (current !== comparisonGeneration) return;
@@ -782,6 +806,7 @@
       if (!data || data.dataset !== sessionDataset || !Array.isArray(data.passages) || !Array.isArray(data.claims)) throw new Error('unexpected');
       if (!query) {
         comparisonPassages = data.passages.filter(p => p && typeof p === 'object' && ['corpus','scheme','reference'].every(k => typeof p[k] === 'string' && p[k].trim() && p[k].length <= 150) && Number.isSafeInteger(p.claim_count) && p.claim_count >= 0);
+        comparisonSets = Array.isArray(data.comparison_sets) ? data.comparison_sets.filter(s => s && typeof s === 'object' && /^d16:comparison_sets:[1-9][0-9]{0,6}$/.test(s.key || '') && ['corpus','scheme','reference'].every(k => typeof s[k] === 'string' && s[k].trim() && s[k].length <= 150) && Number.isSafeInteger(s.claim_count) && s.claim_count >= 0 && ['recorded_unverified','pending'].includes(s.status)) : [];
         fillOptions(comparisonCorpus, comparisonPassages.map(p => p.corpus));
         fillOptions(comparisonScheme, []); fillOptions(comparisonReference, []);
         comparisonTradition.replaceChildren(new Option('전체', ''));
@@ -797,7 +822,7 @@
         return;
       }
       if (!data.selected || ['corpus','scheme','reference'].some(k => data.selected[k] !== query[k])) throw new Error('unexpected');
-      const cards = data.claims.map(raw => ({raw, row:safeRow(raw, data.dataset, data.metadata_projection)})).filter(item => item.row && item.row.record_kind === 'claim');
+      const cards = data.claims.map(raw => ({raw, row:safeRow(raw, data.dataset, data.metadata_projection, data.summary_projection, data.reasoning_projection, data.subject_projection, data.reported_speaker_projection)})).filter(item => item.row && item.row.record_kind === 'claim');
       comparisonStatus.textContent = cards.length ? `선택한 본문의 연구 후보 ${cards.length}건` : '선택한 본문에 표시할 연구 후보가 없습니다.';
       selectionTools.hidden = cards.length < 2;
       for (const {raw,row} of cards) {
@@ -909,13 +934,21 @@
   comparisonCorpus.addEventListener('change', refreshSchemes);
   comparisonStage.addEventListener('change', () => { invalidateComparison(); fetchComparison(); });
   comparisonScheme.addEventListener('change', refreshReferences);
-  comparisonReference.addEventListener('change', invalidateComparison);
+  comparisonReference.addEventListener('change', () => {
+    invalidateComparison();
+    comparisonSet.replaceChildren(new Option('선택한 본문의 전체 후보', ''));
+    const matching = comparisonSets.filter(s => s.corpus === comparisonCorpus.value && s.scheme === comparisonScheme.value && s.reference === comparisonReference.value);
+    for (const item of matching) comparisonSet.add(new Option(`원본 비교 묶음 ${item.key.split(':').pop()} · ${item.claim_count}건 · 검토 대기`, item.key));
+    comparisonSetWrap.hidden = matching.length === 0;
+  });
+  comparisonSet.addEventListener('change', invalidateComparison);
   comparisonTradition.addEventListener('change', invalidateComparison);
   document.getElementById('comparison-form').addEventListener('submit', event => {
     event.preventDefault();
     if (!comparisonCorpus.value || !comparisonScheme.value || !comparisonReference.value) return;
     const query = {corpus:comparisonCorpus.value,scheme:comparisonScheme.value,reference:comparisonReference.value};
     if (comparisonTradition.value) query.tradition = comparisonTradition.value;
+    if (comparisonSet.value && comparisonSets.some(s => s.key === comparisonSet.value && s.corpus === query.corpus && s.scheme === query.scheme && s.reference === query.reference)) query.comparison_set = comparisonSet.value;
     fetchComparison(query);
   });
   document.getElementById('session-form').addEventListener('submit', event => {

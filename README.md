@@ -133,3 +133,7 @@ Windows에서는 `START_SCRIPTURA.cmd`로 로컬 파일 선택기를 열고 고�
 ## Gate K-3–K-7 연속 개발
 
 기존 비공개 비교 화면을 보존하며 합성 자료의 범용 수신·귀속·논거 안전성, 화면 선택과 성능을 검토한다. D-13 원본 수신 및 각 기능의 실제 연동 상태와 남은 제약은 [연속 개발 보고서](K37_REPORT.md), Windows 사용자 재시험 절차는 [Windows 수용 안내](K37_WINDOWS_ACCEPTANCE_KO.md)를 참조한다.
+
+## K-3~K-7 비공개 입력 통합
+
+이후 전달된 비공개 브리지 입력과 실제 수신·비교·안전 검증 범위는 [통합 보고서](docs/K37_PRIVATE_INTEGRATION_REPORT.md), 사용자 PC에서의 최종 수용 절차는 [Windows 안내](K37_PRIVATE_WINDOWS_KO.md)를 참조한다. 입력 파일은 저장소나 CI에 포함하지 않는다.

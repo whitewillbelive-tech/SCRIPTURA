@@ -1,0 +1,10 @@
+D15/D16 reference validation; counts only, read-only input
+claim_review_events rows=47 references_valid=47 pending=0
+D12_field_audit rows=44 references_valid=44 optional_source_missing=7 pending=0
+source_duplicate_review rows=3 references_valid=3 pending=0
+relation_evidence rows=1 references_valid=1 pending=0
+D16_relationships rows=1 references_valid=1 pending=0
+rights_evidence rows=24 references_valid=24 pending=0
+unresolved_modeled_references=0
+modeled_source_or_relation_chain_conflicts=0
+Reference resolution is not source verification, doctrinal authority, scholarly review, or a rights grant.
