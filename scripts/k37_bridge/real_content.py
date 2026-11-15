@@ -149,8 +149,11 @@ def apply_k2_review_restrictions(layers, records, summary_index, tradition_index
 def build_content_index(layers, additions, candidate_index):
     """Build a sealed D16 projection; actual content is never logged or saved.
 
-    Each statement/reasoning requires its own attestation and validated source
-    chain; a field's approval never propagates to another field or claimant.
+    Each statement/reasoning requires a validated source chain and individual
+    restriction checks. With a missing self-authorship attestation, short
+    candidate input is available only as 'local_input_candidate': not a verified
+    paraphrase, rights grant, official position or scholarly review. An
+    attested self-summary remains separately 'recorded_unverified'.
     Recorded tradition is a label, never a verified speaker or doctrine.
     """
     if not isinstance(layers,Mapping) or not isinstance(additions,list) or type(candidate_index) is not LocalCandidateIndex:
@@ -220,9 +223,21 @@ def build_content_index(layers, additions, candidate_index):
                     ('reasoning','reasoning_ko','reasoning_verification_method','reasoning_original_text_stored','reasoning_original_quote',('reasoning_ko','reasoning','argument','own_reasoning')))
             for target,raw,method,stored,quote,aliases in fields:
                 value=row.get(raw)
-                if (_attested(row.get(method),row.get(stored)) and not row.get(quote) and _text_safe(value,protected,500)
+                # There are two distinct *private-local* states. A row with
+                # field-level provenance is a recorded self-summary candidate;
+                # a short input note missing those attestations is readable
+                # only as an UNREVIEWED INPUT NOTE. This is never a rights
+                # grant, verified attribution, scholarly conclusion or quote
+                # clearance. Explicit original-text storage/quote flags and
+                # all linked field-level restrictions continue to deny display.
+                if (not row.get(quote) and row.get(stored) is not True
+                    and row.get('original_text_stored') is not True
+                    and _text_safe(value,protected,500)
                     and not _restricted(objects,aliases)
                     and not _prohibited(related,tuple(aliases)+('display_'+target,'local_'+target))):
-                    result[target]=value.strip();result[target+'_status']='recorded_unverified'
+                    result[target]=value.strip()
+                    result[target+'_status']=('recorded_unverified'
+                        if _attested(row.get(method),row.get(stored))
+                        else 'local_input_candidate')
         out[key]=result
     return RealContentIndex(_TOKEN,out)

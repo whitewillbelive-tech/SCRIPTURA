@@ -453,16 +453,22 @@ def filter_records(dataset, params, *, _internal_all=False):
             # The K2 index is scoped to the frozen D12 baseline, even when it
             # is embedded in a newer validated research receipt.
             summary = summary_for_record(dataset.get('_k2_summary_index'), 'D12', row.get('key'))
-            if mode == 'D16' and content.get('summary_status') == 'recorded_unverified':
+            candidate_status = content.get('summary_status') if mode == 'D16' else None
+            if candidate_status in ('recorded_unverified', 'local_input_candidate'):
                 summary = content.get('summary')
             row['summary'] = summary if isinstance(summary, str) else None
-            row['summary_status'] = 'recorded_unverified' if row['summary'] is not None else 'pending_review'
+            row['summary_status'] = (candidate_status if row['summary'] is not None
+                and candidate_status in ('recorded_unverified', 'local_input_candidate')
+                else 'recorded_unverified' if row['summary'] is not None else 'pending_review')
         if mode == 'D16':
             for field in ('reasoning', 'subject', 'reported_speaker'):
-                valid = 'source_confirmed' if field == 'subject' else 'recorded_unverified'
+                allowed = ('source_confirmed',) if field == 'subject' else (
+                    ('recorded_unverified', 'local_input_candidate') if field == 'reasoning'
+                    else ('recorded_unverified',))
                 value = content.get(field)
-                row[field] = value if content.get(field + '_status') == valid and isinstance(value, str) else None
-                row[field + '_status'] = valid if row[field] is not None else 'pending'
+                state = content.get(field + '_status')
+                row[field] = value if state in allowed and isinstance(value, str) else None
+                row[field + '_status'] = state if row[field] is not None else 'pending'
             label = content.get('tradition')
             if content.get('tradition_status') != 'recorded_unverified' or not isinstance(label, str):
                 label = tradition_for_record(dataset.get('_k2_tradition_index'), 'D12', row.get('key'))
@@ -693,7 +699,12 @@ def compare_passages(dataset, params):
         if selected_members is not None and row.get('key') not in selected_members:
             continue
         summary = row.get('summary') if dataset.get('dataset') == 'D16' else summary_for_record(dataset.get('_k2_summary_index'), dataset.get('dataset'), row.get('key'))
-        claims.append(dict(row, summary=summary, summary_status='recorded_unverified' if summary is not None else 'pending_review'))
+        # Never promote an unreviewed local note while assembling comparison
+        # results; preserve the sealed field-specific provenance state.
+        status = (row.get('summary_status') if dataset.get('dataset') == 'D16'
+                  and row.get('summary_status') in ('recorded_unverified', 'local_input_candidate')
+                  else 'recorded_unverified')
+        claims.append(dict(row, summary=summary, summary_status=status if summary is not None else 'pending_review'))
     return {'dataset': dataset['dataset'], 'metadata_projection': result['metadata_projection'],
             'summary_projection': 'k2-reviewed-summary',
             'reasoning_projection': result.get('reasoning_projection'),

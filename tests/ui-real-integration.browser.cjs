@@ -10,7 +10,7 @@ const sets=[{key:'d16:comparison_sets:1',...selected,claim_count:2,status:'recor
  {key:'d16:comparison_sets:2',corpus:'other',scheme:'other',reference:'other',claim_count:2,status:'pending'}];
 const metadata={source_title:{value:'SYNTHETIC-TITLE',status:'recorded_unverified'},source_creator:{value:'SYNTHETIC-AUTHOR',status:'recorded_unverified'}};
 const row={key:'d14:claims:1',stage:'d14',record_kind:'claim',source_key:'d14:sources:1',candidate_metadata:metadata,
- summary:'SYNTHETIC-SUMMARY',summary_status:'recorded_unverified',reasoning:'SYNTHETIC-REASONING',reasoning_status:'recorded_unverified',subject:'SYNTHETIC-SUBJECT',subject_status:'source_confirmed',reported_speaker:'<img src=x onerror=alert(1)>',reported_speaker_status:'recorded_unverified'};
+ summary:'SYNTHETIC-SUMMARY',summary_status:'local_input_candidate',reasoning:'SYNTHETIC-REASONING',reasoning_status:'local_input_candidate',subject:'SYNTHETIC-SUBJECT',subject_status:'source_confirmed',reported_speaker:'<img src=x onerror=alert(1)>',reported_speaker_status:'recorded_unverified'};
 let browser,page,server,base,query;
 const reply=(route,data)=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data)});
 before(async()=>{

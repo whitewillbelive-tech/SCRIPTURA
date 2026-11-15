@@ -45,7 +45,7 @@ class PrivateContentTests(unittest.TestCase):
         self.assertEqual(result['tradition_status'],'recorded_unverified')
         self.assertEqual(result['reported_speaker'],'SYNTHETIC SPEAKER')
         self.assertEqual(result['reported_speaker_status'],'recorded_unverified')
-        self.assertIsNone(result['reasoning']);self.assertEqual(result['reasoning_status'],'pending_review')
+        self.assertEqual(result['reasoning'],'SYNTHETIC REASONING');self.assertEqual(result['reasoning_status'],'local_input_candidate')
         self.assertIsNone(result['subject']);self.assertEqual(result['subject_status'],'pending')
         self.assertNotIn('SYNTHETIC',repr(index))
 
@@ -57,11 +57,38 @@ class PrivateContentTests(unittest.TestCase):
         row['reasoning_original_quote']='SYNTHETIC QUOTE'
         self.assertIsNone(content_for_record(build(layers,records,dataset),'D16','d13:claims:1')['reasoning'])
 
-    def test_missing_method_or_original_storage_does_not_approve(self):
-        layers,records,dataset=fixture(); row=layers['d13']['claims'][0]['value']
+    def test_missing_method_or_original_storage_is_a_separate_unreviewed_local_candidate(self):
+        layers,records,dataset=fixture()
         for field in ('verification_method','original_text_stored'):
             candidate=copy.deepcopy(layers);candidate['d13']['claims'][0]['value'].pop(field)
-            self.assertIsNone(content_for_record(build(candidate,records,dataset),'D16','d13:claims:1')['summary'])
+            got=content_for_record(build(candidate,records,dataset),'D16','d13:claims:1')
+            self.assertEqual(got['summary'],'SYNTHETIC STATEMENT')
+            self.assertEqual(got['summary_status'],'local_input_candidate')
+            self.assertEqual(got['reasoning'],'SYNTHETIC REASONING')
+            self.assertEqual(got['reasoning_status'],'local_input_candidate')
+
+    def test_unattested_research_reasoning_remains_unreviewed(self):
+        layers,records,dataset=fixture()
+        row=layers['d13']['claims'][0]['value']
+        row.pop('verification_method');row.pop('original_text_stored')
+        result=content_for_record(build(layers,records,dataset),'D16','d13:claims:1')
+        self.assertEqual(result['summary_status'],'local_input_candidate')
+        self.assertEqual(result['reasoning'],'SYNTHETIC REASONING')
+        self.assertEqual(result['reasoning_status'],'local_input_candidate')
+        self.assertIsNone(result['subject'])  # no official/speaker promotion
+
+    def test_explicit_original_text_storage_and_quote_still_block(self):
+        layers,records,dataset=fixture(); row=layers['d13']['claims'][0]['value']
+        row['original_text_stored']=True
+        result=content_for_record(build(layers,records,dataset),'D16','d13:claims:1')
+        self.assertIsNone(result['summary']);self.assertIsNone(result['reasoning'])
+        row['original_text_stored']=False;row.pop('verification_method')
+        row['statement_original_quote']='SYNTHETIC DIRECT QUOTE'
+        result=content_for_record(build(layers,records,dataset),'D16','d13:claims:1')
+        self.assertIsNone(result['summary']);self.assertEqual(result['reasoning_status'],'local_input_candidate')
+        row.pop('statement_original_quote');row['restricted_fields']=['reasoning_ko']
+        result=content_for_record(build(layers,records,dataset),'D16','d13:claims:1')
+        self.assertIsNone(result['reasoning'])
 
     def test_field_privacy_and_conditional_rights_are_not_overridden(self):
         layers,records,dataset=fixture(); row=layers['d13']['claims'][0]['value']

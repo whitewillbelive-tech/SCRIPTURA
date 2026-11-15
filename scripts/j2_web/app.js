@@ -75,16 +75,16 @@
     if (!row || typeof row !== 'object') return null;
     if (dataset === 'synthetic') {
       const synthetic = {...row, summary: null, reasoning: null, subject: null, reported_speaker: null};
-      if (summaryProjection === 'k2-reviewed-summary' && row.summary_status === 'recorded_unverified' && typeof row.summary === 'string' && row.summary.trim() && row.summary.length <= 500 && !/[\x00-\x1f\x7f]/.test(row.summary)) synthetic.summary = row.summary;
-      if (reasoningProjection === 'k37-reviewed-reasoning' && row.reasoning_status === 'recorded_unverified' && typeof row.reasoning === 'string' && row.reasoning.trim() && row.reasoning.length <= 1000 && !/[\x00-\x1f\x7f]/.test(row.reasoning)) synthetic.reasoning = row.reasoning;
+      if (summaryProjection === 'k2-reviewed-summary' && ['recorded_unverified','local_input_candidate'].includes(row.summary_status) && typeof row.summary === 'string' && row.summary.trim() && row.summary.length <= 500 && !/[\x00-\x1f\x7f]/.test(row.summary)) synthetic.summary = row.summary;
+      if (reasoningProjection === 'k37-reviewed-reasoning' && ['recorded_unverified','local_input_candidate'].includes(row.reasoning_status) && typeof row.reasoning === 'string' && row.reasoning.trim() && row.reasoning.length <= 1000 && !/[\x00-\x1f\x7f]/.test(row.reasoning)) synthetic.reasoning = row.reasoning;
       if (subjectProjection === 'k37-reviewed-subject' && row.subject_status === 'source_confirmed' && typeof row.subject === 'string' && row.subject.trim() && row.subject.length <= 512 && !/[\x00-\x1f\x7f]/.test(row.subject)) synthetic.subject = row.subject;
       if (reportedSpeakerProjection === 'k37-recorded-speaker' && row.reported_speaker_status === 'recorded_unverified' && typeof row.reported_speaker === 'string' && row.reported_speaker.trim() && row.reported_speaker.length <= 512 && !/[\x00-\x1f\x7f]/.test(row.reported_speaker)) synthetic.reported_speaker = row.reported_speaker;
       return synthetic;
     }
     const safe = {...row};
     for (const field of ['source_title','source_creator','source_publisher','source_doi','source_year','locator','researcher','speaker','tradition','community_reference','evaluated_subject','summary','reasoning','subject','reported_speaker']) safe[field] = null;
-    if (summaryProjection === 'k2-reviewed-summary' && row.summary_status === 'recorded_unverified' && typeof row.summary === 'string' && row.summary.trim() && row.summary.length <= 500 && !/[\x00-\x1f\x7f]/.test(row.summary)) safe.summary = row.summary;
-    if (reasoningProjection === 'k37-reviewed-reasoning' && row.reasoning_status === 'recorded_unverified' && typeof row.reasoning === 'string' && row.reasoning.trim() && row.reasoning.length <= 1000 && !/[\x00-\x1f\x7f]/.test(row.reasoning)) safe.reasoning = row.reasoning;
+    if (summaryProjection === 'k2-reviewed-summary' && ['recorded_unverified','local_input_candidate'].includes(row.summary_status) && typeof row.summary === 'string' && row.summary.trim() && row.summary.length <= 500 && !/[\x00-\x1f\x7f]/.test(row.summary)) safe.summary = row.summary;
+    if (reasoningProjection === 'k37-reviewed-reasoning' && ['recorded_unverified','local_input_candidate'].includes(row.reasoning_status) && typeof row.reasoning === 'string' && row.reasoning.trim() && row.reasoning.length <= 1000 && !/[\x00-\x1f\x7f]/.test(row.reasoning)) safe.reasoning = row.reasoning;
     if (subjectProjection === 'k37-reviewed-subject' && row.subject_status === 'source_confirmed' && typeof row.subject === 'string' && row.subject.trim() && row.subject.length <= 512 && !/[\x00-\x1f\x7f]/.test(row.subject)) safe.subject = row.subject;
     if (reportedSpeakerProjection === 'k37-recorded-speaker' && row.reported_speaker_status === 'recorded_unverified' && typeof row.reported_speaker === 'string' && row.reported_speaker.trim() && row.reported_speaker.length <= 512 && !/[\x00-\x1f\x7f]/.test(row.reported_speaker)) safe.reported_speaker = row.reported_speaker;
     // Only the authenticated API's explicit K-1.3 safe projection can carry
@@ -252,9 +252,14 @@
     if (!role) actor.append(node('p', `문헌 작성자 · ${value(selected.source_creator, '미확인')}`, 'muted'));
     const claim = node('section', undefined, 'interpretation-summary');
     claim.append(node('h4', '핵심 해석'), node('p', value(summary, '해석 요지 표시 보류')));
+    if (summary && selected.summary_status === 'local_input_candidate')
+      claim.append(node('p', '비공개 연구 입력 메모 · 출처 내용·비인용 여부·재사용 권리 미확인', 'muted'));
     const argument = node('section', undefined, 'interpretation-argument');
     argument.append(node('h4', '핵심 논거'), node('p', value(selected.reasoning, '논거 확인 대기')));
-    if (selected.reasoning) argument.append(node('p', '원본 연구 기록 · 독립 확인 전', 'muted'));
+    if (selected.reasoning) argument.append(node('p',
+      selected.reasoning_status === 'local_input_candidate'
+        ? '비공개 연구 입력 논거 · 독립 확인·비인용 여부·재사용 권리 미확인'
+        : '원본 연구 기록 · 독립 확인 전', 'muted'));
     const source = node('section', undefined, 'interpretation-source');
     source.append(node('h4', '출처'), node('p', value(selected.source_title, '문헌명 표시 보류')));
     container.append(actor, claim, argument, source);
@@ -844,9 +849,13 @@
         card.append(node('p', '원본 기록 · 독립 확인 전', 'tag'));
         const facts = node('dl', undefined, 'facts');
         fact(facts, '문헌 작성자', row.source_creator);
-        const candidateSummary = data.summary_projection === 'k2-reviewed-summary' && raw && raw.summary_status === 'recorded_unverified' && typeof raw.summary === 'string' && raw.summary.trim() && raw.summary.length <= 500 && !/[\x00-\x1f\x7f]/.test(raw.summary) ? raw.summary : null;
+        const candidateSummary = data.summary_projection === 'k2-reviewed-summary' && raw && ['recorded_unverified','local_input_candidate'].includes(raw.summary_status) && typeof raw.summary === 'string' && raw.summary.trim() && raw.summary.length <= 500 && !/[\x00-\x1f\x7f]/.test(raw.summary) ? raw.summary : null;
         fact(facts, '해석 요지', candidateSummary || '표시 보류 · 권리와 인용 범위 검토 필요');
-        fact(facts, '해석 요지 확인', candidateSummary ? '원본 기록 · 독립 확인 전' : '미확인 · 표시 보류');
+        fact(facts, '해석 요지 확인', candidateSummary
+          ? (raw.summary_status === 'local_input_candidate'
+              ? '비공개 연구 입력 메모 · 독립 확인·비인용 여부 미확인'
+              : '원본 기록 · 독립 확인 전')
+          : '미확인 · 표시 보류');
         fact(facts, '출처 위치', '권리·형식 검토 전 표시 보류');
         fact(facts, '출처 확인', readable(row.source_verification_status));
         fact(facts, '입력 주장 검증', row.verification_status);

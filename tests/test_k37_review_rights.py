@@ -96,14 +96,20 @@ class LinkedRightsFields(unittest.TestCase):
         self.assertEqual(fields['community_name']['status'], 'restricted')
         self.assertEqual(fields['source_title']['status'], 'recorded_unverified')
 
-    def test_allow_does_not_approve_unattested_claim(self):
+    def test_allow_does_not_promote_unattested_claim(self):
         layers, records, dataset = fixture()
         row = layers['d13']['claims'][0]['value']
         row.pop('verification_method')
         self.set_right(layers, action='display_summary', decision='allowed')
         result = content_for_record(build(layers, records, dataset), 'D16', 'd13:claims:1')
-        self.assertIsNone(result['summary'])
-        self.assertEqual(result['summary_status'], 'pending_review')
+        self.assertEqual(result['summary'], 'SYNTHETIC STATEMENT')
+        self.assertEqual(result['summary_status'], 'local_input_candidate')
+        self.assertNotEqual(result['summary_status'], 'source_confirmed')
+        # An explicit source/edition field-level restriction still denies
+        # even private local preview; a recorded allowance is not approval.
+        self.set_right(layers, action='display_summary', decision='conditional')
+        refused = content_for_record(build(layers, records, dataset), 'D16', 'd13:claims:1')
+        self.assertIsNone(refused['summary'])
 
     def test_recorded_speaker_denial_aliases_are_honored(self):
         for decision in ('deny', 'not granted', 'disallow', 'rejected'):
