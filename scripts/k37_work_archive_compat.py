@@ -109,12 +109,23 @@ def read_local_unchanged(path):
                 and not re.match(r'^[A-Za-z][A-Za-z0-9+.-]*://', path))
         before = os.stat(path)
         require(stat.S_ISREG(before.st_mode) and 0 < before.st_size <= MAX_BYTES)
-        fingerprint = lambda s: (s.st_dev, s.st_ino, s.st_size, s.st_mtime_ns, s.st_ctime_ns)
+        # On Windows, os.stat(path).st_ctime_ns and os.fstat(handle).st_ctime_ns
+        # may report DIFFERENT meanings (creation time vs metadata-change
+        # time) for the same unchanged file. Comparing them rejects valid
+        # downloaded research ZIPs before the actual pinned hash check.
+        # Cross-API comparison uses identity/size/mtime only. The two
+        # SAME-HANDLE fstat calls still compare ctime to detect changes.
+        identity = lambda s: (s.st_dev, s.st_ino, s.st_size, s.st_mtime_ns)
+        handle_fingerprint = lambda s: identity(s) + (s.st_ctime_ns,)
         with open(path, 'rb') as stream:
-            require(fingerprint(os.fstat(stream.fileno())) == fingerprint(before))
+            handle_before = os.fstat(stream.fileno())
+            require(identity(handle_before) == identity(before))
             data = stream.read(MAX_BYTES + 1)
-            require(fingerprint(os.fstat(stream.fileno())) == fingerprint(before))
-        require(fingerprint(os.stat(path)) == fingerprint(before) and len(data) == before.st_size and len(data) <= MAX_BYTES)
+            handle_after = os.fstat(stream.fileno())
+            require(handle_fingerprint(handle_after) == handle_fingerprint(handle_before))
+        require(identity(os.stat(path)) == identity(before)
+                and identity(handle_after) == identity(before)
+                and len(data) == before.st_size and len(data) <= MAX_BYTES)
         return data
     except Exception:
         raise AuditError('audit_failed') from None

@@ -7,6 +7,8 @@ The operating system's file picker may retain its own recent-file history.
 """
 from __future__ import annotations
 
+import os
+import re
 import sys
 
 
@@ -71,6 +73,7 @@ def main(*, platform=None, chooser=None, increment_chooser=None, is_d13=None, ru
             from j2_private_preview import main as runner
         args = ['--archive', selected]
         if (is_d13 or _is_d13_archive)(selected):
+            print('D-13 정본 확인. 다음 선택창에서 D-14~D-16 증분 ZIP을 선택하세요.')
             increment = (increment_chooser or (lambda: _choose_archive(increment=True)))()
             if not increment:
                 print('증분 자료 선택을 취소했습니다.')
@@ -79,6 +82,11 @@ def main(*, platform=None, chooser=None, increment_chooser=None, is_d13=None, ru
                 print('선택한 증분 자료를 확인할 수 없습니다.', file=sys.stderr)
                 return 1
             args.extend(['--increment', increment])
+        elif re.search(r'(?:^|[_-])d13(?=[_.-]|$)', os.path.basename(selected), re.I):
+            # Never silently misclassify a D13-named but unreadable archive
+            # as a historic D8/D9/D10/D12 single-file input.
+            print('D-13으로 지정한 파일을 확인할 수 없습니다. 정본 ZIP을 선택했는지 확인하세요.', file=sys.stderr)
+            return 1
         # No subprocess: chosen paths and the later secret are not added to argv.
         return runner(args)
     except Exception:
