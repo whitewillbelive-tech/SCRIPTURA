@@ -135,13 +135,18 @@ def build_d16_index(layers, records, groups):
                    or not set(r['passage_ids']).intersection(passage_ids) for _, r in claims):
                 summary['pending_groups'] += 1
                 continue
+            # Resolution alone does not establish that a passage belongs to
+            # this comparison. Require an explicit member link for *each*
+            # listed address, or retain the whole group as pending.
+            if any(not any(pid in r['passage_ids'] for _, r in claims)
+                   for pid in passage_ids):
+                summary['pending_groups'] += 1
+                continue
             summary['validated_groups'] += 1
             summary['claim_refs'] += len(ids)
             summary['passage_refs'] += len(passage_ids)
             for pid in passage_ids:
                 member_keys = [key for key, r in claims if pid in r['passage_ids']]
-                if not member_keys:
-                    continue
                 safe = passage_map[pid]
                 entries.append({'key': f'd16:comparison_sets:{line}', 'corpus': safe['corpus'], 'scheme': safe['scheme'], 'reference': safe['reference'], 'claim_keys': member_keys, 'status': 'recorded_unverified'})
         summary['partitioned_entries'] = len(entries)

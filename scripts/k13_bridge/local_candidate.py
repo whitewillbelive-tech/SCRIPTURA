@@ -83,7 +83,8 @@ def _flags(record):
 def _display_restriction(entries):
     decisions = []
     for row in entries:
-        if not isinstance(row, dict) or str(row.get('action', '')).strip().casefold() not in _DISPLAY_ACTIONS:
+        if (not isinstance(row, dict) or
+                re.sub(r'[\s-]+', '_', str(row.get('action', '')).strip().casefold()) not in _DISPLAY_ACTIONS):
             continue
         for name in ('decision', 'new_decision', 'permission'):
             decision = row.get(name)
@@ -113,9 +114,40 @@ def _field_restriction(record, field):
             value = values.get(name)
             if value is True:
                 return 'explicit_restriction'
-            if isinstance(value, str) and value.strip().casefold() in _DENIED | _SENSITIVE:
+            if isinstance(value, str):
+                code = re.sub(r'[\s-]+', '_', value.strip().casefold())
+                if code in _DENIED | _SENSITIVE:
+                    return 'explicit_restriction'
+                if code == 'conditional':
+                    return 'conditional_use'
+    return None
+
+
+def _field_right_restriction(entries, field):
+    """Apply explicit field restrictions; unrelated rights never grant use."""
+    aliases = _FIELD_ALIASES[field]
+    actions = set(aliases)
+    for name in aliases:
+        actions.update(('display_' + name, 'local_' + name, 'local_display_' + name))
+    for row in entries:
+        reason = _field_restriction(row, field)
+        if reason:
+            return reason
+        if not isinstance(row, dict):
+            continue
+        action = re.sub(r'[\s-]+', '_', str(row.get('action', '')).strip().casefold())
+        if action not in actions:
+            continue
+        for name in ('decision', 'new_decision', 'permission'):
+            value = row.get(name)
+            if value is None:
+                continue
+            if not isinstance(value, str):
                 return 'explicit_restriction'
-            if isinstance(value, str) and value.strip().casefold() == 'conditional':
+            value = re.sub(r'[\s-]+', '_', value.strip().casefold())
+            if value in _DENIED or value in _SENSITIVE:
+                return 'explicit_restriction'
+            if value == 'conditional':
                 return 'conditional_use'
     return None
 
@@ -288,7 +320,15 @@ def prepare_local_candidate_index(dataset, layers):
             relevant_editions = [edition]
         else:
             relevant_editions = source_editions.get(source['id'], [])
-        restrictions = [_flags(source), _display_restriction(rights_by_source[source['id']])]
+        # Edition-scoped decisions affect a claim only for its own edition;
+        # source cards must take every edition of that source into account.
+        edition_ids = {edition.get('id') for edition in relevant_editions}
+        relevant_rights = [right for right in rights_by_source[source['id']]
+                           if not (right.get('edition_id') or right.get('baseline_edition_id'))
+                           or (right.get('edition_id') or right.get('baseline_edition_id')) in edition_ids]
+        for edition_id in edition_ids:
+            relevant_rights.extend(rights_by_edition.get(edition_id, []))
+        restrictions = [_flags(source), _display_restriction(relevant_rights)]
         for edition in relevant_editions:
             restrictions.extend((_flags(edition), _display_restriction(rights_by_edition.get(edition.get('id'), []))))
         reason = ('sensitive_or_personal' if 'sensitive_or_personal' in restrictions else
@@ -298,7 +338,7 @@ def prepare_local_candidate_index(dataset, layers):
                   'source_publisher': source.get('publisher'), 'source_year': _year(source)}
         for field, value in values.items():
             fields[field] = _field(value, field)
-            field_reason = reason or _field_restriction(source, field)
+            field_reason = reason or _field_restriction(source, field) or _field_right_restriction(relevant_rights, field)
             if not field_reason:
                 field_reason = next((_field_restriction(edition, field) for edition in relevant_editions
                                      if _field_restriction(edition, field)), None)
@@ -333,7 +373,9 @@ def prepare_local_candidate_index(dataset, layers):
             else:
                 community = matches[0]
                 fields['community_name'] = _field(community.get('canonical_name'), 'community_name')
-                protection = _flags(community) or _flags(claim) or _field_restriction(community, 'community_name')
+                protection = (_flags(community) or _flags(claim)
+                              or _field_restriction(community, 'community_name')
+                              or _field_right_restriction(relevant_rights, 'community_name'))
                 if protection and fields['community_name']['status'] == 'recorded_unverified':
                     fields['community_name'] = _empty(protection, 'restricted')
                 elif fields['community_name']['status'] == 'recorded_unverified':

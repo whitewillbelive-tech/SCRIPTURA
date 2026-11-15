@@ -124,7 +124,7 @@ jobs:
       - name: Verify private receipt and comparison contracts
         shell: pwsh
         run: |
-          $patterns = @('test_real_receipt.py', 'test_d16_groups.py', 'test_real_content.py', 'test_review_checks.py', 'test_k37_d16_api.py')
+          $patterns = @('test_real_receipt.py', 'test_d16_groups.py', 'test_d16_complete_group_links.py', 'test_k37_increment_quarantine.py', 'test_k37_review_rights.py', 'test_k37_rights_evidence_projection.py', 'test_real_content.py', 'test_review_checks.py', 'test_k37_d16_api.py')
           foreach ($pattern in $patterns) {
             python -m unittest discover -s tests -p $pattern -v
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

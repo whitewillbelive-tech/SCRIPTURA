@@ -29,7 +29,7 @@ from j2_bridge import candidate_readonly as candidate
 WEB_ROOT = Path(__file__).resolve().parent / 'j2_web'
 ASSETS = {'/': ('index.html', 'text/html; charset=utf-8'), '/app.js': ('app.js', 'text/javascript; charset=utf-8'), '/styles.css': ('styles.css', 'text/css; charset=utf-8')}
 FILTERS = {'community': 'tradition', 'researcher': 'researcher', 'corpus': 'passage_corpus', 'scheme': 'passage_scheme', 'reference': 'passage_reference', 'source_kind': 'source_kind', 'attribution': 'attribution', 'verification_status': 'verification_status', 'authority_status': 'authority_status', 'rights_status': 'rights_status', 'access_path': 'access_path', 'record_kind': 'record_kind', 'stage': 'stage'}
-SEARCH_FIELDS = ('tradition', 'community_reference', 'evaluated_subject', 'researcher', 'speaker', 'passage_corpus', 'passage_scheme', 'passage_reference', 'source_title', 'source_creator', 'source_kind', 'attribution', 'verification_status', 'authority_status', 'rights_status', 'access_path', 'record_kind')
+SEARCH_FIELDS = ('tradition', 'community_reference', 'evaluated_subject', 'researcher', 'speaker', 'reported_speaker', 'passage_corpus', 'passage_scheme', 'passage_reference', 'source_title', 'source_creator', 'source_kind', 'attribution', 'verification_status', 'authority_status', 'rights_status', 'access_path', 'record_kind')
 MAX_QUERY_LENGTH = 200
 PAGE_SIZE = 100
 RIGHTS_ACTIONS = frozenset(('browse', 'collect_metadata', 'store_raw', 'store_excerpt', 'index_fulltext', 'embed', 'send_to_model', 'redistribute', 'public_link'))
@@ -528,7 +528,7 @@ def filter_records(dataset, params, *, _internal_all=False):
         if community and not (any(community in _text(row.get(key)) for key in ('tradition', 'community_reference', 'evaluated_subject')) or community in _text(available.get('community_name')) or community in _text(row.get('tradition_candidate', {}).get('value'))):
             continue
         researcher = q.get('researcher', '').casefold()
-        if researcher and not (any(researcher in _text(row.get(key)) for key in ('researcher', 'speaker', 'source_creator')) or researcher in _text(available.get('source_creator'))):
+        if researcher and not (any(researcher in _text(row.get(key)) for key in ('researcher', 'speaker', 'reported_speaker', 'source_creator')) or researcher in _text(available.get('source_creator'))):
             continue
         # Enumerations use exact matches: e.g. "verified" must never also
         # select a record labeled "unverified".

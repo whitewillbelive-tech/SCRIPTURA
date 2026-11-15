@@ -41,6 +41,39 @@ def _tables(z, stage):
     return out
 
 
+def _quarantine_increment(prior_rows, tables):
+    """Return a filtered copy and aggregate findings; never mutate inputs."""
+    masks = {}
+    findings = audit.reference_assessment(
+        prior_rows,
+        {table: [item['value'] for item in tables[table]] for table in audit.TABLES},
+        quarantine_positions=masks)
+    filtered = dict(tables)
+    for table, positions in masks.items():
+        filtered[table] = [row for pos, row in enumerate(tables[table])
+                           if pos not in positions]
+    return filtered, findings
+
+
+def _extend_prior(prior_rows, accepted_tables):
+    """Make only the accepted increment visible to the next validation."""
+    result = {table: dict(stages) for table, stages in prior_rows.items()}
+    for table in audit.TABLES:
+        stages = result.setdefault(table, {})
+        stage = '__accepted_increment__'
+        while stage in stages:
+            stage += '_'
+        stages[stage] = [item['value'] for item in accepted_tables[table]]
+    return result
+
+
+def _receipt_counts(input_counts, d13, d14):
+    """Distinguish archive row totals from rows accepted into the projection."""
+    return {'d13_sources': len(d13['sources']), 'd13_claims': len(d13['claims']),
+            'd14_sources': len(d14['sources']), 'd14_claims': len(d14['claims']),
+            'd14_passages': len(d14['passages']), 'input_counts': input_counts}
+
+
 def load_d16_archive(base_path, delta_path):
     """Build a private D16 projection from both user-selected local archives."""
     try:
@@ -77,26 +110,25 @@ def load_d16_archive(base_path, delta_path):
                                                   ('d16', 'rights_evidence'))}
             if errors or len(groups) != 80:
                 raise base.CandidateError('archive_invalid')
+        input_counts = {stage: {table: len(rows) for table, rows in tables.items()}
+                        for stage, tables in (('d13', d13_tables), ('d14', d14_tables))}
         old = k2.load_k2_archive(d12)
         if old.get('dataset') != 'D12' or len(old.get('records', [])) != 621:
             raise base.CandidateError('baseline_invalid')
         layers, _ = k2._read_layers(d12)
+        prior_rows, _ = audit.old_layers(d12)
+        # Validate each increment against the accepted earlier lineage. An
+        # invalid D13 row must not satisfy a D14 dependency, and intact D12
+        # and sibling records remain available.
+        d13_tables, d13_findings = _quarantine_increment(prior_rows, d13_tables)
         layers['d13'] = d13_tables
-        # Only trusted archives get this far. Isolate invalid D14 rows and
-        # their dependants without dropping intact baseline or sibling rows.
-        prior_rows, _ = audit.old_layers(d13)
-        masks = {}
-        findings = audit.reference_assessment(
-            prior_rows,
-            {table: [item['value'] for item in d14_tables[table]]
-             for table in audit.TABLES},
-            quarantine_positions=masks)
-        for table, positions in masks.items():
-            d14_tables[table] = [row for pos, row in enumerate(d14_tables[table])
-                                 if pos not in positions]
+        d14_tables, d14_findings = _quarantine_increment(
+            _extend_prior(prior_rows, d13_tables), d14_tables)
         layers['d14'] = d14_tables
-        from k37_bridge.review_checks import validate_review_refs
+        from k37_bridge.review_checks import validate_review_refs, verified_rights_actions
         review_summary = validate_review_refs(layers, review_tables)
+        rights_actions, rights_summary = verified_rights_actions(layers, review_tables['rights_evidence'])
+        layers['d16'] = {'rights_actions': rights_actions}
         projected = base._build_projection(layers)
         additions = [r for r in projected if r.get('stage') in ('d13', 'd14') and r.get('record_kind') in ('source', 'claim')]
         expected_additions = sum(len(layers[s][t]) for s in ('d13', 'd14')
@@ -121,6 +153,11 @@ def load_d16_archive(base_path, delta_path):
         result = dict(old)
         result['dataset'] = 'D16'
         result['records'] = list(old['records']) + additions
+        # New restrictions also narrow the previously sealed D12 statement
+        # and tradition indices. This can remove values but never add them.
+        from k37_bridge.real_content import apply_k2_review_restrictions
+        result['_k2_summary_index'], result['_k2_tradition_index'] = apply_k2_review_restrictions(
+            layers, result['records'], result.get('_k2_summary_index'), result.get('_k2_tradition_index'))
         result['_local_candidate_index'] = prepare_local_candidate_index(result, layers)
         from k37_bridge.real_content import build_content_index
         result['_d16_content_index'] = build_content_index(layers, additions, result['_local_candidate_index'])
@@ -128,11 +165,14 @@ def load_d16_archive(base_path, delta_path):
         result['counts']['by_stage'] = dict(result['counts'].get('by_stage', {}))
         for stage in ('d13', 'd14'):
             result['counts']['by_stage'][stage] = {t: len(rows) for t, rows in layers[stage].items()}
-        result['d16_receipt'] = {'d13_sources': 47, 'd13_claims': 47,
-                                 'd14_sources': 96, 'd14_claims': 98,
-                                 'd14_passages': 45, 'comparison_sets': 80,
-                                 'quarantined': findings['quarantined'], 'checksums_verified': 45,
-                                 'review_summary': review_summary}
+        result['d16_receipt'] = _receipt_counts(input_counts, d13_tables, d14_tables)
+        result['d16_receipt'].update({'comparison_sets': len(groups),
+                                     'quarantined': d13_findings['quarantined'] + d14_findings['quarantined'],
+                                     'd13_quarantined': d13_findings['quarantined'],
+                                     'd14_quarantined': d14_findings['quarantined'],
+                                     'checksums_verified': 45,
+                                     'rights_action_summary': rights_summary,
+                                     'review_summary': review_summary})
         # The D16 group builder attaches a separately sealed address index.
         from k37_bridge.d16_groups import build_d16_index
         result['_d16_group_index'] = build_d16_index(layers, result['records'], groups)

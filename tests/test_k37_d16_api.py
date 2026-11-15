@@ -72,4 +72,33 @@ class D16ApiTests(unittest.TestCase):
         self.assertEqual(trusted['records'][0]['reported_speaker_status'], 'recorded_unverified')
         self.assertIsNone(trusted['records'][0]['subject'])
 
+    def test_recorded_speaker_search_uses_only_the_safe_projection(self):
+        row = {'key': 'd13:claims:1', 'stage': 'd13', 'record_kind': 'claim',
+               'reported_speaker': 'RAW SECRET', 'reported_speaker_status': 'recorded_unverified'}
+        dataset = {'dataset': 'D16', 'records': [row]}
+        # Archive-supplied fields must never become searchable through either
+        # the general query or the researcher filter.
+        for parameter in ('q', 'researcher'):
+            self.assertEqual(api.filter_records(dataset, {parameter: ['RAW SECRET']})['records'], [])
+        projection = {'reported_speaker': 'SYNTHETIC SPEAKER',
+                      'reported_speaker_status': 'recorded_unverified'}
+        with patch.object(api, 'content_for_record', return_value=projection):
+            for parameter in ('q', 'researcher'):
+                result = api.filter_records(dataset, {parameter: ['synthetic speaker']})
+                self.assertEqual(len(result['records']), 1)
+                self.assertEqual(result['records'][0]['reported_speaker_status'], 'recorded_unverified')
+                self.assertIsNone(result['records'][0]['subject'])
+            self.assertEqual(api.filter_records(dataset, {'q': ['RAW SECRET']})['records'], [])
+
+    def test_recorded_speaker_search_rejects_unsupported_projection_status(self):
+        dataset = {'dataset': 'D16', 'records': [
+            {'key': 'd13:claims:1', 'stage': 'd13', 'record_kind': 'claim'}]}
+        # Only the expected sealed candidate status participates in search;
+        # a forged or unsupported status does not promote a speaker.
+        with patch.object(api, 'content_for_record', return_value={
+                'reported_speaker': 'SYNTHETIC SPEAKER',
+                'reported_speaker_status': 'source_confirmed'}):
+            for parameter in ('q', 'researcher'):
+                self.assertEqual(api.filter_records(dataset, {parameter: ['SYNTHETIC SPEAKER']})['records'], [])
+
 if __name__ == '__main__': unittest.main()

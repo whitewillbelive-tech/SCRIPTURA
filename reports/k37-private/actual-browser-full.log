@@ -1,0 +1,23 @@
+Actual private data: local Linux headless Chromium, read-only input
+Existing Windows K-2 7/7: prior user acceptance; not rerun in this environment
+D16 comparison sets: 80
+D16 address-separated partitions: 81
+Actual comparison API membership checks: 81 PASS / 0 FAIL
+Actual comparison UI card-count and stale-result checks: 81 PASS / 0 FAIL
+Cross-corpus partitions kept separate: 2 PASS / 0 FAIL
+D13 and D14 speaker general search, API and UI: 2 PASS / 0 FAIL
+D13 and D14 speaker researcher filter, API and UI: 2 PASS / 0 FAIL
+Speaker and source author distinct test samples: 2
+1366x768 prior title and author search: PASS
+1366x768 passage comparison and tradition filter: PASS
+1366x768 evidence, verification and source drawers: PASS
+1366x768 keyboard, focus restoration and zoom: PASS
+1366x768 K6 selection, persistence and reverse source navigation: PASS
+1280x720 tradition-filter verification button with mouse after CSS correction: PASS
+1280x720 K6 full regression: PENDING, further diagnostic in progress
+Unauthorized API request denied: PASS
+Authenticated response cache no-store: PASS
+Content security policy present: PASS
+External network requests in browser tests: 0
+Actual input ZIPs unchanged across completed checks: PASS
+Synthetic 1280x720 browser test suite: 5 PASS / 0 FAIL / 0 SKIP

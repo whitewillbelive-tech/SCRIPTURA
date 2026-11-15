@@ -7,7 +7,10 @@ from collections.abc import Mapping
 import re
 from k13_bridge.local_candidate import LocalCandidateIndex, _field, _flags, _display_restriction
 
-_DENY = frozenset(('denied','prohibited','restricted','blocked','conditional','not_allowed','not_permitted','forbidden','private','sensitive','personal'))
+_DENY = frozenset(('denied','deny','prohibited','restricted','blocked','conditional',
+                   'not_allowed','not_permitted','not_granted','disallowed','disallow',
+                   'forbidden','rejected','private','confidential','sensitive','personal',
+                   'do_not_display','non_public'))
 _TOKEN = object()
 
 def _code(value):
@@ -89,6 +92,60 @@ def _attested(method, stored):
             and stored is False)
 
 
+def apply_k2_review_restrictions(layers, records, summary_index, tradition_index):
+    """Apply newly validated restrictions to previously sealed D12 values.
+
+    This derives new sealed indices without mutating the baseline indices. It
+    can only remove already eligible values; it cannot authorize new content.
+    """
+    from k2_bridge.receipt import (_SummaryIndex, _TraditionIndex,
+                                  summary_for_record, tradition_for_record)
+    if not isinstance(layers, Mapping) or not isinstance(records, list):
+        raise ValueError('content_index_unavailable')
+    d12 = layers.get('d12', {})
+    if not isinstance(d12, Mapping):
+        raise ValueError('content_index_unavailable')
+    claims = {f'd12:claims:{entry["line"]}': entry['value']
+              for entry in d12.get('claims', []) if isinstance(entry, dict)
+              and type(entry.get('line')) is int and isinstance(entry.get('value'), dict)}
+    # The prior K2 projection is scoped to the D12 layer. Older snapshots may
+    # legitimately contain a different historical version of the same ID.
+    d12_only = {'d12': d12}
+    locators = _unique_index(d12_only, 'locators')
+    editions = _unique_index(d12_only, 'editions')
+    sources = _unique_index(d12_only, 'sources')
+    d16 = layers.get('d16', {})
+    entries = d16.get('rights_actions', []) if isinstance(d16, Mapping) else []
+    rights = [entry['value'] for entry in entries if isinstance(entry, dict)
+              and isinstance(entry.get('value'), dict)]
+    summaries, traditions = {}, {}
+    for record in records:
+        if not isinstance(record, dict):
+            continue
+        key = record.get('key')
+        claim = claims.get(key)
+        if not isinstance(claim, dict):
+            continue
+        locator = locators.get(claim.get('source_locator_id') or claim.get('locator_id'))
+        edition = editions.get(locator.get('edition_id')) if isinstance(locator, dict) else None
+        source = sources.get(locator.get('source_id')) if isinstance(locator, dict) else None
+        if not isinstance(edition, dict) or not isinstance(source, dict) or edition.get('source_id') != source.get('id'):
+            continue
+        related = [right for right in rights
+                   if right.get('source_id') == source.get('id') and right.get('edition_id') == edition.get('id')]
+        summary = summary_for_record(summary_index, 'D12', key)
+        summary_aliases = ('statement_ko', 'summary', 'summary_ko', 'own_summary')
+        if (isinstance(summary, str) and not _restricted(related, summary_aliases)
+                and not _prohibited(related, summary_aliases + ('display_summary', 'local_summary'))):
+            summaries[key] = summary
+        tradition = tradition_for_record(tradition_index, 'D12', key)
+        tradition_aliases = ('tradition', 'community_name')
+        if (isinstance(tradition, str) and not _restricted(related, tradition_aliases)
+                and not _prohibited(related, tradition_aliases + ('display_tradition',))):
+            traditions[key] = tradition
+    return _SummaryIndex(summaries), _TraditionIndex(traditions)
+
+
 def build_content_index(layers, additions, candidate_index):
     """Build a sealed D16 projection; actual content is never logged or saved.
 
@@ -124,12 +181,22 @@ def build_content_index(layers, additions, candidate_index):
         if row.get('source_id') and row['source_id']!=source.get('id'):continue
         if row.get('edition_id') and row['edition_id']!=edition.get('id'):continue
         objects=(row,source,edition,loc)
-        related=[x for x in rights if x.get('edition_id')==edition.get('id')
-                 or x.get('baseline_edition_id')==edition.get('id')
-                 or x.get('source_id')==source.get('id')
-                 or x.get('baseline_source_id')==source.get('id')
-                 or (isinstance(locid,str) and locid and
-                     (x.get('source_locator_id')==locid or x.get('locator_id')==locid))]
+        related=[]
+        for x in rights:
+            right_edition=x.get('edition_id') or x.get('baseline_edition_id')
+            right_source=x.get('source_id') or x.get('baseline_source_id')
+            right_locator=x.get('source_locator_id') or x.get('locator_id')
+            # A source-wide rule applies to all editions. More specific rules
+            # must match every supplied part of the source/edition/locator.
+            if (not (right_edition or right_source or right_locator)
+                    or (right_edition and right_edition!=edition.get('id'))
+                    or (right_source and right_source!=source.get('id'))
+                    or (right_locator and right_locator!=locid)):
+                continue
+            related.append(x)
+        # Field-level privacy/restriction declarations in linked rights rows
+        # apply just like declarations on the claim, edition and locator.
+        objects += tuple(related)
         title=candidate_index.for_record('D16',key).get('source_title',{})
         if title.get('status') not in ('recorded_unverified','source_confirmed'):continue
         result={'summary':None,'summary_status':'pending_review','reasoning':None,'reasoning_status':'pending_review',

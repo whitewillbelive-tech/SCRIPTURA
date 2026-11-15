@@ -23,6 +23,24 @@ before(async()=>{
  await page.goto(base,{waitUntil:'networkidle'});await page.getByLabel('세션 비밀').fill(secret);await page.getByRole('button',{name:'세션 열기'}).click();await page.locator('.candidate').first().waitFor();
 });
 after(async()=>{if(browser)await browser.close();if(server)server.kill('SIGTERM');});
+test('1280×720에서 비교 결과와 상세 버튼을 마우스로 접근한다',async()=>{
+ const p=await browser.newPage({viewport:{width:1280,height:720}});
+ try {
+  await p.route('**/api/candidates**',r=>reply(r,{dataset:'D16',metadata_projection:'k1.3-local-candidate',records:[row],total:1,page_size:100}));
+  await p.route('**/api/comparison**',r=>{const query=new URL(r.request().url()).searchParams;
+   const data={dataset:'D16',passages:[{...selected,claim_count:2}],comparison_sets:sets,claims:[]};
+   if(query.has('reference'))Object.assign(data,{selected,claims:[row,{...row,key:'d14:claims:2'}],metadata_projection:'k1.3-local-candidate',summary_projection:'k2-reviewed-summary',reasoning_projection:'k37-reviewed-reasoning',subject_projection:'k37-reviewed-subject',reported_speaker_projection:'k37-recorded-speaker'});
+   return reply(r,data);
+  });
+  await p.goto(base,{waitUntil:'networkidle'});await p.getByLabel('세션 비밀').fill(secret);await p.getByRole('button',{name:'세션 열기'}).click();await p.locator('.candidate').first().waitFor();
+  await p.getByRole('button',{name:'본문 비교',exact:true}).click();await p.getByText(/본문 주소 1개/).waitFor();
+  await p.locator('#comparison-corpus').selectOption(selected.corpus);await p.locator('#comparison-scheme').selectOption(selected.scheme);await p.locator('#comparison-reference').selectOption(selected.reference);
+  await p.getByRole('button',{name:'해석 비교',exact:true}).click();await p.locator('.comparison-card').nth(1).waitFor();
+  assert.ok(await p.locator('#comparison-results').evaluate(e=>e.clientHeight>=100));
+  await p.locator('.comparison-card').first().getByRole('button',{name:'검증 정보 보기'}).click({timeout:5000});
+  assert.equal(await p.locator('#research-drawer').evaluate(e=>e.open),true);
+ } finally {await p.close()}
+});
 test('D16 단계 및 정확 주소의 안전 비교 묶음만 선택한다',async()=>{
  await page.getByRole('button',{name:'본문 비교',exact:true}).click();await page.getByText(/본문 주소 1개/).waitFor();
  await page.locator('#comparison-corpus').selectOption(selected.corpus);await page.locator('#comparison-scheme').selectOption(selected.scheme);await page.locator('#comparison-reference').selectOption(selected.reference);

@@ -5,6 +5,8 @@ Recorded review events, source links and relationship labels do not establish
 formal adoption, direct rebuttal, rights permission, or scholarly review.
 """
 from collections import Counter, defaultdict
+import re
+from k13_bridge.local_candidate import _FIELD_ALIASES
 
 
 # review-table → (reference field, expected table, required)
@@ -56,6 +58,100 @@ def _indexes(layers):
         if all(t == table and r == row for t, r in occurrences):
             unique[ident] = (table, row)
     return unique, len(lookup) - len(unique)
+
+
+_DENY = frozenset(('denied', 'deny', 'prohibited', 'restricted', 'blocked',
+                   'not_allowed', 'not_permitted', 'not_granted', 'disallowed',
+                   'disallow', 'forbidden', 'rejected', 'conditional',
+                   'private', 'sensitive', 'personal'))
+_FIELDS = frozenset(('source_title', 'title', 'source_creator', 'creator', 'author',
+                     'source_publisher', 'publisher', 'source_year', 'publication_year',
+                     'publication_date', 'community_name', 'canonical_name', 'speaker',
+                     'speaker_name', 'claim_speaker', 'tradition',
+                     'statement_ko', 'reasoning', 'reasoning_ko', 'summary',
+                     'summary_ko', 'own_summary', 'argument', 'own_reasoning'))
+_ACTIONS = frozenset(('browse', 'display_metadata', 'metadata_display', 'local_display',
+                      'private_display', 'display', 'speaker', 'speaker_name',
+                      'claim_speaker', 'display_speaker', 'tradition', 'community_name',
+                      'display_tradition', 'statement_ko', 'summary', 'summary_ko',
+                      'own_summary', 'display_summary', 'local_summary', 'reasoning_ko',
+                      'reasoning', 'argument', 'own_reasoning', 'display_reasoning',
+                      'local_reasoning'))
+_ACTIONS |= frozenset(prefix + alias for aliases in _FIELD_ALIASES.values()
+                      for alias in aliases for prefix in ('', 'display_', 'local_', 'local_display_'))
+_NON_RESTRICTING = frozenset(('allowed', 'allow', 'permitted', 'approved', 'granted', 'yes'))
+
+
+def verified_rights_actions(layers, entries):
+    """Project restrictions only for a unique, consistent source/edition chain.
+
+    Positive decisions and free text are never copied or used as permission.
+    Only internal entry wrappers and fixed aggregate counts leave this function.
+    """
+    index, _ = _indexes(layers)
+    result = []
+    counts = Counter(rows=len(entries))
+    for entry in entries:
+        row = _row(entry)
+        line = entry.get('line') if isinstance(entry, dict) else None
+        if not isinstance(row, dict) or type(line) is not int or line < 1:
+            counts['pending'] += 1
+            continue
+        sid, eid = row.get('source_id'), row.get('edition_id')
+        if not isinstance(sid, str) or not isinstance(eid, str):
+            counts['pending'] += 1
+            continue
+        source, edition = index.get(sid), index.get(eid)
+        if not source or source[0] != 'sources' or not edition or edition[0] != 'editions' or edition[1].get('source_id') != sid:
+            counts['pending'] += 1
+            continue
+        projected = {'source_id': sid, 'edition_id': eid}
+        action = row.get('action')
+        action = re.sub(r'[\s-]+', '_', action.strip().casefold()) if isinstance(action, str) else ''
+        applicable_action = action in _ACTIONS
+        if applicable_action:
+            projected['action'] = action
+        unapplied = False
+        for key in ('decision', 'new_decision', 'permission'):
+            value = row.get(key)
+            code = re.sub(r'[\s-]+', '_', value.strip().casefold()) if isinstance(value, str) else None
+            if code in _DENY:
+                if applicable_action:
+                    projected[key] = value
+                else:
+                    unapplied = True
+            elif value is not None and code not in _NON_RESTRICTING:
+                unapplied = True
+        for key in ('restricted_fields', 'private_fields', 'personal_fields', 'sensitive_fields'):
+            values = row.get(key)
+            if isinstance(values, (list, tuple)):
+                filtered = [item for item in values if isinstance(item, str) and item in _FIELDS]
+                if len(filtered) != len(values):
+                    unapplied = True
+                if filtered:
+                    projected[key] = filtered
+            elif values is not None:
+                unapplied = True
+        fields = row.get('field_restrictions')
+        if isinstance(fields, dict):
+            filtered = {key: value for key, value in fields.items() if key in _FIELDS and
+                        (value is True or (isinstance(value, str) and
+                         re.sub(r'[\s-]+', '_', value.strip().casefold()) in _DENY))}
+            if filtered:
+                projected['field_restrictions'] = filtered
+            if len(filtered) != len(fields):
+                unapplied = True
+        elif fields is not None:
+            unapplied = True
+        if unapplied:
+            counts['unapplied'] += 1
+            counts['pending'] += 1
+        if len(projected) > (3 if 'action' in projected else 2):
+            result.append({'line': line, 'value': projected})
+            counts['restricted'] += 1
+        elif not unapplied:
+            counts['no_applicable_signal'] += 1
+    return result, {key: counts[key] for key in ('rows', 'pending', 'restricted', 'unapplied', 'no_applicable_signal')}
 
 
 def validate_review_refs(layers, tables):
