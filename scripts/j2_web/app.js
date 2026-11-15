@@ -233,7 +233,10 @@
     // Evidence types and statuses are metadata, not the content of a proof.
     // Do not turn them into an argument or generate a theological rationale.
     section.append(node('p', value(selected.reasoning, '논거 확인 대기')));
-    if (selected.reasoning) section.append(node('p', '원본 연구 기록 · 독립 확인 전', 'muted'));
+    if (selected.reasoning) section.append(node('p',
+      selected.reasoning_status === 'local_input_candidate'
+        ? '비공개 연구 입력 논거 · 인용 여부·출처 정확성·재사용 권리 미확인'
+        : '원본 연구 기록 · 독립 확인 전', 'muted'));
     const evidence = Array.isArray(selected.evidence) ? selected.evidence : [];
     if (evidence.length) {
       const list = node('ul');

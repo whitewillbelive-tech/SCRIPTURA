@@ -70,3 +70,31 @@ If an access gate fails, summarize the single actionable blocker immediately,
 not after running many unrelated tests. Do not claim "all complete" when the
 actual dataset path has never been exercised. Preserve preflight state and
 resume from the exact blocked step once input access is legitimately fixed.
+
+## K-3~K-7 functional acceptance vs independent scholarly validation
+
+The private user's research browser and a scholarly peer-review pipeline have
+**different completion criteria**. A missing individual authorship/nonquotation
+marker must not automatically render every already-imported short research note
+invisible. In D-16 *authenticated loopback-only* mode, use the sealed field-level
+`local_input_candidate` path for text with independently checked source
+chain, exactly one evidence link, bounded safe format, no explicit quotations
+or stored original, and no applicable privacy/right restriction. Display a
+visible warning that independent provenance, nonquotation, accuracy and reuse
+rights are **unverified**. A field's local visibility does not clear any rights.
+
+Keep `recorded_unverified` for existing individually attested self-summaries
+and keep `pending_review` for blocked/unmapped fields. D-12 historic K-2
+acceptance and original sealed indices must remain unchanged even if the newer
+D-16 viewer can show previously withheld private input notes separately.
+
+Once code, actual import, comparison navigation, private notes, synthetic CI
+and on-device user tests pass, report **functional prototype complete**.
+Report scholarly attribution, human review and public reuse permissions as
+**ongoing independent research coverage**, not as proof that the functional
+interface is eternally incomplete. Do not turn any unknown into `verified`,
+`allowed`, official adoption or direct rebuttal.
+
+When updating reports, use verified, explicit statements of what did and did
+not run. Never repeat the generic status "not completed" without a concrete
+functional failure and a directly actionable repair.
