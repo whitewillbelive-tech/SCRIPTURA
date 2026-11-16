@@ -908,6 +908,26 @@ class Handler(BaseHTTPRequestHandler):
             if url.path in ASSETS and not url.query:
                 name, mime = ASSETS[url.path]
                 return self._respond(200, (WEB_ROOT / name).read_bytes(), mime)
+            if url.path in ('/api/canonical/find', '/api/canonical/notes'):
+                if not self._authenticated():
+                    return self._respond(401, '세션 인증이 필요합니다.')
+                index = self.server.dataset.get('_canonical_index')
+                if index is None:
+                    return self._respond(404, '정본이 연결되지 않았습니다.')
+                if len(url.query) > 2048:
+                    return self._respond(400, '잘못된 요청입니다.')
+                params = urllib.parse.parse_qs(url.query, keep_blank_values=True, max_num_fields=1)
+                if url.path == '/api/canonical/find':
+                    if set(params) != {'q'} or len(params['q']) != 1:
+                        return self._respond(400, '잘못된 요청입니다.')
+                    answer = {'dataset':'W10R','counts':index.counts,
+                              'passages':index.find(params['q'][0])}
+                else:
+                    if set(params) != {'id'} or len(params['id']) != 1:
+                        return self._respond(400, '잘못된 요청입니다.')
+                    answer = {'dataset':'W10R','notes':index.notes(params['id'][0],limit=8)}
+                return self._respond(200, json.dumps(answer, ensure_ascii=False, separators=(',', ':')),
+                                     'application/json; charset=utf-8')
             if url.path == '/api/candidates':
                 if not self._authenticated():
                     return self._respond(401, '세션 인증이 필요합니다.')
@@ -950,7 +970,7 @@ class Handler(BaseHTTPRequestHandler):
         # Never leave unread request bytes on a persistent connection after an
         # early rejection. No body, question, or request path is logged.
         self.close_connection = True
-        if self.path != '/api/research-analysis':
+        if self.path not in ('/api/research-analysis','/api/canonical/analyze'):
             return self._respond(405, '허용되지 않는 요청입니다.')
         if not self._valid_peer():
             return self._respond(403, '접근이 거부되었습니다.')
@@ -993,7 +1013,24 @@ class Handler(BaseHTTPRequestHandler):
                 raise ValueError('short_body')
             payload = json.loads(raw.decode('utf-8'), object_pairs_hook=unique_pairs,
                                  parse_constant=lambda _: (_ for _ in ()).throw(ValueError('invalid_constant')))
-            value = research_analysis(self.server.dataset, payload)
+            if self.path == '/api/canonical/analyze':
+                from c03_canonical_local import CanonicalError, analyze_local
+                index = self.server.dataset.get('_canonical_index')
+                model = self.server.dataset.get('_local_model')
+                if index is None:
+                    return self._respond(404, '정본이 연결되지 않았습니다.')
+                if not isinstance(payload, dict) or set(payload) != {'question','mode','passage_id'}:
+                    raise ValueError('invalid_canonical_request')
+                if any(not isinstance(payload[k],str) for k in payload):
+                    raise ValueError('invalid_canonical_request')
+                notes = index.notes(payload['passage_id'],limit=8)
+                if not model:
+                    value = {'status':'model_unavailable','notes':notes,
+                             'limitations':['로컬 Ollama 모델이 연결되지 않았습니다. 근거 자료만 표시합니다.']}
+                else:
+                    value = {'notes':notes,**analyze_local(payload['question'],payload['mode'],notes,model)}
+            else:
+                value = research_analysis(self.server.dataset, payload)
             return self._respond(200, json.dumps(value, ensure_ascii=False, separators=(',', ':')), 'application/json; charset=utf-8')
         except TimeoutError:
             return self._respond(408, '요청 시간이 초과되었습니다.')
@@ -1011,18 +1048,32 @@ class Handler(BaseHTTPRequestHandler):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description='로컬 연구 후보 탐색기 (루프백 전용)')
-    parser.add_argument('--archive', required=True, help='로컬 연구 ZIP 파일')
+    parser.add_argument('--archive', help='로컬 기존 연구 ZIP 파일')
+    parser.add_argument('--canonical', help='비공개 W10R 정본 ZIP 파일')
+    parser.add_argument('--local-model', help='선택적으로 연결할 이 PC의 Ollama 모델 이름')
     parser.add_argument('--increment', help='별도로 제공된 D-14~D-16 증분 ZIP 파일')
     parser.add_argument('--public-snapshot', help='검토된 고정 공개 서지 스냅샷의 로컬 파일')
     parser.add_argument('--public-snapshot-id', help='코드에 등록된 스냅샷 정책 이름')
     args = parser.parse_args(argv)
     try:
-        archive = local_archive_path(args.archive)
-        if args.increment:
-            from k37_bridge.real_receipt import load_d16_archive
-            dataset = load_d16_archive(archive, local_archive_path(args.increment))
+        if args.canonical:
+            if args.archive or args.increment:
+                raise ValueError('canonical_mode_exclusive')
+            from c03_canonical_local import CanonicalIndex
+            index = CanonicalIndex(local_archive_path(args.canonical))
+            if args.local_model and not re.fullmatch(r'[A-Za-z0-9_.:-]{1,70}', args.local_model):
+                raise ValueError('invalid_local_model')
+            dataset = {'dataset':'synthetic','records':[],
+                       '_canonical_index':index,'_local_model':args.local_model}
         else:
-            dataset = load_versioned_archive(archive)
+            if not args.archive or args.local_model:
+                raise ValueError('archive_required')
+            archive = local_archive_path(args.archive)
+            if args.increment:
+                from k37_bridge.real_receipt import load_d16_archive
+                dataset = load_d16_archive(archive, local_archive_path(args.increment))
+            else:
+                dataset = load_versioned_archive(archive)
         if bool(args.public_snapshot) != bool(args.public_snapshot_id):
             raise ValueError('public_snapshot_untrusted')
         if args.public_snapshot:

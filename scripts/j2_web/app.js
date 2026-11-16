@@ -1141,4 +1141,173 @@
   form.addEventListener('reset', () => { offset = 0; clear(); setTimeout(search, 0); });
   prev.addEventListener('click', () => { offset = Math.max(0, offset - pageSize); search(); });
   next.addEventListener('click', () => { offset += pageSize; search(); });
+
+  // C-03: W10R canonical workstation. Its authenticated loopback routes share
+  // the same session, but never reclassify legacy K2/K37 research statuses.
+  const canonicalTab = document.createElement('button');
+  canonicalTab.id = 'canonical-view';
+  canonicalTab.type = 'button';
+  canonicalTab.textContent = '통합 정본 · AI 연구';
+  canonicalTab.setAttribute('aria-pressed','false');
+  document.querySelector('.view-switch').append(canonicalTab);
+  const canonicalPanel = document.createElement('section');
+  canonicalPanel.id = 'canonical-panel';
+  canonicalPanel.className = 'panel comparison';
+  canonicalPanel.hidden = true;
+  const canonHeading = document.createElement('h2');
+  canonHeading.textContent = '통합 정본 연구 · 비공개 로컬';
+  const canonNotice = document.createElement('p');
+  canonNotice.className = 'subtle';
+  canonNotice.textContent = '실제 W10R 연구 입력 후보를 확인합니다. 문헌 확인·공식성·학술 심사 및 외부 전송 권리는 미확정입니다. AI 추론은 로컬 모델을 명시적으로 활성화한 경우에만 수행합니다.';
+  const canonForm = document.createElement('form');
+  const canonLabel = document.createElement('label');
+  canonLabel.textContent = '성경 본문 원본 표기 검색';
+  const canonSearch = document.createElement('input');
+  canonSearch.type = 'search';
+  canonSearch.maxLength = 100;
+  canonSearch.placeholder = '예: John 1:1, Genesis 1:1, Isaiah 7:14';
+  canonLabel.append(canonSearch);
+  const canonFind = document.createElement('button');
+  canonFind.className = 'primary';
+  canonFind.type = 'submit';
+  canonFind.textContent = '정본 찾기';
+  canonForm.append(canonLabel, canonFind);
+  const canonStatus = document.createElement('p');
+  canonStatus.setAttribute('role','status');
+  canonStatus.textContent = '세션을 연 후 본문을 검색하세요.';
+  const canonMatches = document.createElement('div');
+  const canonNotes = document.createElement('div');
+  const canonQuestionForm = document.createElement('form');
+  const canonQuestionLabel = document.createElement('label');
+  canonQuestionLabel.textContent = '선택한 본문에 질문하기';
+  const canonQuestion = document.createElement('textarea');
+  canonQuestion.rows = 3; canonQuestion.maxLength = 600;
+  canonQuestion.placeholder = '예: 이 본문의 두 해석은 어떤 전제에서 갈라지는가?';
+  canonQuestionLabel.append(canonQuestion);
+  const canonMode = document.createElement('select');
+  for (const [key,label] of [['comparison','해석 비교'],['historical_linguistic','역사·언어'],
+    ['textual_criticism','본문비평'],['canonical','정경적 읽기'],
+    ['doctrinal_assumption','특정 교리 전제'],['logical','논리 분석']]) {
+    canonMode.add(new Option(label,key));
+  }
+  const canonAnalyze = document.createElement('button');
+  canonAnalyze.type='submit';canonAnalyze.className='primary';
+  canonAnalyze.textContent = '로컬 AI 분석';
+  canonAnalyze.disabled=true;
+  canonQuestionForm.append(canonQuestionLabel,canonMode,canonAnalyze);
+  const canonOutput = document.createElement('div');
+  canonicalPanel.append(canonHeading,canonNotice,canonForm,canonStatus,canonMatches,
+                        canonNotes,canonQuestionForm,canonOutput);
+  document.getElementById('candidate-layout').before(canonicalPanel);
+  let selectedCanonical = null;
+  let canonicalGeneration = 0;
+  const canonicalP = (parent,value,kind='p') => {
+    const element=document.createElement(kind);
+    element.textContent=value || '미확인';
+    parent.append(element);
+    return element;
+  };
+  const clearCanonical = () => {
+    canonicalGeneration += 1;
+    selectedCanonical = null;
+    canonAnalyze.disabled=true;
+    canonMatches.replaceChildren();
+    canonNotes.replaceChildren();
+    canonOutput.replaceChildren();
+  };
+  canonicalTab.addEventListener('click',()=>{
+    clearCanonical();
+    candidateLayout.hidden=true; comparisonPanel.hidden=true;
+    canonicalPanel.hidden=false;
+    document.getElementById('candidate-view').setAttribute('aria-pressed','false');
+    document.getElementById('comparison-view').setAttribute('aria-pressed','false');
+    canonicalTab.setAttribute('aria-pressed','true');
+  });
+  for(const item of ['candidate-view','comparison-view']){
+    document.getElementById(item).addEventListener('click',()=>{
+      canonicalPanel.hidden=true;
+      canonicalTab.setAttribute('aria-pressed','false');
+      clearCanonical();
+    });
+  }
+  document.getElementById('session-close').addEventListener('click',()=>{
+    canonicalPanel.hidden=true;canonicalTab.setAttribute('aria-pressed','false');
+    clearCanonical();
+  });
+  document.getElementById('session-form').addEventListener('submit',()=>{
+    clearCanonical();
+  });
+  const canonRequest = async (url, options={})=>{
+    if (!secret) throw new Error('세션 비밀을 먼저 입력하세요.');
+    const response = await fetch(url,{...options,cache:'no-store',
+      headers:{Authorization:'Bearer '+secret,...(options.headers || {})}});
+    if (!response.ok) throw new Error(response.status===404?'정본 모드로 프로그램을 실행해야 합니다.':'조회 또는 인증에 실패했습니다.');
+    return await response.json();
+  };
+  canonForm.addEventListener('submit',async event=>{
+    event.preventDefault();
+    clearCanonical();
+    const seq=canonicalGeneration;
+    canonStatus.textContent='정본 검색 중…';
+    try{
+      const data=await canonRequest('/api/canonical/find?q='+encodeURIComponent(canonSearch.value));
+      if(seq!==canonicalGeneration)return;
+      if(data.dataset!=='W10R'||!Array.isArray(data.passages))throw Error('잘못된 정본 응답');
+      canonStatus.textContent='정본 주장 '+data.counts.claims+'건 · 본문 '+data.counts.passages+'건 · 검색 결과 '+data.passages.length+'건';
+      for(const item of data.passages){
+        const btn=document.createElement('button');
+        btn.type='button';
+        btn.textContent=(item.reference||'주소 미확인')+' · 연결 주장 '+item.claim_count+'건';
+        btn.addEventListener('click',async()=>{
+          clearCanonical();
+          selectedCanonical=item.id;
+          const now=canonicalGeneration;
+          canonStatus.textContent='연구 입력 후보를 읽는 중…';
+          try{
+            const pack=await canonRequest('/api/canonical/notes?id='+encodeURIComponent(item.id));
+            if(now!==canonicalGeneration || selectedCanonical!==item.id)return;
+            canonStatus.textContent='선택 본문: '+(item.reference||'미확인')+' · 화면 후보 '+pack.notes.length+'건';
+            canonAnalyze.disabled=pack.notes.length===0;
+            for(const note of pack.notes){
+              const card=document.createElement('article');
+              card.className='comparison-card';
+              canonicalP(card,(note.source_title||'문헌 미확인')+' · '+(note.source_creator||'작성자 미확인'),'h3');
+              canonicalP(card,'핵심 해석: '+(note.statement||'표시 가능한 요지 없음'));
+              canonicalP(card,'논거: '+(note.reasoning||'기록된 논거 없음'));
+              canonicalP(card,'원본 입력 후보 · 공식성·학술 검증·모델 전송 권리 미확정','small');
+              canonNotes.append(card);
+            }
+            canonOutput.replaceChildren();
+          }catch(e){if(now===canonicalGeneration)canonStatus.textContent=e.message;}
+        });
+        canonMatches.append(btn);
+      }
+    }catch(e){if(seq===canonicalGeneration)canonStatus.textContent=e.message;}
+  });
+  canonQuestionForm.addEventListener('submit',async event=>{
+    event.preventDefault();
+    if(!selectedCanonical||!canonQuestion.value.trim())return;
+    const current=canonicalGeneration;
+    canonOutput.replaceChildren();
+    canonicalP(canonOutput,'로컬 모델에 질문 중…');
+    try{
+      const data=await canonRequest('/api/canonical/analyze',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({question:canonQuestion.value,mode:canonMode.value,passage_id:selectedCanonical})});
+      if(current!==canonicalGeneration)return;
+      canonOutput.replaceChildren();
+      if(data.status!=='analysis_unverified'){
+        canonicalP(canonOutput,'AI 분석 미실행: '+(data.status||'미확인'));
+        canonicalP(canonOutput,(data.limitations||[]).join(' '));
+        return;
+      }
+      canonicalP(canonOutput,'AI 생성 분석 · 독립 검증 전','h3');
+      for(const section of (data.analyses||[]).slice(0,8)){
+        canonicalP(canonOutput,section.text);
+        canonicalP(canonOutput,'사용된 연구 후보 ID: '+(section.citations||[]).join(', '),'small');
+      }
+      canonicalP(canonOutput,(data.limitations||[]).join(' '));
+    }catch(e){if(current===canonicalGeneration){canonOutput.replaceChildren();canonicalP(canonOutput,e.message);}}
+  });
+
 })();
