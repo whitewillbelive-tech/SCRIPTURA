@@ -41,3 +41,16 @@
 - 미로그인 요청 401, 외부 출처 공격 403, 명시적으로 모델 연결하지 않은 상태 model_unavailable.
 - 실제 로컬 모델의 성공 여부는 모델이 설치된 사용자 Windows에서만 판정한다.
 - W-11 기존 50문항 벤치마크는 별도, 실제 모델 실행 전에는 NOT_RUN으로 유지한다.
+
+## W-11 재감사 후속 실행
+
+별도 라이브러리 W11 원본 ZIP을 보관한다. 정본과 감사 ZIP을 모두 선택하여 다음을 실행할 수 있다.
+
+- 모델 없이 안전한 사전점검(50문항의 원본 질문 문구만 검사, 실제 AI 0):
+  py -3 scripts\c03_benchmark.py --canonical "정본 ZIP 경로" --audit "W11 감사 ZIP 경로"
+- 이미 PC에 로컬 Ollama가 설치·동작하며 모델명이 확인된 경우에만:
+  py -3 scripts\c03_benchmark.py --canonical "정본 ZIP 경로" --audit "W11 감사 ZIP 경로" --model "설치된 모델명" --output "개인 폴더\scriptura_qa_run.jsonl"
+
+감사 ZIP의 oracle.jsonl은 모델에 주지 않는다. 질문 중 구절의 정확한 대응이 확인되지 않는 것은 NOT_RUN_NO_LINKED_PASSAGE로 남긴다.
+50문항을 불완전한 문헌 연결로 강제 평가하지 않는다. 생성된 AI 답변은 학술 평가 완료가 아니며,
+기존 W11 평가자 기준에 따라 원전 대조와 독립 채점이 별도로 필요하다.
