@@ -81,7 +81,12 @@ class C04BenchmarkTests(unittest.TestCase):
                                        qa_expected_sha256=digest, canonical_expected_sha256=ANCHOR)
             self.assertEqual((summary['not_run'], summary['model_called']), (50, 0))
             self.assertFalse(any('DO_NOT_FORWARD_ORACLE' in line for line in output.read_text(encoding='utf8').splitlines()))
-            self.assertEqual(os.stat(output).st_mode & 0o077, 0)
+            # Python's Windows st_mode does not represent NTFS ACLs. Only
+            # assert POSIX file permissions on platforms that implement them;
+            # the Windows acceptance guide separately requires a private
+            # user-controlled directory and does not claim ACL verification.
+            if os.name == 'posix':
+                self.assertEqual(os.stat(output).st_mode & 0o077, 0)
             call.assert_not_called()
 
     def test_actual_callback_counts_attempts_not_automatic_grades(self):
