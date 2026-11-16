@@ -29,7 +29,7 @@ def safe(value, limit=480):
     value = value.strip()
     if not value or len(value) > limit or URL.search(value) or SENSITIVE.search(value) or DIRECTIVE.search(value):
         return None
-    if any(ord(c) < 32 or ord(c) == 127 for c in value) or any(c in value for c in "<>{}\x60\\\"“”「」『』"):
+    if any(ord(c) < 32 or ord(c) == 127 for c in value) or any(c in value for c in ('<', '>', '{', '}', chr(96), '"', '“', '”', '「', '」', '『', '』')):
         return None
     return value
 
