@@ -5,6 +5,7 @@ remain pending; this module does not infer theology or a person's affiliation.
 """
 from collections.abc import Mapping
 import re
+import unicodedata
 from k13_bridge.local_candidate import LocalCandidateIndex, _field, _flags, _display_restriction
 
 _DENY = frozenset(('denied','deny','prohibited','restricted','blocked','conditional',
@@ -81,7 +82,8 @@ def _text_safe(value, protected, maxlen):
     if not isinstance(value,str) or not value.strip() or len(value)>maxlen:return False
     if any(x in value for x in ('“','”','"','「','」','\n','\r')):return False
     if _field(value,'source_title').get('status')!='recorded_unverified':return False
-    return not any(name in value.casefold() for name in protected)
+    candidate = unicodedata.normalize('NFKC', value).casefold()
+    return not any(unicodedata.normalize('NFKC', name).casefold() in candidate for name in protected)
 
 
 def _attested(method, stored):

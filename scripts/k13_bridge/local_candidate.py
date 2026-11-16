@@ -8,6 +8,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from datetime import date
 import re
+import unicodedata
 
 FIELDS = ('source_title', 'source_creator', 'source_publisher', 'source_year', 'community_name')
 STATUSES = frozenset(('recorded_unverified', 'source_confirmed', 'restricted', 'missing_or_unmapped'))
@@ -59,7 +60,11 @@ def _field(value, field):
             or any(ord(ch) < 32 or ord(ch) == 127 for ch in value)
             or '<' in value or '>' in value):
         return _empty('unsafe_format', 'restricted')
-    if _URL.search(value) or _EMAIL.search(value) or _TELEPHONE.search(value) or _NATIONAL_ID.search(value):
+    # Check compatibility forms as well: full-width punctuation and digits
+    # must not bypass privacy detection. Keep the displayed value unchanged.
+    privacy_probe = unicodedata.normalize('NFKC', value)
+    if (_URL.search(privacy_probe) or _EMAIL.search(privacy_probe)
+            or _TELEPHONE.search(privacy_probe) or _NATIONAL_ID.search(privacy_probe)):
         return _empty('sensitive_or_personal', 'restricted')
     if field == 'source_year' and (not re.fullmatch(r'[0-9]{4}', value) or not 1000 <= int(value) <= 2100):
         return _empty('unsafe_format', 'restricted')
@@ -155,8 +160,9 @@ def _field_right_restriction(entries, field):
 def _contains_protected_name(value, names):
     if not isinstance(value, str):
         return False
-    candidate = value.strip().casefold()
+    candidate = unicodedata.normalize('NFKC', value.strip()).casefold()
     for name in names:
+        name = unicodedata.normalize('NFKC', name).casefold()
         if candidate == name:
             return True
         if len(name) >= 2 and re.search(r'(?<!\w)' + re.escape(name) + r'(?!\w)', candidate):

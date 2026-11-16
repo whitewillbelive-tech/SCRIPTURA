@@ -729,9 +729,10 @@
   const selectedOnly = document.getElementById('comparison-selected-only');
   const clearSelectionButton = document.getElementById('comparison-clear-selection');
   const analysisOpen = document.getElementById('analysis-open');
+  const dossierOpen = document.getElementById('dossier-open');
   const graphOpen = document.getElementById('graph-open');
   let analysisContext = null;
-  const clearAnalysis = () => { analysisContext = null; analysisOpen.disabled = true; graphOpen.disabled = true; };
+  const clearAnalysis = () => { analysisContext = null; analysisOpen.disabled = true; dossierOpen.disabled = true; graphOpen.disabled = true; };
   let selectedClaims = new Set();
   let selectionCards = [];
   let selectionOnly = false;
@@ -839,9 +840,11 @@
       if (!data.selected || ['corpus','scheme','reference'].some(k => data.selected[k] !== query[k])) throw new Error('unexpected');
       const cards = data.claims.map(raw => ({raw, row:safeRow(raw, data.dataset, data.metadata_projection, data.summary_projection, data.reasoning_projection, data.subject_projection, data.reported_speaker_projection)})).filter(item => item.row && item.row.record_kind === 'claim');
       analysisContext = {corpus:query.corpus, scheme:query.scheme, reference:query.reference, dataset:data.dataset,
+        metadataProjection:data.metadata_projection,
         claims:new Map(cards.filter(item => safeCoordinate(item.row.key, 'claims') !== '미확인').map(item => [item.row.key, item.row])),
         sources:new Set(cards.map(item => item.row.source_key).filter(key => safeCoordinate(key, 'sources') !== '미확인'))};
       analysisOpen.disabled = false;
+      dossierOpen.disabled = false;
       graphOpen.disabled = false;
       comparisonStatus.textContent = cards.length ? `선택한 본문의 연구 후보 ${cards.length}건` : '선택한 본문에 표시할 연구 후보가 없습니다.';
       selectionTools.hidden = cards.length < 2;
@@ -945,6 +948,65 @@
       if (data.truncated === true) holder.append(node('p', '연결이 많아 일부만 표시합니다.', 'subtle'));
     } catch (_) {
       if (drawer.open && analysisContext === context && current === comparisonGeneration && secret === session) holder.replaceChildren(node('p', '연결된 주장을 불러오지 못했습니다.', 'error'));
+    }
+  });
+  dossierOpen.addEventListener('click', async () => {
+    if (!analysisContext || !secret) return;
+    const context = analysisContext, current = comparisonGeneration, session = secret;
+    const holder = node('div'); holder.append(node('p', '근거 자료집을 불러오는 중입니다.', 'subtle'));
+    openDrawer('본문 근거 자료집', holder, dossierOpen);
+    try {
+      const params = new URLSearchParams({corpus:context.corpus, scheme:context.scheme, reference:context.reference});
+      const response = await fetch(`/api/research-dossier?${params}`, {cache:'no-store',headers:{Authorization:`Bearer ${secret}`}});
+      if (!drawer.open || analysisContext !== context || current !== comparisonGeneration || secret !== session) return;
+      if (!response.ok) throw new Error('unavailable');
+      const data = await response.json();
+      if (!drawer.open || analysisContext !== context || current !== comparisonGeneration || secret !== session) return;
+      if (!data || data.status !== 'evidence_only' || data.model_status !== 'model_unavailable' || !Array.isArray(data.entries) || !data.selected || ['corpus','scheme','reference'].some(k => data.selected[k] !== context[k])) throw new Error('invalid');
+      holder.replaceChildren();
+      holder.append(node('p', 'AI 모델 미연결 · 이 자료집은 연구 기록이며 AI 분석이 아닙니다.', 'tag'));
+      holder.append(node('p', '출처 확인, 공식 채택, 학술 심사와 권리 상태는 서로 별도로 확인해야 합니다. 단순한 해석 차이는 직접 반박이 아닙니다.', 'subtle'));
+      holder.append(node('p', `${context.corpus} · ${context.scheme} · ${context.reference}`));
+      const seen = new Set();
+      for (const entry of data.entries.slice(0, 100)) {
+        if (!entry || typeof entry !== 'object' || !context.claims.has(entry.ref) || seen.has(entry.ref)) continue;
+        seen.add(entry.ref);
+        const row = context.claims.get(entry.ref);
+        // A second response cannot introduce a field hidden by the original
+        // authenticated comparison projection or change its status.
+        const match = (field, key, states) => field && typeof field === 'object' && states.includes(field.status) && field.status === row[key + '_status'] && typeof field.value === 'string' && field.value === row[key] ? row[key] : null;
+        const limited = {...row};
+        limited.subject = match(entry.subject, 'subject', ['source_confirmed']);
+        limited.reported_speaker = match(entry.recorded_speaker, 'reported_speaker', ['recorded_unverified']);
+        limited.summary = match(entry.summary, 'summary', ['recorded_unverified','local_input_candidate']);
+        limited.reasoning = match(entry.reasoning, 'reasoning', ['recorded_unverified','local_input_candidate']);
+        const source = entry.source && typeof entry.source === 'object' && entry.source.ref === row.source_key && context.sources.has(row.source_key) ? entry.source : null;
+        for (const [field, name] of [['title','source_title'],['creator','source_creator']]) {
+          const candidate = source && source[field];
+          const status = (row.candidate_field_states && row.candidate_field_states[name]) || (context.metadataProjection === METADATA_PROJECTION && typeof row[name] === 'string' ? 'source_confirmed' : undefined);
+          limited[name] = candidate && ['recorded_unverified','source_confirmed'].includes(candidate.status) && candidate.status === status && candidate.value === row[name] ? row[name] : null;
+        }
+        const section = node('section', undefined, 'dossier-entry');
+        appendPrimary(section, limited, limited.summary);
+        const labels = {source_confirmed:'출처 대조 완료',recorded_unverified:'원본 기록 · 독립 확인 전',verified_fields_only:'일부 서지 필드 확인',source_checked:'출처 위치 확인',unconfirmed:'미확인',unreviewed:'미심사',pending:'확인 대기',pending_review:'확인 대기',unmapped:'연결 미확인',unknown:'미확인',disputed:'이견 있음',reviewed:'심사 기록 있음',individual:'개인 견해로 기록',external_criticism:'외부 비판으로 기록',official_confirmed:'공식성 확인 기록',not_granted:'허가 미확인',restricted:'제한',verified:'확인 기록',unverified:'독립 확인 전',not_reviewed:'미심사',not_applicable:'해당 없음'};
+        const statuses = entry.statuses && typeof entry.statuses === 'object' ? entry.statuses : {};
+        const axis = (key, original) => statuses[key] === original && Object.hasOwn(labels, original) ? labels[original] : '미확인';
+        section.append(node('p', `출처 상태: ${axis('source_status', row.source_verification_status)} · 공식성: 미확인 · 독립 학술 심사: 미확인 · 권리: ${axis('rights_status', row.rights_status)}`, 'subtle'));
+        section.append(node('p', `원본 기록의 공식성: ${axis('recorded_authority_status', row.input_authority_status)} · 원본 기록의 학술 심사: ${axis('reported_academic_status', row.reported_independent_review_status)}`, 'subtle'));
+        const claimButton = node('button', '연결 주장 보기'); claimButton.type = 'button';
+        claimButton.addEventListener('click', () => { const detail = node('div'); showDetail(row, detail); openDrawer('연결 주장', detail, claimButton); });
+        section.append(claimButton);
+        if (source) {
+          const sourceButton = node('button', '연결 문헌 보기'); sourceButton.type = 'button';
+          sourceButton.addEventListener('click', () => openSourceDrawer(source.ref, sourceButton));
+          section.append(sourceButton);
+        }
+        holder.append(section);
+      }
+      if (!seen.size) holder.append(node('p', '현재 표시할 수 있는 연구 기록이 없습니다.', 'empty'));
+      holder.append(node('p', '출처 위치·반론·공통점·차이는 별도 근거가 필요합니다. 확인되지 않은 내용은 판단을 보류합니다.', 'subtle'));
+    } catch (_) {
+      if (drawer.open && analysisContext === context && current === comparisonGeneration && secret === session) holder.replaceChildren(node('p', '근거 자료집을 불러오지 못했습니다.', 'error'));
     }
   });
   analysisOpen.addEventListener('click', () => {

@@ -794,6 +794,28 @@ def research_graph(dataset, params):
             'truncated': len(seen) > len(edges)}
 
 
+def research_dossier(dataset, params):
+    """Return only the local, rights-filtered comparison for an exact address.
+
+    The comparison is assembled by the server; request parameters cannot
+    provide evidence or choose an AI provider. This is evidence browsing and
+    never constitutes an AI analysis or approval of scholarly claims.
+    """
+    from c02_dossier import build_dossier
+    if (not isinstance(params, dict) or set(params) != {'corpus', 'scheme', 'reference'}
+            or any(not isinstance(v, list) or len(v) != 1 or not isinstance(v[0], str)
+                   or not v[0].strip() or len(v[0]) > MAX_QUERY_LENGTH for v in params.values())):
+        raise ValueError('invalid_query')
+    comparison = compare_passages(dataset, params)
+    sources = filter_records(dataset, {'record_kind': ['source']}, _internal_all=True)
+    mode = dataset.get('dataset')
+    pattern = _stage_pattern(mode, research=mode in RESEARCH_DATASETS) + r':sources:[1-9][0-9]*'
+    source_refs = frozenset(row['key'] for row in sources.get('records', [])
+                            if isinstance(row, dict) and row.get('record_kind') == 'source'
+                            and isinstance(row.get('key'), str) and re.fullmatch(pattern, row['key']))
+    return build_dossier(comparison, source_refs=source_refs)
+
+
 class PrivatePreviewServer(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = False
@@ -909,6 +931,14 @@ class Handler(BaseHTTPRequestHandler):
                     return self._respond(400, '잘못된 요청입니다.')
                 params = urllib.parse.parse_qs(url.query, keep_blank_values=True, max_num_fields=3, encoding='utf-8', errors='strict')
                 value = research_graph(self.server.dataset, params)
+                return self._respond(200, json.dumps(value, ensure_ascii=False, separators=(',', ':')), 'application/json; charset=utf-8')
+            if url.path == '/api/research-dossier':
+                if not self._authenticated():
+                    return self._respond(401, '세션 인증이 필요합니다.')
+                if len(url.query) > 4096:
+                    return self._respond(400, '잘못된 요청입니다.')
+                params = urllib.parse.parse_qs(url.query, keep_blank_values=True, max_num_fields=3, encoding='utf-8', errors='strict')
+                value = research_dossier(self.server.dataset, params)
                 return self._respond(200, json.dumps(value, ensure_ascii=False, separators=(',', ':')), 'application/json; charset=utf-8')
             return self._respond(404, '요청을 찾을 수 없습니다.')
         except (ValueError, UnicodeError):

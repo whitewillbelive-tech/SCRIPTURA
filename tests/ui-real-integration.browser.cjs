@@ -70,6 +70,24 @@ test('본문 그래프는 안전한 내부 주장 연결만 확인 대기로 연
  await page.getByRole('button',{name:'상세 닫기'}).click();
  await page.unroute('**/api/research-graph?**');
 });
+test('근거 자료집은 현재 비교의 안전 투영과 일치한 항목만 표시한다',async()=>{
+ await page.route('**/api/research-dossier?**',r=>reply(r,{status:'evidence_only',model_status:'model_unavailable',selected,entries:[
+  {ref:row.key,subject:{value:row.subject,status:'source_confirmed'},recorded_speaker:{value:row.reported_speaker,status:'recorded_unverified'},summary:{value:row.summary,status:'local_input_candidate'},reasoning:{value:'UNAPPROVED-REASONING',status:'local_input_candidate'},source:{ref:row.source_key,title:{value:'UNAPPROVED-TITLE',status:'source_confirmed'},creator:{value:'UNAPPROVED-AUTHOR',status:'source_confirmed'}}},
+  {ref:'d14:claims:999',summary:{value:'FOREIGN-CLAIM',status:'recorded_unverified'}}],unresolved:[]}));
+ await page.getByRole('button',{name:'근거 자료집 보기'}).click();
+ const drawer=page.locator('#research-drawer');
+ await drawer.getByText('AI 모델 미연결 · 이 자료집은 연구 기록이며 AI 분석이 아닙니다.').waitFor();
+ assert.equal(await drawer.getByText('SYNTHETIC-SUMMARY').count(),1);
+ assert.equal(await drawer.getByText('논거 확인 대기').count(),1);
+ const text=await drawer.textContent();
+ assert.ok(!text.includes('UNAPPROVED-REASONING'));assert.ok(!text.includes('UNAPPROVED-TITLE'));assert.ok(!text.includes('FOREIGN-CLAIM'));
+ assert.equal(await drawer.locator('img').count(),0);
+ assert.equal(await drawer.getByRole('button',{name:'연결 주장 보기'}).count(),1);
+ await drawer.getByRole('button',{name:'연결 주장 보기'}).click();
+ await page.getByRole('heading',{name:'연결 주장'}).waitFor();
+ await page.getByRole('button',{name:'상세 닫기'}).click();
+ await page.unroute('**/api/research-dossier?**');
+});
 test('연구 질문은 미연결 상태를 표시하고 안전한 내부 근거만 연다',async()=>{
  let sent;
  const sourceRoute=r=>{if(new URL(r.request().url()).searchParams.get('key')!==row.source_key)return r.fallback();return reply(r,{dataset:'D16',metadata_projection:'k1.3-local-candidate',records:[{key:row.source_key,stage:'d14',record_kind:'source',candidate_metadata:metadata}]});};
@@ -97,6 +115,10 @@ test('실제 로컬 분석 API와 합성 비교 UI가 모델 미연결을 함께
   await p.getByRole('button',{name:'본문 비교',exact:true}).click();await p.getByText(/본문 주소 2개/).waitFor();
   await p.locator('#comparison-corpus').selectOption({label:'가상 코퍼스'});await p.locator('#comparison-scheme').selectOption({label:'가상 체계'});await p.locator('#comparison-reference').selectOption({label:'가상 1:1'});
   await p.getByRole('button',{name:'해석 비교',exact:true}).click();await p.locator('.comparison-card').first().waitFor();
+  const [dossierResponse]=await Promise.all([p.waitForResponse(r=>r.url().includes('/api/research-dossier?')),p.getByRole('button',{name:'근거 자료집 보기'}).click()]);
+  assert.equal(dossierResponse.status(),200);assert.match(dossierResponse.headers()['cache-control'],/no-store/);
+  await p.getByText('AI 모델 미연결 · 이 자료집은 연구 기록이며 AI 분석이 아닙니다.').waitFor();
+  await p.getByRole('button',{name:'상세 닫기'}).click();
   await p.getByRole('button',{name:'연결된 주장 살펴보기'}).click();await p.getByText(/본문 연결은 원본 기록 후보/).waitFor();await p.getByRole('button',{name:'상세 닫기'}).click();
   await p.getByRole('button',{name:'이 본문에 질문하기'}).click();await p.getByRole('textbox',{name:'연구 질문',exact:true}).fill('합성 근거는 무엇인가?');
   const [response]=await Promise.all([p.waitForResponse(r=>r.url().endsWith('/api/research-analysis')),p.getByRole('button',{name:'질문하기',exact:true}).click()]);
