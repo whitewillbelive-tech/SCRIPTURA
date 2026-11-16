@@ -101,12 +101,14 @@ class CanonicalLocalTests(unittest.TestCase):
             content=path.read_bytes(); digest=hashlib.sha256(content).hexdigest()
             original=Path.open
             def mutate_after_open(p,*args,**kwargs):
-                f=original(p,*args,**kwargs)
                 if p==path and args and args[0]=='rb':
-                    # Replace path after opening: the checked descriptor still
-                    # yields the original bytes, which must also be parsed.
-                    moved=path.with_suffix('.old');path.rename(moved);path.write_bytes(b'not a zip')
-                return f
+                    # No live handle remains while replacing the path; Windows
+                    # cannot rename or replace a currently open file. Parsing
+                    # must still use the exact authenticated original bytes.
+                    with original(p,'wb') as changed:
+                        changed.write(b'not a zip')
+                    return io.BytesIO(content)
+                return original(p,*args,**kwargs)
             with patch.object(Path,'open',mutate_after_open):
                 index=CanonicalIndex(path,expected_sha256=digest)
             self.assertEqual(index.counts['claims'],0)
