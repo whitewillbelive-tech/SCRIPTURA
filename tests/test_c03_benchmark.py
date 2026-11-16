@@ -1,5 +1,6 @@
 """W11 C03 replay must never pretend that a dry run is a model answer."""
 import json
+import hashlib
 import sys
 import tempfile
 import unittest
@@ -30,14 +31,15 @@ class LookupTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             p=Path(folder)/'synthetic_qa.zip'
             with ZipFile(p,'w') as z:
-                z.writestr('MANIFEST.json',json.dumps({'gate':'W11'}))
+                z.writestr('MANIFEST.json',json.dumps({'gate':'W11','canonical_sha256':'a'*64}))
                 z.writestr('benchmark/questions.jsonl',''.join(json.dumps({'id':f'B{i:03d}','question':'이사야 7:14의 해석은?'},ensure_ascii=False)+'\n' for i in range(1,51)))
-            with patch('c03_benchmark.CanonicalIndex',return_value=Index()),patch('c03_benchmark.analyze_local') as m:
-                out=replay('SYNTHETIC_CANONICAL',str(p))
+            digest = hashlib.sha256(p.read_bytes()).hexdigest()
+            with patch('c04_benchmark.CanonicalIndex',return_value=Index()),patch('c04_benchmark.analyze_local') as m:
+                out=replay('SYNTHETIC_CANONICAL',str(p),qa_expected_sha256=digest,canonical_expected_sha256='a'*64)
             self.assertEqual(out['questions'],50)
             self.assertEqual(out['model_called'],0)
-            self.assertEqual(out['unrun'],50)
-            self.assertEqual(out['score'],'NOT_SCORED_REQUIRES_INDEPENDENT_SOURCE_CHECK')
+            self.assertEqual(out['not_run'],50)
+            self.assertEqual(out['independent_scores'],'NOT_SCORED')
             m.assert_not_called()
 
 if __name__=='__main__':unittest.main()

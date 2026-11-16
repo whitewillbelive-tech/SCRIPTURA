@@ -148,3 +148,49 @@ test('봉인된 전통 라벨만 공동체 필터 검색을 허용한다',async(
  await page.locator('#advanced-filters summary').click();await page.locator('input[name="community"]').fill('SYNTHETIC-TRADITION');const blocked=requests;
  await page.getByRole('button',{name:'후보 검색'}).click();await page.getByText('검색 보류',{exact:true}).waitFor();assert.equal(requests,blocked);
 });
+
+test('정본 화면은 모델 입력 권리와 인용 후보를 분리한다',async()=>{
+ const p=await browser.newPage();
+ let mode='withheld', forged=false, serverDenied=false;
+ const records=[{ref:'synthetic:claim:1',source_title:'합성 문헌 A',source_creator:'합성 작성자',location:'합성 위치',statement:'합성 요지',reasoning:'합성 논거',model_input_status:'withheld'},
+                {ref:'synthetic:claim:2',source_title:'합성 문헌 B',source_creator:'합성 작성자 B',location:'합성 위치 B',statement:'합성 요지 B',reasoning:'합성 논거 B',model_input_status:'permitted'}];
+ try {
+  await p.route('**/api/canonical/find**',r=>reply(r,{dataset:'W10R',counts:{claims:2,passages:1},passages:[{id:'synthetic:passage:1',reference:'가상 본문 1:1',claim_count:2}]}));
+  await p.route('**/api/canonical/notes**',r=>reply(r,{notes:mode==='withheld'?[records[0]]:records}));
+  await p.route('**/api/canonical/analyze',r=>reply(r,serverDenied?{status:'model_input_not_permitted',limitations:[]}:{status:'analysis_unverified',analyses:[{text:'합성 모델의 미검증 응답',citations:[forged?records[0].ref:records[1].ref]}],limitations:['학술 검증 전']}));
+  await p.route('**/api/canonical/models',r=>reply(r,{status:'ready',models:['synthetic-model:1'],selected_model:'synthetic-model:1'}));
+  await p.goto(base,{waitUntil:'networkidle'});await p.getByLabel('세션 비밀').fill(secret);await p.getByRole('button',{name:'세션 열기'}).click();
+  await p.getByRole('button',{name:'통합 정본 · AI 연구'}).click();
+  await p.getByRole('button',{name:'로컬 모델 연결 확인'}).click();
+  await p.getByText('연결 성공 · 설치된 모델 1개 · 시작 시 선택한 모델: synthetic-model:1. 모델 선택은 시작 프로그램에서 설정합니다.').waitFor();
+  const find=async()=>{await p.getByLabel('성경 본문 원본 표기 검색').fill('가상 본문');await p.getByRole('button',{name:'정본 찾기'}).click();await p.getByRole('button',{name:'가상 본문 1:1 · 연결 주장 2건'}).click();};
+  await find();await p.getByText('모델 입력 권리 확인 대기 · 표시된 후보가 모델 입력으로 자동 승인되지는 않습니다.').waitFor();
+  assert.equal(await p.getByRole('button',{name:'로컬 AI 분석'}).isDisabled(),true);
+  assert.equal(await p.getByText('원본 기록상 출처 위치: 합성 위치 · 독립 확인 전').count(),1);
+  mode='permitted';await find();await p.getByText('모델 입력 허용 후보 1건 · 각 후보의 권리 조건을 따릅니다.').waitFor();
+  await p.getByLabel('선택한 본문에 질문하기').fill('합성 질문');
+  serverDenied=true;await p.getByRole('button',{name:'로컬 AI 분석'}).click();await p.getByText('AI 분석 미실행: 모델 입력 권리 확인 대기').waitFor();serverDenied=false;
+  forged=true;await p.getByRole('button',{name:'로컬 AI 분석'}).click();await p.getByText('AI 응답의 인용이 허용된 연구 후보와 일치하지 않아 표시를 보류했습니다.').waitFor();
+  assert.equal(await p.getByText('합성 모델의 미검증 응답').count(),0);
+  forged=false;await p.getByRole('button',{name:'로컬 AI 분석'}).click();await p.getByText('합성 모델의 미검증 응답').waitFor();
+  assert.equal(await p.getByText('근거 기록: 합성 문헌 B · 위치 합성 위치 B · 독립 확인 전').count(),1);
+  await p.getByRole('button',{name:'세션 닫기'}).click();
+  assert.equal(await p.getByLabel('선택한 본문에 질문하기').inputValue(),'');
+ } finally {await p.close()}
+});
+
+test('정본 연구 화면은 데스크톱·모바일·확대에서 키보드 접근이 가능하다',async()=>{
+ for(const config of [{width:1366,height:768,zoom:'1'},{width:1920,height:1080,zoom:'1'},
+                      {width:390,height:844,zoom:'1'},{width:1366,height:768,zoom:'2'}]){
+  const p=await browser.newPage({viewport:{width:config.width,height:config.height}});
+  try{
+   await p.goto(base,{waitUntil:'networkidle'});await p.getByLabel('세션 비밀').fill(secret);await p.getByRole('button',{name:'세션 열기'}).click();
+   await p.evaluate(zoom=>{document.documentElement.style.zoom=zoom;},config.zoom);
+   await p.getByRole('button',{name:'통합 정본 · AI 연구'}).click();
+   const control=p.getByRole('button',{name:'로컬 모델 연결 확인'});
+   await control.focus();assert.equal(await control.evaluate(e=>document.activeElement===e),true);
+   const box=await control.boundingBox();assert.ok(box && box.width>0 && box.height>0);
+   assert.equal(await p.getByLabel('성경 본문 원본 표기 검색').isVisible(),true);
+  } finally {await p.close();}
+ }
+});

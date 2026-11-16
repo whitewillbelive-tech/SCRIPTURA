@@ -34,63 +34,16 @@ def search_from_question(question, index):
     found=[row for row in index.find(ref,limit=30) if row['reference']==ref]
     return found,ref
 
-def replay(canonical, audit, *, model=None, output=None):
-    index=CanonicalIndex(canonical)
-    with ZipFile(audit) as z:
-        manifest=json.loads(z.read('MANIFEST.json'))
-        if manifest.get('gate')!='W11':
-            raise CanonicalError('wrong_audit_archive')
-        questions=[json.loads(line) for line in z.read('benchmark/questions.jsonl').decode('utf-8').splitlines() if line.strip()]
-    if len(questions)!=50 or len({q.get('id') for q in questions})!=50:
-        raise CanonicalError('invalid_50_question_benchmark')
-    results=[]
-    for item in questions:
-        matched,ref=search_from_question(item.get('question'),index)
-        evidence=index.notes(matched[0]['id'],limit=8) if matched else []
-        line={'id':item['id'],'status':'NOT_RUN','source_reference':ref,
-              'matched_passages':len(matched),'evidence_candidates':len(evidence),
-              'model_called':False}
-        if model and evidence:
-            line['model_called']=True
-            try:
-                answer=analyze_local(item['question'],'comparison',evidence,model)
-                line.update(status=answer['status'],analysis=answer.get('analyses',[]))
-            except CanonicalError as exc:
-                line.update(status='MODEL_ERROR',error_code=str(exc))
-        elif model:
-            line.update(status='NOT_RUN_NO_LINKED_PASSAGE',reason='no exact source-backed passage')
-        results.append(line)
-    summary={'questions':50,'matched_question_count':sum(bool(r['matched_passages']) for r in results),
-             'model_called':sum(r['model_called'] for r in results),
-             'model_responded':sum(r['status']=='analysis_unverified' for r in results),
-             'model_errors':sum(r['status']=='MODEL_ERROR' for r in results),
-             'unrun':sum(r['status'].startswith('NOT_RUN') for r in results),
-             'score':'NOT_SCORED_REQUIRES_INDEPENDENT_SOURCE_CHECK',
-             'data_note':'W11 original benchmark oracle is not transmitted to models'}
-    if output:
-        path=Path(output)
-        if path.exists():
-            raise CanonicalError('output_already_exists')
-        path.parent.mkdir(parents=True,exist_ok=True)
-        with path.open('x',encoding='utf-8') as f:
-            for record in results:
-                f.write(json.dumps(record,ensure_ascii=False)+'\n')
-    return summary
+def replay(canonical, audit, *, model=None, output=None, **kwargs):
+    """Legacy entry point; C-04 verifies QA integrity before any replay."""
+    from c04_benchmark import replay as safe_replay
+    return safe_replay(canonical, audit, model=model, output=output, **kwargs)
+
 
 def main(argv=None):
-    p=argparse.ArgumentParser(description='SCRIPTURA W11 local model benchmark (no automatic grading)')
-    p.add_argument('--canonical',required=True)
-    p.add_argument('--audit',required=True)
-    p.add_argument('--model',default=None,help='Opt in only to locally installed Ollama model')
-    p.add_argument('--output',help='Private LOCAL results JSONL; will not overwrite')
-    a=p.parse_args(argv)
-    try:
-        result=replay(a.canonical,a.audit,model=a.model,output=a.output)
-        print(json.dumps(result,ensure_ascii=False,indent=2))
-        return 0
-    except (CanonicalError,FileNotFoundError,BadZipFile,KeyError,ValueError):
-        print('W11_REPLAY_FAILED — confirm private inputs and local Ollama installation')
-        return 1
+    from c04_benchmark import main as safe_main
+    return safe_main(argv)
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     raise SystemExit(main())

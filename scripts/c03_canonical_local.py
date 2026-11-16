@@ -4,11 +4,14 @@ Does not upload archives, use cloud models, claim independent source verificatio
 or infer canon/versification equivalence. Always treat AI output as unreviewed.
 """
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
 import re
+import time
 import urllib.request
+import unicodedata
 from collections import defaultdict
 from zipfile import ZipFile, BadZipFile
 
@@ -18,6 +21,7 @@ MODES = {"historical_linguistic", "textual_criticism", "canonical",
          "doctrinal_assumption", "logical", "comparison"}
 URL = re.compile(r"https?://|www\.", re.I)
 SENSITIVE = re.compile(r"[\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}|\b\d{6}[- ]?[1-4]\d{6}\b")
+PHONE = re.compile(r'(?<!\d)(?:\+\d{1,3}[ .-]?)?0\d{1,3}[ .-]\d{3,4}[ .-]\d{4}(?!\d)')
 DIRECTIVE = re.compile(r"ignore\s+(?:all\s+)?(?:previous|prior|system)|system\s+prompt|이전\s*지시.{0,20}무시", re.I)
 
 class CanonicalError(ValueError):
@@ -27,9 +31,10 @@ def safe(value, limit=480):
     if not isinstance(value, str):
         return None
     value = value.strip()
-    if not value or len(value) > limit or URL.search(value) or SENSITIVE.search(value) or DIRECTIVE.search(value):
+    probe = unicodedata.normalize('NFKC', value)
+    if not value or len(value) > limit or URL.search(probe) or SENSITIVE.search(probe) or PHONE.search(probe) or DIRECTIVE.search(probe):
         return None
-    if any(ord(c) < 32 or ord(c) == 127 for c in value) or any(c in value for c in ('<', '>', '{', '}', chr(96), '"', '“', '”', '「', '」', '『', '』')):
+    if any(ord(c) < 32 or ord(c) == 127 for c in probe) or any(c in probe for c in ('<', '>', '{', '}', chr(96), '"', '“', '”', '「', '」', '『', '』')):
         return None
     return value
 
@@ -46,19 +51,44 @@ def rows(zipfile_obj, table):
         raise CanonicalError("duplicate_ids")
     return parsed
 
+_MODEL_TOKEN = object()
+
+
+class ModelEvidence:
+    """Process-local, checked projection; ordinary JSON flags cannot authorize use."""
+    __slots__ = ('__token', '__rows')
+
+    def __init__(self, token, rows):
+        if token is not _MODEL_TOKEN:
+            raise CanonicalError('model_input_not_permitted')
+        self.__token, self.__rows = token, tuple(dict(row) for row in rows)
+
+    def __len__(self):
+        return len(self.__rows)
+
+    def _payload(self):
+        if self.__token is not _MODEL_TOKEN:
+            raise CanonicalError('model_input_not_permitted')
+        return [dict(row) for row in self.__rows]
+
+
 class CanonicalIndex:
-    def __init__(self, path, *, expected_sha256=W10R_SHA256):
+    def __init__(self, path, *, expected_sha256=W10R_SHA256, model_permission_check=None):
         path = os.fspath(path)
         if not path or path.startswith(("\\\\", "//")) or URL.search(path):
             raise CanonicalError("private_local_path_required")
         p = Path(path)
         if not p.is_file() or not 0 < p.stat().st_size <= 64 * 1024 * 1024:
             raise CanonicalError("canonical_file_unavailable")
-        data = p.read_bytes()
+        with p.open('rb') as stream:
+            data = stream.read(64 * 1024 * 1024 + 1)
+        if not 0 < len(data) <= 64 * 1024 * 1024:
+            raise CanonicalError('canonical_file_unavailable')
         if hashlib.sha256(data).hexdigest() != expected_sha256:
             raise CanonicalError("canonical_digest_mismatch")
         try:
-            with ZipFile(p) as z:
+            # Read the same authenticated bytes, not a path reopened after hashing.
+            with ZipFile(io.BytesIO(data)) as z:
                 infos = z.infolist()
                 if (len(infos) > 512 or len({v.filename for v in infos}) != len(infos)
                     or sum(v.file_size for v in infos) > 256 * 1024 * 1024
@@ -78,12 +108,24 @@ class CanonicalIndex:
         self.sources = {r["id"]:r for r in sources}
         self.passages = {r["id"]:r for r in passages}
         self.locators = {r["id"]:r for r in locators}
-        self.cards = {r.get("claim_id"):r for r in cards if isinstance(r.get("claim_id"),str)}
+        grouped_cards = defaultdict(list)
+        for card in cards:
+            if isinstance(card.get('claim_id'), str):
+                grouped_cards[card['claim_id']].append(card)
+        # Ambiguous duplicate cards cannot grant field or model rights.
+        self.cards = {key: values[0] for key, values in grouped_cards.items() if len(values) == 1}
+        self._conflicting_card_ids = {key for key, values in grouped_cards.items() if len(values) != 1}
         args = defaultdict(list)
         for row in arguments:
             if row.get("claim_id") in self.claims and row.get("summary"):
                 args[row["claim_id"]].append(row)
         self.arguments = args
+        # This verifier must be installed by trusted application code, never
+        # by a request, archive record or self-declared status. The real W10R
+        # rights schema has not yet been independently inspected: default deny.
+        if model_permission_check is not None and not callable(model_permission_check):
+            raise CanonicalError('invalid_model_policy')
+        self._model_permission_check = model_permission_check
         by_passage = defaultdict(list)
         for claim in claims:
             for pid in claim.get("passage_ids", []) or []:
@@ -99,11 +141,17 @@ class CanonicalIndex:
             return []
         answer = []
         for row in self.passages.values():
-            original = row.get("original_notation") or (row.get("raw") or {}).get("reference")
+            raw = row.get('raw') if isinstance(row.get('raw'), dict) else {}
+            original = row.get("original_notation") or raw.get("reference")
             if isinstance(original,str) and term.casefold() in original.casefold():
                 answer.append({"id":row["id"],"reference":safe(original,200),
+                               "corpus":safe(row.get('corpus'),100),
+                               "scheme":safe(row.get('scheme'),100),
                                "claim_count":len(self.by_passage.get(row["id"],[])),
-                               "alignment_confirmed":row.get("automatic_comparison_eligible") is True})
+                               # A source row's boolean is not independent
+                               # evidence of cross-canon alignment.
+                               "alignment_confirmed":False,
+                               "alignment_status":"unconfirmed"})
                 if len(answer)>=limit:
                     break
         return answer
@@ -114,9 +162,24 @@ class CanonicalIndex:
         result = []
         for claim_id in self.by_passage.get(passage_id,[])[:min(8,max(1,limit))]:
             claim, card = self.claims[claim_id], self.cards.get(claim_id,{})
-            source = self.sources.get(card.get("source_id") or claim.get("source_id"),{})
-            loc = self.locators.get(card.get("locator_id") or claim.get("locator_id"),{})
-            raw = claim.get("raw") or {}
+            sid = card.get("source_id") or claim.get("source_id")
+            lid = card.get("locator_id") or claim.get("locator_id")
+            source = self.sources.get(sid,{}) if isinstance(sid,str) else {}
+            loc = self.locators.get(lid,{}) if isinstance(lid,str) else {}
+            conflict = (claim_id in getattr(self, '_conflicting_card_ids', set()) or
+                        (card.get('source_id') and claim.get('source_id') and card['source_id'] != claim['source_id']) or
+                        (card.get('locator_id') and claim.get('locator_id') and card['locator_id'] != claim['locator_id']) or
+                        (loc and source and loc.get('source_id') != source.get('id')))
+            if conflict:
+                result.append({'ref':claim_id, 'source_ref':None, 'source_title':None,
+                               'source_creator':None, 'location':None, 'statement':None,
+                               'reasoning':None, 'status':'pending_review',
+                               'rights':'unknown_no_external_transfer', 'officialness':'unconfirmed',
+                               'model_input_status':'withheld'})
+                continue
+            if loc and not source:
+                loc = {}
+            raw = claim.get("raw") if isinstance(claim.get("raw"), dict) else {}
             reasoning = safe(card.get("reasoning") or raw.get("reasoning_ko"))
             if not reasoning and self.arguments.get(claim_id):
                 reasoning = safe(self.arguments[claim_id][0].get("summary"))
@@ -128,15 +191,65 @@ class CanonicalIndex:
                            "reasoning":reasoning,
                            "status":"local_research_input_unverified",
                            "rights":"unknown_no_external_transfer",
-                           "officialness":"unconfirmed"})
+                           "officialness":"unconfirmed",
+                           "model_input_status":"permitted" if self._model_row(passage_id, claim_id) else "withheld"})
         return result
 
-def analyze_local(question, mode, notes, model):
+    def _model_row(self, passage_id, claim_id):
+        """One claim's strictly checked, field-limited local model projection."""
+        checker = getattr(self, '_model_permission_check', None)
+        claim = self.claims.get(claim_id, {})
+        card = self.cards.get(claim_id, {})
+        if (not callable(checker) or claim_id in getattr(self, '_conflicting_card_ids', set())
+                or claim_id not in self.by_passage.get(passage_id, ())):
+            return None
+        source_id = card.get('source_id')
+        locator_id = card.get('locator_id')
+        if not isinstance(source_id, str) or not isinstance(locator_id, str):
+            return None
+        source, locator = self.sources.get(source_id), self.locators.get(locator_id)
+        # Never infer linkage from coincidentally matching references. The
+        # visible candidate may remain visible while the model input is held.
+        if (not isinstance(source_id, str) or not isinstance(locator_id, str)
+                or not source or not locator or card.get('claim_id') != claim_id
+                or claim.get('source_id') != source_id
+                or (claim.get('locator_id') and claim.get('locator_id') != locator_id)
+                or locator.get('source_id') != source_id):
+            return None
+        raw = claim.get('raw') if isinstance(claim.get('raw'), dict) else {}
+        values = {'statement': safe(card.get('statement') or raw.get('statement_ko')),
+                  'reasoning': safe(card.get('reasoning') or raw.get('reasoning_ko'))}
+        # Separate permission per field, with the source chain supplied to the
+        # trusted verifier. A general display flag is never an input grant.
+        projected = {'ref': claim_id}
+        for field, value in values.items():
+            if not value:
+                continue
+            try:
+                allowed = checker(source, claim, card, locator, field, value) is True
+            except Exception:
+                allowed = False
+            if allowed:
+                projected[field] = value
+        return projected if len(projected) > 1 else None
+
+    def model_notes(self, passage_id, *, limit=8):
+        if passage_id not in self.passages:
+            raise CanonicalError('unknown_passage')
+        rows = []
+        for claim_id in self.by_passage.get(passage_id, [])[:min(8,max(1,limit))]:
+            row = self._model_row(passage_id, claim_id)
+            if row is not None:
+                rows.append(row)
+        return ModelEvidence(_MODEL_TOKEN, rows)
+
+def analyze_local(question, mode, notes, model, *, on_model_call=None):
     """Explicit local-only opt-in; never connects to an externally hosted model."""
     if not safe(question,600) or mode not in MODES or not isinstance(model,str) or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,70}",model):
         raise CanonicalError("invalid_analysis_request")
-    if not isinstance(notes,list) or not 1 <= len(notes) <= 8:
-        raise CanonicalError("insufficient_evidence")
+    if type(notes) is not ModelEvidence or not 1 <= len(notes) <= 8:
+        raise CanonicalError("model_input_not_permitted")
+    notes = notes._payload()
     payload = {"model":model,"stream":False,"format":"json","options":{"temperature":0},
        "messages":[
           {"role":"system","content":("한국어 신학 연구 조력자. 제공된 것은 출처의 원문이 아닌 독립 검증 전 연구 입력 메모다. "
@@ -147,15 +260,41 @@ def analyze_local(question, mode, notes, model):
     request = urllib.request.Request("http://127.0.0.1:11434/api/chat",
         json.dumps(payload,ensure_ascii=False).encode("utf-8"),
         {"Content-Type":"application/json"},method="POST")
-    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    class NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, req, fp, code, msg, headers, newurl):
+            return None
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
     try:
+        if on_model_call is not None:
+            if not callable(on_model_call):
+                raise CanonicalError('invalid_model_call_observer')
+            on_model_call()
+        deadline = time.monotonic() + 45
         with opener.open(request,timeout=45) as response:
             if response.status != 200:
                 raise CanonicalError("local_model_error")
-            data = response.read(65537)
+            chunks, total = [], 0
+            while total <= 65536:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise TimeoutError('model_deadline')
+                sock = getattr(getattr(getattr(response, 'fp', None), 'raw', None), '_sock', None)
+                if sock is not None:
+                    sock.settimeout(remaining)
+                read = getattr(response, 'read1', response.read)
+                chunk = read(min(8192, 65537 - total))
+                if not chunk:
+                    break
+                chunks.append(chunk)
+                total += len(chunk)
+            data = b''.join(chunks)
             if len(data)>65536:
                 raise CanonicalError("local_model_response_too_large")
         result=json.loads(json.loads(data)["message"]["content"])
+    except TimeoutError:
+        raise CanonicalError("local_model_timeout") from None
+    except CanonicalError:
+        raise
     except (KeyError, ValueError, OSError, UnicodeError):
         raise CanonicalError("local_model_unavailable_or_invalid") from None
     entries=result.get("analyses") if isinstance(result,dict) else None
@@ -168,7 +307,7 @@ def analyze_local(question, mode, notes, model):
             raise CanonicalError("invalid_model_answer")
         text=safe(item["text"],1200)
         refs=item["citations"]
-        if not text or not isinstance(refs,list) or not refs or len(refs)>8 or any(r not in allowed for r in refs):
+        if not text or not isinstance(refs,list) or not refs or len(refs)>8 or any(not isinstance(r,str) or r not in allowed for r in refs):
             raise CanonicalError("invalid_model_answer")
         output.append({"text":text,"citations":list(dict.fromkeys(refs)),"status":"ai_inference_unverified"})
     return {"status":"analysis_unverified","analyses":output,"model":model,

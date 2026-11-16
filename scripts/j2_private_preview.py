@@ -960,6 +960,16 @@ class Handler(BaseHTTPRequestHandler):
                 params = urllib.parse.parse_qs(url.query, keep_blank_values=True, max_num_fields=3, encoding='utf-8', errors='strict')
                 value = research_dossier(self.server.dataset, params)
                 return self._respond(200, json.dumps(value, ensure_ascii=False, separators=(',', ':')), 'application/json; charset=utf-8')
+            if url.path == '/api/canonical/models':
+                if not self._authenticated():
+                    return self._respond(401, '세션 인증이 필요합니다.')
+                if url.query or self.server.dataset.get('_canonical_index') is None:
+                    return self._respond(404, '요청을 찾을 수 없습니다.')
+                from c04_ollama import list_local_models
+                value = list_local_models()
+                selected = self.server.dataset.get('_local_model')
+                value['selected_model'] = selected if isinstance(selected, str) and re.fullmatch(r'[A-Za-z0-9_.:-]{1,70}', selected) else None
+                return self._respond(200, json.dumps(value, ensure_ascii=False, separators=(',', ':')), 'application/json; charset=utf-8')
             return self._respond(404, '요청을 찾을 수 없습니다.')
         except (ValueError, UnicodeError):
             return self._respond(400, '잘못된 요청입니다.')
@@ -1028,7 +1038,20 @@ class Handler(BaseHTTPRequestHandler):
                     value = {'status':'model_unavailable','notes':notes,
                              'limitations':['로컬 Ollama 모델이 연결되지 않았습니다. 근거 자료만 표시합니다.']}
                 else:
-                    value = {'notes':notes,**analyze_local(payload['question'],payload['mode'],notes,model)}
+                    allowed = index.model_notes(payload['passage_id'], limit=8)
+                    if not allowed:
+                        value = {'status':'model_input_not_permitted','notes':notes,
+                                 'limitations':['선택한 근거의 로컬 모델 입력 권리가 확인되지 않았습니다.']}
+                    else:
+                        try:
+                            value = {'notes':notes,**analyze_local(payload['question'],payload['mode'],allowed,model)}
+                        except CanonicalError as exc:
+                            codes = {'local_model_unavailable_or_invalid', 'local_model_error',
+                                     'local_model_response_too_large', 'local_model_timeout', 'invalid_model_answer',
+                                     'invalid_analysis_request', 'model_input_not_permitted'}
+                            code = str(exc) if str(exc) in codes else 'local_model_error'
+                            value = {'status':'model_error','error_code':code,'notes':notes,
+                                     'limitations':['로컬 모델 응답을 사용할 수 없습니다.']}
             else:
                 value = research_analysis(self.server.dataset, payload)
             return self._respond(200, json.dumps(value, ensure_ascii=False, separators=(',', ':')), 'application/json; charset=utf-8')

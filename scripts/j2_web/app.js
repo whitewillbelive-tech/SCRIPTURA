@@ -1159,6 +1159,11 @@
   const canonNotice = document.createElement('p');
   canonNotice.className = 'subtle';
   canonNotice.textContent = '실제 W10R 연구 입력 후보를 확인합니다. 문헌 확인·공식성·학술 심사 및 외부 전송 권리는 미확정입니다. AI 추론은 로컬 모델을 명시적으로 활성화한 경우에만 수행합니다.';
+  const canonModelCheck = document.createElement('button');
+  canonModelCheck.type='button'; canonModelCheck.textContent='로컬 모델 연결 확인';
+  const canonModelStatus = document.createElement('p');
+  canonModelStatus.setAttribute('role','status');
+  canonModelStatus.textContent='모델 연결은 아직 확인하지 않았습니다.';
   const canonForm = document.createElement('form');
   const canonLabel = document.createElement('label');
   canonLabel.textContent = '성경 본문 원본 표기 검색';
@@ -1196,10 +1201,11 @@
   canonAnalyze.disabled=true;
   canonQuestionForm.append(canonQuestionLabel,canonMode,canonAnalyze);
   const canonOutput = document.createElement('div');
-  canonicalPanel.append(canonHeading,canonNotice,canonForm,canonStatus,canonMatches,
+  canonicalPanel.append(canonHeading,canonNotice,canonModelCheck,canonModelStatus,canonForm,canonStatus,canonMatches,
                         canonNotes,canonQuestionForm,canonOutput);
   document.getElementById('candidate-layout').before(canonicalPanel);
   let selectedCanonical = null;
+  let selectedCanonicalNotes = [];
   let canonicalGeneration = 0;
   const canonicalP = (parent,value,kind='p') => {
     const element=document.createElement(kind);
@@ -1210,6 +1216,7 @@
   const clearCanonical = () => {
     canonicalGeneration += 1;
     selectedCanonical = null;
+    selectedCanonicalNotes = [];
     canonAnalyze.disabled=true;
     canonMatches.replaceChildren();
     canonNotes.replaceChildren();
@@ -1232,9 +1239,12 @@
   }
   document.getElementById('session-close').addEventListener('click',()=>{
     canonicalPanel.hidden=true;canonicalTab.setAttribute('aria-pressed','false');
+    canonQuestion.value='';canonSearch.value='';
+    canonModelStatus.textContent='모델 연결은 아직 확인하지 않았습니다.';
     clearCanonical();
   });
   document.getElementById('session-form').addEventListener('submit',()=>{
+    canonQuestion.value='';canonSearch.value='';
     clearCanonical();
   });
   const canonRequest = async (url, options={})=>{
@@ -1244,6 +1254,21 @@
     if (!response.ok) throw new Error(response.status===404?'정본 모드로 프로그램을 실행해야 합니다.':'조회 또는 인증에 실패했습니다.');
     return await response.json();
   };
+  canonModelCheck.addEventListener('click',async()=>{
+    const current=canonicalGeneration, session=secret;
+    canonModelStatus.textContent='이 PC의 로컬 모델 연결을 확인 중입니다.';
+    try{
+      const data=await canonRequest('/api/canonical/models');
+      if(current!==canonicalGeneration || session!==secret || canonicalPanel.hidden)return;
+      if(!data || data.status!=='ready' || !Array.isArray(data.models)){
+        canonModelStatus.textContent='로컬 Ollama에 연결하지 못했습니다. 모델 상태를 확인하세요.';
+        return;
+      }
+      const models=data.models.filter(name=>typeof name==='string' && /^[A-Za-z0-9_.:-]{1,70}$/.test(name));
+      const selected=typeof data.selected_model==='string' && /^[A-Za-z0-9_.:-]{1,70}$/.test(data.selected_model) ? data.selected_model : '';
+      canonModelStatus.textContent='연결 성공 · 설치된 모델 '+models.length+'개'+(selected?' · 시작 시 선택한 모델: '+selected:' · 시작 시 선택한 모델 없음')+'. 모델 선택은 시작 프로그램에서 설정합니다.';
+    }catch(e){if(current===canonicalGeneration && session===secret && !canonicalPanel.hidden)canonModelStatus.textContent='로컬 모델 연결 상태를 확인하지 못했습니다.';}
+  });
   canonForm.addEventListener('submit',async event=>{
     event.preventDefault();
     clearCanonical();
@@ -1266,15 +1291,22 @@
           try{
             const pack=await canonRequest('/api/canonical/notes?id='+encodeURIComponent(item.id));
             if(now!==canonicalGeneration || selectedCanonical!==item.id)return;
+            if(!pack || !Array.isArray(pack.notes))throw Error('연구 후보를 확인하지 못했습니다.');
+            selectedCanonicalNotes=pack.notes;
             canonStatus.textContent='선택 본문: '+(item.reference||'미확인')+' · 화면 후보 '+pack.notes.length+'건';
-            canonAnalyze.disabled=pack.notes.length===0;
+            const permitted=pack.notes.filter(note=>note && note.model_input_status==='permitted');
+            canonAnalyze.disabled=permitted.length===0;
+            canonicalP(canonNotes,permitted.length ? '모델 입력 허용 후보 '+permitted.length+'건 · 각 후보의 권리 조건을 따릅니다.' : '모델 입력 권리 확인 대기 · 표시된 후보가 모델 입력으로 자동 승인되지는 않습니다.');
             for(const note of pack.notes){
+              if(!note || typeof note!=='object')continue;
               const card=document.createElement('article');
               card.className='comparison-card';
               canonicalP(card,(note.source_title||'문헌 미확인')+' · '+(note.source_creator||'작성자 미확인'),'h3');
+              canonicalP(card,'연구 후보 ID: '+(note.ref||'미확인'),'small');
+              canonicalP(card,'원본 기록상 출처 위치: '+(note.location||'미확인')+' · 독립 확인 전','small');
               canonicalP(card,'핵심 해석: '+(note.statement||'표시 가능한 요지 없음'));
               canonicalP(card,'논거: '+(note.reasoning||'기록된 논거 없음'));
-              canonicalP(card,'원본 입력 후보 · 공식성·학술 검증·모델 전송 권리 미확정','small');
+              canonicalP(card,note.model_input_status==='permitted' ? '로컬 모델 입력 허용 기록 · 공식성·학술 검증은 별도' : '원본 입력 후보 · 공식성·학술 검증·모델 입력 권리 미확정','small');
               canonNotes.append(card);
             }
             canonOutput.replaceChildren();
@@ -1297,14 +1329,25 @@
       if(current!==canonicalGeneration)return;
       canonOutput.replaceChildren();
       if(data.status!=='analysis_unverified'){
-        canonicalP(canonOutput,'AI 분석 미실행: '+(data.status||'미확인'));
+        const stateLabels={model_input_not_permitted:'모델 입력 권리 확인 대기',model_unavailable:'로컬 모델 미연결',insufficient_evidence:'사용 가능한 근거 부족'};
+        canonicalP(canonOutput,'AI 분석 미실행: '+(stateLabels[data.status]||'상태 미확인'));
         canonicalP(canonOutput,(data.limitations||[]).join(' '));
         return;
       }
       canonicalP(canonOutput,'AI 생성 분석 · 독립 검증 전','h3');
       for(const section of (data.analyses||[]).slice(0,8)){
+        const evidenceMap=new Map(selectedCanonicalNotes.filter(n=>n && n.model_input_status==='permitted' && typeof n.ref==='string').map(n=>[n.ref,n]));
+        if(!section || typeof section.text!=='string' || !Array.isArray(section.citations) || !section.citations.length || section.citations.some(ref=>!evidenceMap.has(ref))){
+          canonOutput.replaceChildren();
+          canonicalP(canonOutput,'AI 응답의 인용이 허용된 연구 후보와 일치하지 않아 표시를 보류했습니다.');
+          return;
+        }
         canonicalP(canonOutput,section.text);
         canonicalP(canonOutput,'사용된 연구 후보 ID: '+(section.citations||[]).join(', '),'small');
+        for(const ref of section.citations){
+          const note=evidenceMap.get(ref);
+          canonicalP(canonOutput,'근거 기록: '+(note.source_title||'문헌 미확인')+' · 위치 '+(note.location||'미확인')+' · 독립 확인 전','small');
+        }
       }
       canonicalP(canonOutput,(data.limitations||[]).join(' '));
     }catch(e){if(current===canonicalGeneration){canonOutput.replaceChildren();canonicalP(canonOutput,e.message);}}
