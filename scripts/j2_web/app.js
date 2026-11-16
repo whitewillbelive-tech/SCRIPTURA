@@ -728,6 +728,10 @@
   const selectionStatus = document.getElementById('comparison-selection-status');
   const selectedOnly = document.getElementById('comparison-selected-only');
   const clearSelectionButton = document.getElementById('comparison-clear-selection');
+  const analysisOpen = document.getElementById('analysis-open');
+  const graphOpen = document.getElementById('graph-open');
+  let analysisContext = null;
+  const clearAnalysis = () => { analysisContext = null; analysisOpen.disabled = true; graphOpen.disabled = true; };
   let selectedClaims = new Set();
   let selectionCards = [];
   let selectionOnly = false;
@@ -757,6 +761,7 @@
   });
   const resetComparison = () => {
     closeDrawer();
+    clearAnalysis();
     comparisonGeneration += 1;
     if (comparisonController) comparisonController.abort();
     comparisonController = null; comparisonPassages = []; comparisonSets = [];
@@ -773,6 +778,7 @@
   };
   const invalidateComparison = () => {
     closeDrawer();
+    clearAnalysis();
     comparisonGeneration += 1;
     if (comparisonController) comparisonController.abort();
     comparisonController = null;
@@ -795,6 +801,7 @@
   };
   const fetchComparison = async (query = null) => {
     comparisonGeneration += 1;
+    clearAnalysis();
     const current = comparisonGeneration;
     if (comparisonController) comparisonController.abort();
     comparisonController = new AbortController();
@@ -831,6 +838,11 @@
       }
       if (!data.selected || ['corpus','scheme','reference'].some(k => data.selected[k] !== query[k])) throw new Error('unexpected');
       const cards = data.claims.map(raw => ({raw, row:safeRow(raw, data.dataset, data.metadata_projection, data.summary_projection, data.reasoning_projection, data.subject_projection, data.reported_speaker_projection)})).filter(item => item.row && item.row.record_kind === 'claim');
+      analysisContext = {corpus:query.corpus, scheme:query.scheme, reference:query.reference, dataset:data.dataset,
+        claims:new Map(cards.filter(item => safeCoordinate(item.row.key, 'claims') !== '미확인').map(item => [item.row.key, item.row])),
+        sources:new Set(cards.map(item => item.row.source_key).filter(key => safeCoordinate(key, 'sources') !== '미확인'))};
+      analysisOpen.disabled = false;
+      graphOpen.disabled = false;
       comparisonStatus.textContent = cards.length ? `선택한 본문의 연구 후보 ${cards.length}건` : '선택한 본문에 표시할 연구 후보가 없습니다.';
       selectionTools.hidden = cards.length < 2;
       for (const {raw,row} of cards) {
@@ -907,6 +919,89 @@
       comparisonStatus.textContent = '본문 비교를 불러오지 못했습니다. 로컬 서버와 자료를 확인해 주세요.';
     }
   };
+  graphOpen.addEventListener('click', async () => {
+    if (!analysisContext || !secret) return;
+    const context = analysisContext, current = comparisonGeneration, session = secret;
+    const holder = node('div'); holder.append(node('p', '관련 주장 연결을 확인하는 중입니다.', 'subtle'));
+    openDrawer('연결된 연구 주장', holder, graphOpen);
+    try {
+      const params = new URLSearchParams({corpus:context.corpus,scheme:context.scheme,reference:context.reference});
+      const response = await fetch(`/api/research-graph?${params}`, {cache:'no-store',headers:{Authorization:`Bearer ${secret}`}});
+      if (!drawer.open || analysisContext !== context || current !== comparisonGeneration || secret !== session) return;
+      if (!response.ok) throw new Error('unavailable');
+      const data = await response.json();
+      if (!drawer.open || analysisContext !== context || current !== comparisonGeneration || secret !== session) return;
+      if (!data || !Array.isArray(data.edges)) throw new Error('invalid');
+      const seen = new Set(); holder.replaceChildren();
+      holder.append(node('p', '본문 연결은 원본 기록 후보입니다. 출처, 직접 반박과 공식성은 별도 확인이 필요합니다.', 'subtle'));
+      for (const edge of data.edges.slice(0, 500)) {
+        if (!edge || edge.asserted_kind !== 'about_passage' || !['pending','recorded_unverified'].includes(edge.status) || edge.to !== 'local:passage:1' || !context.claims.has(edge.from) || seen.has(edge.from)) continue;
+        seen.add(edge.from);
+        const button = node('button', `연결 주장 ${seen.size} · 확인 대기`); button.type = 'button';
+        button.addEventListener('click', () => { const detail = node('div'); showDetail(context.claims.get(edge.from), detail); openDrawer('연결 주장', detail, button); });
+        holder.append(button);
+      }
+      if (!seen.size) holder.append(node('p', '표시 가능한 연결 주장 후보가 없습니다.', 'empty'));
+      if (data.truncated === true) holder.append(node('p', '연결이 많아 일부만 표시합니다.', 'subtle'));
+    } catch (_) {
+      if (drawer.open && analysisContext === context && current === comparisonGeneration && secret === session) holder.replaceChildren(node('p', '연결된 주장을 불러오지 못했습니다.', 'error'));
+    }
+  });
+  analysisOpen.addEventListener('click', () => {
+    if (!analysisContext || !secret) return;
+    const context = analysisContext, current = comparisonGeneration, session = secret;
+    const panel = node('div'), form = node('form'); form.autocomplete = 'off';
+    const label = node('label', '연구 질문');
+    const question = document.createElement('textarea'); question.required = true; question.maxLength = 1000; question.rows = 3;
+    label.append(question);
+    const modeLabel = node('label', '분석 관점');
+    const mode = document.createElement('select');
+    for (const [key, text] of [['comparison','해석 비교'],['historical_linguistic','역사언어학'],['textual_criticism','본문비평'],['canonical','정경적 해석'],['doctrinal_assumption','교리 전제'],['logical','논리 분석']]) mode.add(new Option(text, key));
+    modeLabel.append(mode);
+    const submit = node('button', '질문하기', 'primary'); submit.type = 'submit';
+    const status = node('p', 'AI 모델은 기본적으로 연결되어 있지 않습니다. 질문은 이 로컬 서버에만 전달됩니다.', 'subtle'); status.setAttribute('role', 'status');
+    const result = node('div');
+    form.append(label, modeLabel, submit); panel.append(form, status, result);
+    openDrawer('근거 기반 연구 질문', panel, analysisOpen);
+    question.focus();
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (!question.value.trim() || !secret || analysisContext !== context || current !== comparisonGeneration) return;
+      submit.disabled = true; result.replaceChildren(); status.textContent = '근거와 모델 연결 상태를 확인하는 중입니다.';
+      try {
+        const response = await fetch('/api/research-analysis', {method:'POST',cache:'no-store',headers:{Authorization:`Bearer ${secret}`,'Content-Type':'application/json'},body:JSON.stringify({question:question.value,mode:mode.value,corpus:context.corpus,scheme:context.scheme,reference:context.reference})});
+        if (!drawer.open || analysisContext !== context || current !== comparisonGeneration || secret !== session) return;
+        if (!response.ok) throw new Error('unavailable');
+        const data = await response.json();
+        if (!drawer.open || analysisContext !== context || current !== comparisonGeneration || secret !== session) return;
+        if (!data || !Array.isArray(data.sections) || !Array.isArray(data.limitations)) throw new Error('invalid');
+        const states = {model_unavailable:'AI 모델 미연결 · 분석을 생성하지 않았습니다.',provider_blocked:'이 모델 공급자는 비활성 상태입니다.',insufficient_evidence:'확인된 근거가 부족합니다.',provider_error:'모델 실행에 실패했습니다.',invalid_model_output:'모델 결과를 검증하지 못했습니다.',analysis_unverified:'AI 추론 · 독립 학술 검증 전'};
+        status.textContent = states[data.status] || '분석 상태를 확인할 수 없습니다.';
+        const reference = (item, parent) => {
+          if (!item || typeof item !== 'object') return;
+          if (item.kind === 'source' && context.sources.has(item.ref)) {
+            const button = node('button', '연결 문헌 보기'); button.type = 'button'; button.addEventListener('click', () => openSourceDrawer(item.ref, button)); parent.append(button);
+          } else if (item.kind === 'claim' && context.claims.has(item.ref)) {
+            const button = node('button', '연결 주장 보기'); button.type = 'button'; button.addEventListener('click', () => { const holder = node('div'); showDetail(context.claims.get(item.ref), holder); openDrawer('연결 주장', holder, button); }); parent.append(button);
+          }
+        };
+        for (const entry of (data.status === 'analysis_unverified' ? data.sections : []).slice(0, 10)) {
+          if (!entry || entry.category !== 'ai_inference' || typeof entry.text !== 'string' || entry.text.length > 1200 || !Array.isArray(entry.citations)) continue;
+          const section = node('section'); section.append(node('h3', 'AI 자체 추론 · 검증 전'), node('p', entry.text));
+          for (const item of entry.citations.slice(0, 20)) reference(item, section);
+          result.append(section);
+        }
+        if (Array.isArray(data.evidence) && data.evidence.length) {
+          const section = node('section'); section.append(node('h3', '연결된 연구 기록'));
+          for (const item of data.evidence.slice(0, 100)) reference(item, section);
+          result.append(section);
+        }
+        for (const item of data.limitations.slice(0, 10)) if (typeof item === 'string' && item.length <= 300) result.append(node('p', item, 'subtle'));
+      } catch (_) {
+        if (drawer.open && analysisContext === context && current === comparisonGeneration && secret === session) status.textContent = '연구 질문을 처리하지 못했습니다. 로컬 서버 상태를 확인하세요.';
+      } finally { submit.disabled = false; }
+    });
+  });
   const openComparisonAt = async passage => {
     // Do not infer equivalence between corpora or numbering systems: select
     // only the exact triple returned by the authenticated candidate API.

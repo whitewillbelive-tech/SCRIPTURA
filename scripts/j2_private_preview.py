@@ -720,6 +720,80 @@ def compare_passages(dataset, params):
             'claims': claims}
 
 
+def research_analysis(dataset, payload):
+    """Use only local, rights-filtered comparison projections as evidence.
+
+    A request cannot supply evidence or choose a model provider. Original text
+    and excerpts are never passed to this interface.
+    """
+    from c01_ai import Evidence, analyze
+    if not isinstance(payload, dict) or set(payload) != {'question', 'mode', 'corpus', 'scheme', 'reference'}:
+        raise ValueError('invalid_request')
+    if any(not isinstance(payload[k], str) for k in payload):
+        raise ValueError('invalid_request')
+    values = [payload[k].strip() for k in ('corpus', 'scheme', 'reference')]
+    if any(len(v) > MAX_QUERY_LENGTH for v in values) or (any(values) and not all(values)):
+        raise ValueError('invalid_request')
+    evidence = []
+    if all(values):
+        comparison = compare_passages(dataset, dict(zip(('corpus', 'scheme', 'reference'), ([v] for v in values))))
+        seen = set()
+        source_keys = {row.get('key') for row in dataset.get('records', [])
+                       if isinstance(row, dict) and row.get('record_kind') == 'source' and isinstance(row.get('key'), str)}
+        for row in comparison.get('claims', [])[:50]:
+            # Internal keys have already been checked by the comparison
+            # projection. Neither caller-supplied records nor free text are used.
+            key = row.get('key')
+            if isinstance(key, str) and key not in seen and re.fullmatch(_stage_pattern(dataset.get('dataset'), research=dataset.get('dataset') != 'synthetic') + r':claims:[1-9][0-9]*', key):
+                evidence.append(Evidence(ref=key, kind='claim', label='연구 후보',
+                                         source_status='recorded_unverified'))
+                seen.add(key)
+            source_key = row.get('source_key')
+            if (isinstance(source_key, str) and source_key in source_keys and source_key not in seen
+                    and re.fullmatch(_stage_pattern(dataset.get('dataset'), research=dataset.get('dataset') != 'synthetic') + r':sources:[1-9][0-9]*', source_key)):
+                evidence.append(Evidence(ref=source_key, kind='source', label='연결 문헌',
+                                         source_status='unconfirmed'))
+                seen.add(source_key)
+    return analyze(payload['question'], payload['mode'], evidence, provider=None)
+
+
+def research_graph(dataset, params):
+    """Build address links only from the application's safe comparison view.
+
+    This does not create claims of official status, alignment or rebuttal. A
+    passage link is a recorded candidate, not independently verified evidence.
+    """
+    from c01_graph import ResearchGraph
+    if (not isinstance(params, dict) or set(params) != {'corpus', 'scheme', 'reference'}
+            or any(not isinstance(v, list) or len(v) != 1 or not isinstance(v[0], str)
+                   or not v[0].strip() or len(v[0]) > MAX_QUERY_LENGTH for v in params.values())):
+        raise ValueError('invalid_query')
+    comparison = compare_passages(dataset, params)
+    selected = comparison.get('selected')
+    if not isinstance(selected, dict):
+        return {'nodes': [], 'edges': [], 'truncated': False}
+    nodes = [{'key': 'local:passage:1', 'kind': 'passage', **selected}]
+    edges = []
+    seen = set()
+    pattern = _stage_pattern(dataset.get('dataset'), research=dataset.get('dataset') != 'synthetic') + r':claims:[1-9][0-9]*'
+    for row in comparison.get('claims', []):
+        key = row.get('key') if isinstance(row, dict) else None
+        if not isinstance(key, str) or not re.fullmatch(pattern, key) or key in seen:
+            continue
+        seen.add(key)
+        if len(edges) >= 500:
+            continue
+        nodes.append({'key': key, 'kind': 'claim'})
+        edges.append({'key': f'local:edge:{len(edges) + 1}', 'from': key,
+                      'to': 'local:passage:1', 'kind': 'about_passage', 'evidence': []})
+    graph = ResearchGraph(nodes, edges)
+    # The graph engine emits fixed status codes and local keys only. No input
+    # labels, original texts, addresses, or private identifiers are logged.
+    return {'nodes': [{'key': n['key'], 'kind': n['kind']} for n in nodes],
+            'edges': list(graph.neighbors('local:passage:1', direction='in', include_pending=True)),
+            'truncated': len(seen) > len(edges)}
+
+
 class PrivatePreviewServer(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = False
@@ -828,6 +902,14 @@ class Handler(BaseHTTPRequestHandler):
                 params = urllib.parse.parse_qs(url.query, keep_blank_values=True, max_num_fields=6, encoding='utf-8', errors='strict')
                 value = compare_passages(self.server.dataset, params)
                 return self._respond(200, json.dumps(value, ensure_ascii=False, separators=(',', ':')), 'application/json; charset=utf-8')
+            if url.path == '/api/research-graph':
+                if not self._authenticated():
+                    return self._respond(401, '세션 인증이 필요합니다.')
+                if len(url.query) > 4096:
+                    return self._respond(400, '잘못된 요청입니다.')
+                params = urllib.parse.parse_qs(url.query, keep_blank_values=True, max_num_fields=3, encoding='utf-8', errors='strict')
+                value = research_graph(self.server.dataset, params)
+                return self._respond(200, json.dumps(value, ensure_ascii=False, separators=(',', ':')), 'application/json; charset=utf-8')
             return self._respond(404, '요청을 찾을 수 없습니다.')
         except (ValueError, UnicodeError):
             return self._respond(400, '잘못된 요청입니다.')
@@ -835,9 +917,66 @@ class Handler(BaseHTTPRequestHandler):
             return self._respond(500, '요청을 처리할 수 없습니다.')
 
     def do_POST(self):
+        # Never leave unread request bytes on a persistent connection after an
+        # early rejection. No body, question, or request path is logged.
+        self.close_connection = True
+        if self.path != '/api/research-analysis':
+            return self._respond(405, '허용되지 않는 요청입니다.')
+        if not self._valid_peer():
+            return self._respond(403, '접근이 거부되었습니다.')
+        if not self._authenticated():
+            return self._respond(401, '세션 인증이 필요합니다.')
+        lengths = self.headers.get_all('Content-Length', [])
+        types = self.headers.get_all('Content-Type', [])
+        if (self.headers.get_all('Transfer-Encoding', []) or len(lengths) != 1
+                or not re.fullmatch(r'[0-9]{1,5}', lengths[0])
+                or len(types) != 1 or types[0].split(';', 1)[0].strip().lower() != 'application/json'):
+            return self._respond(400, '잘못된 요청입니다.')
+        length = int(lengths[0])
+        if length < 1 or length > 8192:
+            return self._respond(413, '요청이 너무 큽니다.')
+        try:
+            def unique_pairs(pairs):
+                result = {}
+                for key, value in pairs:
+                    if key in result:
+                        raise ValueError('duplicate_key')
+                    result[key] = value
+                return result
+            # Bound total time, not just inactivity between bytes: otherwise
+            # a slow sender could keep a worker alive indefinitely.
+            deadline = time.monotonic() + 2
+            chunks = []
+            remaining = length
+            while remaining:
+                seconds = deadline - time.monotonic()
+                if seconds <= 0:
+                    raise TimeoutError('body_deadline')
+                self.connection.settimeout(seconds)
+                chunk = self.rfile.read1(remaining)
+                if not chunk:
+                    break
+                chunks.append(chunk)
+                remaining -= len(chunk)
+            raw = b''.join(chunks)
+            if len(raw) != length:
+                raise ValueError('short_body')
+            payload = json.loads(raw.decode('utf-8'), object_pairs_hook=unique_pairs,
+                                 parse_constant=lambda _: (_ for _ in ()).throw(ValueError('invalid_constant')))
+            value = research_analysis(self.server.dataset, payload)
+            return self._respond(200, json.dumps(value, ensure_ascii=False, separators=(',', ':')), 'application/json; charset=utf-8')
+        except TimeoutError:
+            return self._respond(408, '요청 시간이 초과되었습니다.')
+        except (ValueError, UnicodeError, RecursionError):
+            return self._respond(400, '잘못된 요청입니다.')
+        except (OSError, KeyError, TypeError):
+            return self._respond(500, '요청을 처리할 수 없습니다.')
+
+    def _method_not_allowed(self):
+        self.close_connection = True
         return self._respond(405, '허용되지 않는 요청입니다.')
 
-    do_PUT = do_PATCH = do_DELETE = do_OPTIONS = do_POST
+    do_PUT = do_PATCH = do_DELETE = do_OPTIONS = _method_not_allowed
 
 
 def main(argv=None):
